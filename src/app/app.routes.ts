@@ -1,10 +1,33 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './componente/home/home.component';
 import { LoginComponent } from './componente/login/login.component';
+import { CadastrarPetComponent } from './pages/cadastrar-pet/cadastrar-pet.component';
+import { PainelMediadorComponent } from './componente/painel-mediador/painel-mediador.component';
+import { PainelVoluntarioComponent } from './componente/painel-voluntario/painel-voluntario.component';
+import { PainelDoadorComponent } from './componente/painel-doador/painel-doador.component';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'auth', component: LoginComponent },
-  { path: 'painel-mediador', component: HomeComponent },
+  { path: 'cadastrar-pet', component: CadastrarPetComponent, canActivate: [AuthGuard] },
+  {
+    path: 'painel-mediador',
+    component: PainelMediadorComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'painel-voluntario',
+    component: PainelVoluntarioComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'painel-doador',
+    component: PainelDoadorComponent,
+    canActivate: [AuthGuard]
+  },
+  // Routes para futuras páginas - redirecionam para home por enquanto
+  { path: 'doar', redirectTo: '' },
+  { path: 'voluntario', redirectTo: '' },
   { path: '**', redirectTo: '' }
 ];

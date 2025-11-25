@@ -1,0 +1,373 @@
+<!-- ===== CABEÇALHO DA PAGINA ===== -->
+<header class="cadastrar-pet-header">
+  <div class="container">
+    <div class="header-content">
+      <div class="header-text">
+        <h1>🐕 Cadastrar Pet para Adoção</h1>
+        <p>Preencha as informações e encontre um lar amoroso para seu pet</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-cancel" (click)="cancelCadastro()">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== PROGRESS INDICATOR ===== -->
+<section class="progress-section">
+  <div class="container">
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+      </div>
+
+      <div class="progress-steps">
+        <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
+          <div class="step-number">1</div>
+          <div class="step-label">Dados Básicos</div>
+        </div>
+        <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+          <div class="step-number">2</div>
+          <div class="step-label">Saúde & Temperamento</div>
+        </div>
+        <div class="step" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">
+          <div class="step-number">3</div>
+          <div class="step-label">Fotos & Contato</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FORM CONTEUDO ===== -->
+<main class="main-content">
+  <div class="container">
+    <div class="form-card">
+
+      <!-- ===== ETAPA 1: DADOS BÁSICOS ===== -->
+      <div class="form-step" *ngIf="currentStep === 1">
+        <div class="step-header">
+          <h2>🐾 Informações Básicas do Pet</h2>
+          <p>Conte-nos sobre seu amigo de quatro patas</p>
+        </div>
+
+        <form class="step-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nome">Nome do Pet *</label>
+              <input
+                type="text"
+                id="nome"
+                formControlName="nome"
+                placeholder="Ex: Luna, Thor, Mimi..."
+                [class.error]="petForm.get('nome')?.invalid && petForm.get('nome')?.touched"
+              >
+              <div class="field-error" *ngIf="petForm.get('nome')?.invalid && petForm.get('nome')?.touched">
+                <div *ngIf="petForm.get('nome')?.errors?.['required']">Nome é obrigatório</div>
+                <div *ngIf="petForm.get('nome')?.errors?.['minlength']">Nome deve ter pelo menos 2 caracteres</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="especie">Espécie *</label>
+              <select id="especie" formControlName="especie" (change)="getEspecieIcon()">
+                <option *ngFor="let especie of especiesDisponiveis" [value]="especie.value">
+                  {{ especie.icon }} {{ especie.label }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="raca">Raça *</label>
+              <input
+                type="text"
+                id="raca"
+                formControlName="raca"
+                placeholder="Ex: Golden Retriever, SRD, Maltês..."
+                [class.error]="petForm.get('raca')?.invalid && petForm.get('raca')?.touched"
+              >
+              <div class="field-error" *ngIf="petForm.get('raca')?.invalid && petForm.get('raca')?.touched">
+                Raça é obrigatória
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="idade">Idade *</label>
+              <div class="input-group">
+                <input
+                  type="number"
+                  id="idade"
+                  formControlName="idade"
+                  min="0"
+                  max="30"
+                  [class.error]="petForm.get('idade')?.invalid && petForm.get('idade')?.touched"
+                >
+                <select formControlName="unidade_idade">
+                  <option value="meses">meses</option>
+                  <option value="anos">anos</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Porte *</label>
+              <div class="option-grid">
+                <div
+                  *ngFor="let porte of portesDisponiveis"
+                  class="option-card"
+                  [class.selected]="petForm.get('porte')?.value === porte.value"
+                  (click)="petForm.get('porte')?.setValue(porte.value)"
+                >
+                  <div class="option-icon">{{ porte.icon }}</div>
+                  <div class="option-text">{{ porte.label }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Gênero *</label>
+              <div class="option-grid">
+                <div
+                  class="option-card"
+                  [class.selected]="petForm.get('genero')?.value === 'macho'"
+                  (click)="petForm.get('genero')?.setValue('macho')"
+                >
+                  <div class="option-icon">♂️</div>
+                  <div class="option-text">Macho</div>
+                </div>
+                <div
+                  class="option-card"
+                  [class.selected]="petForm.get('genero')?.value === 'femea'"
+                  (click)="petForm.get('genero')?.setValue('femea')"
+                >
+                  <div class="option-icon">♀️</div>
+                  <div class="option-text">Fêmea</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== ETAPA 2: SAÚDE & TEMPERAMENTO ===== -->
+      <div class="form-step" *ngIf="currentStep === 2">
+        <div class="step-header">
+          <h2>❤️ Saúde e Temperamento</h2>
+          <p>Ajude potenciais adotantes a conhecerem melhor seu pet</p>
+        </div>
+
+        <form class="step-form">
+          <div class="form-section">
+            <h3>💊 Informações de Saúde</h3>
+            <div class="checkbox-grid">
+              <label class="checkbox-item">
+                <input type="checkbox" formControlName="vacinado">
+                <span class="checkmark"></span>
+                Vacinado contra doenças comuns
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" formControlName="vermifugado">
+                <span class="checkmark"></span>
+                Vermifugado (últimos 3-6 meses)
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" formControlName="castrado">
+                <span class="checkmark"></span>
+                Castrado/Sterilizado
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label for="necessidades">Necessidades Especiais (opcional)</label>
+              <textarea
+                id="necessidades"
+                formControlName="necessidades_especiais"
+                placeholder="Ex: Medicamentos específicos, cuidados especiais, restrições alimentares..."
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>🎭 Temperamento e Personalidade</h3>
+
+            <div class="form-group">
+              <label>Nível de Energia</label>
+              <div class="option-grid">
+                <div
+                  class="option-card"
+                  [class.selected]="petForm.get('energia')?.value === 'baixo'"
+                  (click)="petForm.get('energia')?.setValue('baixo')"
+                >
+                  <div class="option-icon">😴</div>
+                  <div class="option-text">Baixa</div>
+                </div>
+                <div
+                  class="option-card"
+                  [class.selected]="petForm.get('energia')?.value === 'medio'"
+                  (click)="petForm.get('energia')?.setValue('medio')"
+                >
+                  <div class="option-icon">😐</div>
+                  <div class="option-text">Média</div>
+                </div>
+                <div
+                  class="option-card"
+                  [class.selected]="petForm.get('energia')?.value === 'alto'"
+                  (click)="petForm.get('energia')?.setValue('alto')"
+                >
+                  <div class="option-icon">⚡</div>
+                  <div class="option-text">Alta</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Personalidade (selecione todos que se aplicam)</label>
+              <div class="temperamento-grid">
+                <button
+                  type="button"
+                  *ngFor="let temp of temperamentosDisponiveis"
+                  class="temperamento-btn"
+                  [class.selected]="isTemperamentoSelected(temp)"
+                  (click)="toggleTemperamento(temp)"
+                >
+                  {{ temp }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== ETAPA 3: FOTOS & CONTATO ===== -->
+      <div class="form-step" *ngIf="currentStep === 3">
+        <div class="step-header">
+          <h2>📸 Fotos e Informações de Contato</h2>
+          <p>Complete o cadastro para conectar com futuros tutores</p>
+        </div>
+
+        <form class="step-form">
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="descricao">Descrição do Pet *</label>
+              <textarea
+                id="descricao"
+                formControlName="descricao"
+                placeholder="Descreva seu pet: personalidade, hábitos, amor especial por brinquedos... (mín. 20 caracteres)"
+                rows="4"
+                [class.error]="petForm.get('descricao')?.invalid && petForm.get('descricao')?.touched"
+              ></textarea>
+              <div class="field-error" *ngIf="petForm.get('descricao')?.invalid && petForm.get('descricao')?.touched">
+                <div *ngIf="petForm.get('descricao')?.errors?.['required']">Descrição é obrigatória</div>
+                <div *ngIf="petForm.get('descricao')?.errors?.['minlength']">
+                  Mínimo 20 caracteres restantes: {{ 20 - (petForm.get('descricao')?.value?.length || 0) }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="localizacao">Localização *</label>
+              <input
+                type="text"
+                id="localizacao"
+                formControlName="localizacao"
+                placeholder="Cidade - Estado (Ex: São Paulo - SP)"
+                [class.error]="petForm.get('localizacao')?.invalid && petForm.get('localizacao')?.touched"
+              >
+              <div class="field-error" *ngIf="petForm.get('localizacao')?.invalid && petForm.get('localizacao')?.touched">
+                Localização é obrigatória
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="contato">Telefone/WhatsApp *</label>
+              <input
+                type="text"
+                id="contato"
+                formControlName="contato"
+                placeholder="(11) 99999-9999"
+                [class.error]="petForm.get('contato')?.invalid && petForm.get('contato')?.touched"
+              >
+              <div class="field-error" *ngIf="petForm.get('contato')?.invalid && petForm.get('contato')?.touched">
+                <div *ngIf="petForm.get('contato')?.errors?.['required']">Telefone é obrigatório</div>
+                <div *ngIf="petForm.get('contato')?.errors?.['pattern']">Formato: (11) 99999-9999 ou 11999999999</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="caracteristicas">Características Positivas (opcional)</label>
+              <textarea
+                id="caracteristicas"
+                formControlName="caracteristicas_positivas"
+                placeholder="Ex: Amor por crianças, gosta de caminhadas, adora brincar de buscar..."
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="photo-section">
+            <div class="photo-header">
+              <h3>📷 Fotos do Pet</h3>
+              <p>(opcional - você pode adicionar depois no painel)</p>
+            </div>
+            <div class="photo-upload-placeholder">
+              <div class="upload-icon">📸</div>
+              <p>Clique para adicionar fotos do pet</p>
+              <small>Faça fotos com boa iluminação</small>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== NAVEGAÇÃO DOS STEPS ===== -->
+      <div class="step-navigation">
+        <div class="nav-left">
+          <button
+            type="button"
+            class="btn-outline"
+            (click)="prevStep()"
+            [disabled]="currentStep === 1"
+          >
+            ← Anterior
+          </button>
+        </div>
+
+        <div class="nav-center">
+          <span class="step-counter">Etapa {{ currentStep }} de {{ totalSteps }}</span>
+        </div>
+
+        <div class="nav-right">
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="nextStep()"
+            *ngIf="currentStep < totalSteps"
+            [disabled]="!canProceed()"
+          >
+            Próximo →
+          </button>
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="onSubmit()"
+            *ngIf="currentStep === totalSteps"
+            [disabled]="!petForm.valid"
+          >
+            🎉 Finalizar Cadastro
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>

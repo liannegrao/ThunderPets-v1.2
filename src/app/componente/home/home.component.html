@@ -2,9 +2,12 @@
   <!-- Hero Section with Carousel -->
   <section class="hero">
     <div class="carousel-fade">
-      <div class="slide" [style.background-image]="'url(/img/Design%20sem%20nome.jpg)'"></div>
-      <div class="slide" [style.background-image]="'url(/img/raca-de-cachorro_2.jpg)'"></div>
-      <div class="slide" [style.background-image]="'url(/img/shihtzunsc.jpg)'"></div>
+      <div
+        *ngFor="let slide of carouselSlides; let i = index"
+        class="slide"
+        [ngClass]="{'active': i === currentSlideIndex}"
+        [style.background-image]="'url(' + slide + ')'"
+      ></div>
     </div>
     <div class="container">
       <h1>Transforme Vidas,<br>Encontre Alegria Duradoura.</h1>
@@ -58,9 +61,9 @@
       <h2>💙 Encontre seu Terapeuta Emocional</h2>
       <p>Descreva suas necessidades emocionais e encontraremos o companheiro terapêutico ideal para sua jornada de cura!</p>
 
-      <form class="match-form" id="petMatchingForm">
+      <form class="match-form" [formGroup]="matchingForm" (ngSubmit)="onMatchSubmit()">
         <label for="situacao">Qual sua situação emocional atual?</label>
-        <select id="situacao" name="situacao" required>
+        <select id="situacao" formControlName="situacao" required>
           <option value="">Selecione...</option>
           <option value="depressao">Luto ou Depressão</option>
           <option value="ansiedade">Ansiedade ou Stress</option>
@@ -70,7 +73,7 @@
         </select>
 
         <label for="energia">Que tipo de energia terapêutica você precisa?</label>
-        <select id="energia" name="energia" required>
+        <select id="energia" formControlName="energia" required>
           <option value="">Selecione...</option>
           <option value="calmo-caseiro">Calma e Serenidade</option>
           <option value="moderado">Energia Equilibrada</option>
@@ -79,39 +82,48 @@
 
         <label>Sua disponibilidade para interação:</label>
         <div class="companheiros-options">
-          <label class="checkbox-label">
-            <input type="checkbox" id="poucas-horas" name="disponibilidade" value="poucas-horas">
-            <span class="checkmark">⏰</span>
-            Poucas horas/dia
-          </label>
-          <label class="checkbox-label">
-            <input type="checkbox" id="metade-dia" name="disponibilidade" value="metade-dia">
-            <span class="checkmark">🌙</span>
-            Meia jornada
-          </label>
-          <label class="checkbox-label">
-            <input type="checkbox" id="todo-dia" name="disponibilidade" value="todo-dia">
-            <span class="checkmark">🏠</span>
-            Todo o dia
-          </label>
-          <label class="checkbox-label">
-            <input type="checkbox" id="flexivel" name="disponibilidade" value="flexivel">
-            <span class="checkmark">🔄</span>
-            Horário flexível
+          <label class="checkbox-label" *ngFor="let option of disponibilidadeOptions">
+            <input
+              type="checkbox"
+              [formControlName]="option.value"
+              [value]="option.value"
+            >
+            <span class="checkmark">{{ option.emoji }}</span>
+            {{ option.label }}
           </label>
         </div>
 
-        <button type="submit" class="button-primary" id="matchBtn">
-          💚 Encontrar meu Terapeuta Emocional!
+        <button
+          type="submit"
+          class="button-primary"
+          [disabled]="matchingForm.invalid || isMatching"
+          id="matchBtn"
+        >
+          <span *ngIf="!isMatching">💚 Encontrar meu Terapeuta Emocional!</span>
+          <span *ngIf="isMatching">🔍 Buscando terapeuta...</span>
         </button>
       </form>
 
       <!-- Results Section -->
-      <div id="matching-results" style="display: none; margin-top: 2rem;">
+      <div *ngIf="showResults" id="matching-results" style="margin-top: 2rem;">
         <h3 style="margin-bottom: 1rem; color: #14b8a6;">💝 Terapeutas Emocionais Compatíveis!</h3>
-        <div id="results-container"></div>
-        <div style="text-align: center; margin-top: 1.5rem;">
-          <button id="showMoreResults" style="display: none; background: #f97316; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; cursor: pointer;">
+        <div id="results-container">
+          <div *ngFor="let pet of matchedPets" class="pet-result-card">
+            <img [src]="pet.foto" [alt]="pet.alt" class="pet-result-img">
+            <div class="pet-result-content">
+              <h4>{{ pet.nome }}</h4>
+              <p><strong>{{ pet.beneficio }}</strong></p>
+              <p>{{ pet.descricao }}</p>
+              <button class="button button-secondary" (click)="adoptPet(pet)">❤️ Quero Adotar {{ pet.nome }}</button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="hasMoreResults" style="text-align: center; margin-top: 1.5rem;">
+          <button
+            id="showMoreResults"
+            class="button button-primary"
+            (click)="onShowMoreResults()"
+          >
             Ver Mais Opções Terapêuticas
           </button>
         </div>
@@ -126,31 +138,13 @@
       <p>Cada animal aqui pode se tornar seu parceiro terapêutico permanente. A adoção é um compromisso sério que gera benefícios emocionais duradouros para ambos.</p>
     </div>
     <div class="pet-grid">
-      <div class="pet-card">
-        <img src="/img/cachorro-caramelo-Petlove.jpg" alt="Foto do Biscoito, companheiro terapêutico energético">
+      <div *ngFor="let pet of showcasedPets" class="pet-card">
+        <img [src]="pet.foto" [alt]="pet.alt">
         <div class="pet-card-content">
-          <h3>Biscoito</h3>
-          <p><span style="font-weight: 600;">Benefício Emocional:</span> Energia & Alegria<br><span style="font-weight: 600;">Perfil:</span> Extrovertido Ativo</p>
-          <p>Perfeito para combater inércia depressiva e isolamento. Sua energia contagiante ajuda a estabelecer rotina, exercícios e socialização, fundamentais para recuperação emocional.</p>
-          <button onclick="new AdoptionRequestForm('1', 'Biscoito')" class="button button-secondary">❤️ Quero Adotar Biscoito</button>
-        </div>
-      </div>
-      <div class="pet-card">
-        <img src="/img/pexels-photo-2247894.jpeg" alt="Foto da Lua, companheira terapêutica calma">
-        <div class="pet-card-content">
-          <h3>Lua</h3>
-          <p><span style="font-weight: 600;">Benefício Emocional:</span> Calma & Serenidade<br><span style="font-weight: 600;">Perfil:</span> Pacífica Independente</p>
-          <p>Ideal para ansiedade e insônia. Sua presença constante e ronronar terapêutico ajudam a criar ambiente de paz, essencial para reorganização emocional e relaxamento.</p>
-          <button onclick="new AdoptionRequestForm('2', 'Lua')" class="button button-secondary">❤️ Quero Adotar Lua</button>
-        </div>
-      </div>
-      <div class="pet-card">
-        <img src="/img/raca-de-cachorro-preto.jpg" alt="Foto do Thor, companheiro terapêutico social">
-        <div class="pet-card-content">
-          <h3>Thor</h3>
-          <p><span style="font-weight: 600;">Benefício Emocional:</span> Socialização & Conexão<br><span style="font-weight: 600;">Perfil:</span> Sociável Brincalhão</p>
-          <p>Especialista em combater isolamento social. Sua alegria e brincadeiras ajudam a reconstruir conexões emocionais, trazendo vida e propósito diário para qualquer lar.</p>
-          <button onclick="new AdoptionRequestForm('3', 'Thor')" class="button button-secondary">❤️ Quero Adotar Thor</button>
+          <h3>{{ pet.nome }}</h3>
+          <p><span style="font-weight: 600;">Benefício Emocional:</span> {{ pet.beneficio }}<br><span style="font-weight: 600;">Perfil:</span> {{ pet.perfil }}</p>
+          <p>{{ pet.descricao }}</p>
+          <button class="button button-secondary" (click)="adoptPet(pet)">❤️ Quero Adotar {{ pet.nome }}</button>
         </div>
       </div>
     </div>

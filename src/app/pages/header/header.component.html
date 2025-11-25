@@ -5,16 +5,36 @@
         <img src="/img/THUNDERPETS (4) (1).png" class="logo-img" alt="logo">
         ThunderPets
       </a>
-      <div class="nav-links">
+      <div class="nav-links" *ngIf="(currentUser$ | async); else linksNoAuth">
         <a href="#missao">Nossa Missão</a>
         <a href="#adote">Adote</a>
-        <a href="/painel-mediador" routerLink="/painel-mediador">Painel Mediador</a>
+        <a [routerLink]="['painel-' + (currentUser$ | async)?.role]">Meu Painel</a>
         <a href="#ajude">Ajude</a>
       </div>
-      <div class="nav-buttons">
-        <button class="button button-secondary" [routerLink]="['/auth']">Entrar</button>
-        <button class="button button-primary" [routerLink]="['/auth']">Cadastrar</button>
+      <ng-template #linksNoAuth>
+        <div class="nav-links">
+          <a href="#missao">Nossa Missão</a>
+          <a href="#adote">Adote</a>
+          <a href="#ajude">Ajude</a>
+        </div>
+      </ng-template>
+      <div class="nav-buttons" *ngIf="(currentUser$ | async) as user; else buttonsNoAuth">
+        <span class="user-welcome">Olá, {{ user.nome }} ({{ getRoleLabel(user.role) }})</span>
+        <button class="button button-primary" [routerLink]="['painel-' + user.role]">Painel</button>
+        <button class="button button-secondary" (click)="logout()">Sair</button>
       </div>
+      <ng-template #buttonsNoAuth>
+        <div class="nav-buttons">
+          <button class="button button-secondary" (click)="openAuthModal()">Entrar</button>
+          <button class="button button-primary" (click)="openAuthModal()">Cadastrar</button>
+        </div>
+      </ng-template>
     </nav>
   </div>
+
+  <!-- Auth Modal -->
+  <app-login
+    *ngIf="showAuthModal"
+    (closed)="closeAuthModal()">
+  </app-login>
 </header>

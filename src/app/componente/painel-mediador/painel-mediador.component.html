@@ -1,0 +1,72 @@
+<main class="container" style="padding: 2rem;">
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <h1>🏠 Painel do Mediador</h1>
+    <p>Bem-vindo ao seu painel de controle! Aqui você pode gerenciar adoções, acompanhar conexões terapêuticas e acessar estatísticas importantes.</p>
+  </div>
+
+  <div style="display: grid; gap: 2rem; max-width: 1200px; margin: 0 auto;">
+
+    <!-- Stats Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+      <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+        <h3 style="color: var(--color-primary);">🔗 Conexões Ativas</h3>
+        <p style="font-size: 2rem; font-weight: bold; color: var(--color-secondary);">42</p>
+        <p>Adoções com terapia ativa</p>
+      </div>
+
+      <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+        <h3 style="color: var(--color-primary);">❤️ Sucesso de Ações</h3>
+        <p style="font-size: 2rem; font-weight: bold; color: var(--color-accent);">96%</p>
+        <p>Taxa de recuperação emocional</p>
+      </div>
+
+      <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+        <h3 style="color: var(--color-primary);">😐 Casos Monitorados</h3>
+        <p style="font-size: 2rem; font-weight: bold; color: var(--color-warning);">15</p>
+        <p>Acompanhamento especial</p>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+      <h3 style="color: var(--color-primary); margin-bottom: 1rem;">🚀 Ações Rápidas</h3>
+      <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+        <button class="button button-primary">📋 Novos Matches</button>
+        <button class="button button-secondary">📊 Relatórios</button>
+        <button class="button button-secondary">✨ Agendamentos</button>
+        <button class="button button-secondary">📞 Suporte</button>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+      <h3 style="color: var(--color-primary); margin-bottom: 1rem;">📱 Atividade Recente</h3>
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; padding: 0.5rem; border-left: 4px solid var(--color-accent);">
+          <span>✅</span>
+          <div>
+            <p style="font-weight: 600; margin: 0;">Nova adoção terapêutica</p>
+            <p style="margin: 0; color: var(--color-gray-600); font-size: 0.9rem;">João adotou Luna há 2 horas</p>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 1rem; padding: 0.5rem; border-left: 4px solid var(--color-secondary);">
+          <span>❤️</span>
+          <div>
+            <p style="font-weight: 600; margin: 0;">Avaliação positiva</p>
+            <p style="margin: 0; color: var(--color-gray-600); font-size: 0.9rem;">Maria deu 5 estrelas para Thor</p>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 1rem; padding: 0.5rem; border-left: 4px solid var(--color-warning);">
+          <span>📞</span>
+          <div>
+            <p style="font-weight: 600; margin: 0;">Acompanhamento necessário</p>
+            <p style="margin: 0; color: var(--color-gray-600); font-size: 0.9rem;">Carlos precisa de check-in</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>

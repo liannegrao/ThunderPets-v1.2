@@ -574,6 +574,42 @@ header {
     font-weight: 600;
 }
 
+/* ===== Matching Results Cards ===== */
+.pet-result-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.pet-result-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.pet-result-content {
+    flex: 1;
+}
+
+.pet-result-content h4 {
+    color: #2563eb;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.pet-result-content p {
+    margin: 0.5rem 0;
+    color: #4b5563;
+    line-height: 1.4;
+}
+
 /* ===== Responsivo ===== */
 @media (max-width: 767px) {
     .companheiros-options {
@@ -583,5 +619,14 @@ header {
     .checkbox-label {
         font-size: 0.85rem;
         padding: 0.6rem;
+    }
+    .pet-result-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .pet-result-img {
+        width: 120px;
+        height: 120px;
     }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -33,20 +33,26 @@ interface DisponibilidadeOption {
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
 
   isAdmin = false; // Depends on user auth
 
-  currentSlide = '/img/cachorro-_1750287085273-750x375.webp'; // Default slide
+  carouselSlides: string[] = [
+    '/img/Design%20sem%20nome.jpg',
+    '/img/raca-de-cachorro_2.jpg',
+    '/img/shihtzunsc.jpg',
+    '/img/cachorro-_1750287085273-750x375.webp'
+  ];
+  currentSlideIndex = 0;
+  private carouselInterval: any;
 
   matchingForm!: FormGroup;
 
   disponibilidadeOptions: DisponibilidadeOption[] = [
-    { value: 'manha', label: 'Manhã (6h - 12h)', emoji: '🌅' },
-    { value: 'tarde', label: 'Tarde (12h - 18h)', emoji: '🌇' },
-    { value: 'noite', label: 'Noite (18h - 22h)', emoji: '🌙' },
-    { value: 'semanal', label: 'Finais de Semana', emoji: '🏖️' },
-    { value: 'integral', label: 'Disponível Integralmente', emoji: '🔄' }
+    { value: 'poucas-horas', label: 'Poucas horas/dia', emoji: '⏰' },
+    { value: 'metade-dia', label: 'Meia jornada', emoji: '🌙' },
+    { value: 'todo-dia', label: 'Todo o dia', emoji: '🏠' },
+    { value: 'flexivel', label: 'Horário flexível', emoji: '🔄' }
   ];
 
   isMatching = false;
@@ -78,18 +84,66 @@ export class HomeComponent implements OnInit {
     // Add more testimonials
   ];
 
+  showcasedPets: Pet[] = [
+    {
+      nome: 'Biscoito',
+      foto: '/img/cachorro-caramelo-Petlove.jpg',
+      alt: 'Foto do Biscoito, companheiro terapêutico energético',
+      beneficio: 'Energia & Alegria',
+      perfil: 'Extrovertido Ativo',
+      descricao: 'Perfeito para combater inércia depressiva e isolamento. Sua energia contagiante ajuda a estabelecer rotina, exercícios e socialização, fundamentais para recuperação emocional.',
+      personalidade: 'Energético'
+    },
+    {
+      nome: 'Lua',
+      foto: '/img/pexels-photo-2247894.jpeg',
+      alt: 'Foto da Lua, companheira terapêutica calma',
+      beneficio: 'Calma & Serenidade',
+      perfil: 'Pacífica Independente',
+      descricao: 'Ideal para ansiedade e insônia. Sua presença constante e ronronar terapêutico ajudam a criar ambiente de paz, essencial para reorganização emocional e relaxamento.',
+      personalidade: 'Calma'
+    },
+    {
+      nome: 'Thor',
+      foto: '/img/raca-de-cachorro-preto.jpg',
+      alt: 'Foto do Thor, companheiro terapêutico social',
+      beneficio: 'Socialização & Conexão',
+      perfil: 'Sociável Brincalhão',
+      descricao: 'Especialista em combater isolamento social. Sua alegria e brincadeiras ajudam a reconstruir conexões emocionais, trazendo vida e propósito diário para qualquer lar.',
+      personalidade: 'Sociável'
+    }
+  ];
+
   constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
     this.matchingForm = this.fb.group({
       situacao: [''],
       energia: [''],
-      manha: [false],
-      tarde: [false],
-      noite: [false],
-      semanal: [false],
-      integral: [false]
+      'poucas-horas': [false],
+      'metade-dia': [false],
+      'todo-dia': [false],
+      'flexivel': [false]
     });
+
+    // Start carousel
+    this.startCarousel();
+  }
+
+  ngOnDestroy() {
+    if (this.carouselInterval) {
+      clearInterval(this.carouselInterval);
+    }
+  }
+
+  startCarousel() {
+    this.carouselInterval = setInterval(() => {
+      this.nextSlide();
+    }, 5000); // Change slide every 5 seconds
+  }
+
+  nextSlide() {
+    this.currentSlideIndex = (this.currentSlideIndex + 1) % this.carouselSlides.length;
   }
 
   openLoginModal() {
@@ -123,5 +177,9 @@ export class HomeComponent implements OnInit {
     // Show all matched pets
     this.matchedPets = this.availablePets;
     this.hasMoreResults = false;
+  }
+
+  onShowMoreResults() {
+    this.showMoreResults();
   }
 }

@@ -1,1 +1,120 @@
-<p>login works!</p>
+<!-- Modal Overlay -->
+  <div class="modal-overlay" (click)="closeModal()">
+    <!-- Modal Content -->
+    <div class="modal-content" (click)="$event.stopPropagation()">
+
+      <!-- Modal Close Button -->
+      <button class="modal-close-btn" (click)="closeModal()">&times;</button>
+
+      <!-- Modal Body - Two Column Layout -->
+      <div class="modal-body">
+
+        <!-- Left Column - Image -->
+        <div class="modal-left">
+          <img src="/img/homem-abracando-seu-pitbull-amigavel.jpg" alt="Pet therapy image" class="modal-image">
+        </div>
+
+        <!-- Right Column - Forms -->
+        <div class="modal-right">
+
+          <!-- Tab Navigation -->
+          <div class="auth-tabs">
+            <button
+              class="auth-tab"
+              [class.active]="!isCadastroMode"
+              (click)="toggleMode('login')"
+            >
+              Entrar
+            </button>
+            <button
+              class="auth-tab"
+              [class.active]="isCadastroMode"
+              (click)="toggleMode('cadastro')"
+            >
+              Cadastrar
+            </button>
+          </div>
+
+          <!-- Error/Success Messages -->
+          <div *ngIf="errorMessage" class="auth-message error">
+            {{ errorMessage }}
+          </div>
+          <div *ngIf="successMessage" class="auth-message success">
+            {{ successMessage }}
+          </div>
+
+          <!-- Login Form -->
+          <form *ngIf="!isCadastroMode" [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-form">
+            <h2>Entrar</h2>
+            <p class="auth-subtitle">Bem-vindo de volta!</p>
+
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="E-mail"
+              [class.error]="loginFormErrors.email && (loginForm.get('email')?.touched || isSubmitted)"
+            >
+
+            <input
+              type="password"
+              formControlName="password"
+              placeholder="Senha"
+              [class.error]="loginFormErrors.password && (loginForm.get('password')?.touched || isSubmitted)"
+            >
+
+            <button type="submit" class="auth-submit-btn" [disabled]="isLoading">
+              {{ isLoading ? 'Entrando...' : 'Entrar' }}
+            </button>
+
+            <p class="auth-toggle-text">
+              Não tem conta?
+              <span (click)="toggleMode('cadastro')">Cadastrar-se</span>
+            </p>
+          </form>
+
+          <!-- Cadastro Form -->
+          <form *ngIf="isCadastroMode" [formGroup]="cadastroForm" (ngSubmit)="onCadastro()" class="auth-form">
+            <h2>Criar Conta</h2>
+            <p class="auth-subtitle">Junte-se ao ThunderPets!</p>
+
+            <input
+              type="text"
+              formControlName="nome"
+              placeholder="Nome completo"
+              [class.error]="cadastroFormErrors.nome && (cadastroForm.get('nome')?.touched || isSubmitted)"
+            >
+
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="E-mail"
+              [class.error]="cadastroFormErrors.email && (cadastroForm.get('email')?.touched || isSubmitted)"
+            >
+
+            <input
+              type="password"
+              formControlName="password"
+              placeholder="Senha (mín. 6 caracteres)"
+              [class.error]="cadastroFormErrors.password && (cadastroForm.get('password')?.touched || isSubmitted)"
+            >
+
+            <select formControlName="tipo">
+              <option value="Usuário Comum">Usuário Comum</option>
+              <option value="Administrador">Administrador</option>
+            </select>
+
+            <button type="submit" class="auth-submit-btn" [disabled]="isLoading">
+              {{ isLoading ? 'Cadastrando...' : 'Cadastrar' }}
+            </button>
+
+            <p class="auth-toggle-text">
+              Já tem conta?
+              <span (click)="toggleMode('login')">Entrar</span>
+            </p>
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>

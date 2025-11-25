@@ -1,5 +1,5 @@
-<app-header></app-header>
-<main>
+<app-header *ngIf="!isAuthRoute"></app-header>
+<main class="main-content" [class.fullscreen]="isAuthRoute">
   <router-outlet></router-outlet>
 </main>
-<app-footer></app-footer>
+<app-footer *ngIf="!isAuthRoute"></app-footer>
