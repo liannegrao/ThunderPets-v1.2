@@ -1,1 +1,587 @@
-/* You can add global styles to this file, and also import other style files */
+/* ===== DESIGN SYSTEM PROFISSIONAL ===== */
+@import url('https://fonts.googleapis.com/css2?family=Chewy&display=swap');
+
+/* CSS Custom Properties - Design Tokens */
+:root {
+    /* Colors - Enterprise Grade */
+    --color-primary: #2563eb;
+    --color-secondary: #f97316;
+    --color-accent: #14b8a6;
+    --color-danger: #ef4444;
+    --color-success: #22c55e;
+    --color-warning: #f59e0b;
+    --color-info: #06b6d4;
+
+    /* Neutrals */
+    --color-white: #ffffff;
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f3f4f6;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #9ca3af;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+    --color-gray-900: #111827;
+
+    /* Spacing Scale - 8px system */
+    --space-1: 0.25rem;  /* 4px */
+    --space-2: 0.5rem;   /* 8px */
+    --space-3: 0.75rem;  /* 12px */
+    --space-4: 1rem;     /* 16px */
+    --space-5: 1.25rem;  /* 20px */
+    --space-6: 1.5rem;   /* 24px */
+    --space-8: 2rem;     /* 32px */
+    --space-10: 2.5rem;  /* 40px */
+    --space-12: 3rem;    /* 48px */
+    --space-16: 4rem;    /* 64px */
+    --space-20: 5rem;    /* 80px */
+
+    /* Typography Scale */
+    --text-xs: 0.75rem;   /* 12px */
+    --text-sm: 0.875rem;  /* 14px */
+    --text-base: 1rem;    /* 16px */
+    --text-lg: 1.125rem;  /* 18px */
+    --text-xl: 1.25rem;   /* 20px */
+    --text-2xl: 1.5rem;   /* 24px */
+    --text-3xl: 1.875rem; /* 30px */
+    --text-4xl: 2.25rem;  /* 36px */
+    --text-5xl: 3rem;     /* 48px */
+
+    /* Font Weights */
+    --font-light: 300;
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+
+    /* Border Radius */
+    --radius-sm: 0.125rem; /* 2px */
+    --radius-base: 0.25rem; /* 4px */
+    --radius-md: 0.375rem; /* 6px */
+    --radius-lg: 0.5rem;   /* 8px */
+    --radius-xl: 0.75rem;  /* 12px */
+    --radius-2xl: 1rem;    /* 16px */
+    --radius-3xl: 1.5rem;  /* 24px */
+
+    /* Shadows - Layered System */
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-base: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== RESET E BASE PROFISSIONAL ===== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Modern Focus Styles - Accessibility First */
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-base);
+}
+
+/* Selection Modern */
+::selection {
+    background-color: rgba(37, 99, 235, 0.2);
+    color: var(--color-gray-900);
+}
+
+/* Scrollbar Modern */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--color-gray-100);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--color-gray-300);
+    border-radius: var(--radius-lg);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gray-400);
+}
+
+/* Remove default button styles */
+button {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+/* ===== BODY PROFISSIONAL ===== */
+
+body {
+    font-family: 'Inter', sans-serif;
+    font-size: var(--text-base);
+    line-height: 1.65;
+    font-weight: var(--font-normal);
+    color: var(--color-gray-800);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Background Pattern Professional */
+body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 25% 25%, rgba(37, 99, 235, 0.02) 1px, transparent 1px),
+        radial-gradient(circle at 75% 75%, rgba(249, 115, 22, 0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    z-index: -1;
+}
+
+/* Performance Optimizations */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+}
+
+h1, h2, h3 {
+    font-weight: 700;
+    color: #2563eb;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* ===== Botões ===== */
+.button {
+    display: inline-block;
+    padding: 0.3rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    transition: background 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.button-primary { background: #f97316; }
+.button-primary:hover { background: #ea580c; }
+
+.button-secondary { background: #2563eb; }
+.button-secondary:hover { background: #1d4ed8; }
+
+/* ===== Cabeçalho ===== */
+header {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #2563eb;
+    font-weight: 800;
+    font-size: 1.5rem;
+}
+
+.logo-img {
+    width: 90px;
+    height: auto;
+    display: block;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1rem;
+}
+.nav-links a {
+    color: #4b5563;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Hover azul */
+.nav-links a:hover {
+    color: #2563eb;
+}
+
+/* Navigation Buttons */
+.nav-buttons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* ===== Hero / Carrossel ===== */
+.hero {
+    position: relative;
+    height: 95vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    overflow: hidden;
+}
+.carousel-fade {
+    position: absolute;
+    inset: 0;
+}
+.carousel-fade .slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+}
+.carousel-fade .slide.active {
+    opacity: 1;
+}
+.hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+}
+.hero .container {
+    position: relative;
+    z-index: 2;
+}
+.hero h1, .hero p {
+    color: #fff;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+.hero p {
+    max-width: 600px;
+    margin: 1rem auto 2rem;
+    font-size: larger;
+}
+
+/* ===== Seções ===== */
+.section {
+    padding: 4rem 0;
+    text-align: center;
+    position: relative;
+}
+
+.section p {
+    color: #4b5563;
+    max-width: 700px;
+    margin: 0.5rem auto 2rem;
+}
+
+/* ===== Missão ===== */
+.mission {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+.mission-grid {
+    display: grid;
+    gap: 2rem;
+}
+.mission-item h3 {
+    color: #111827;
+}
+
+/* Match Section */
+.match-section {
+    padding: 4rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.match-box {
+    background: white;
+    padding: 2.5rem 3rem;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    max-width: 550px;
+    width: 100%;
+    transition: transform 0.3s ease;
+}
+
+.match-box:hover { transform: translateY(-4px); }
+
+.match-box h2 {
+    color: #2563eb;
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.match-box p {
+    color: #4b5563;
+    margin-bottom: 2rem;
+}
+
+.match-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: left;
+}
+
+.match-form label {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.95rem;
+}
+
+.match-form select,
+.match-form input {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border 0.2s;
+}
+
+.match-form select:focus,
+.match-form input:focus {
+    border-color: #2563eb;
+}
+
+.match-form .button-primary {
+    background: #f97316;
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 0.9rem;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 0.5rem;
+}
+
+.match-form .button-primary:hover {
+    background: #ea580c;
+}
+
+/* ===== Cards dos Pets ===== */
+.pet-grid {
+    display: grid;
+    gap: 2rem;
+}
+
+.pet-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.pet-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.pet-card-content {
+    padding: 1rem;
+}
+
+.pet-card h3 {
+    color: #2563eb;
+    margin-bottom: 0.5rem;
+}
+
+.pet-card p {
+    margin-bottom: 0.5rem;
+}
+
+/* ===== Depoimentos ===== */
+.testimonials {
+    background: #f0fdfa;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.testimonial-grid {
+    display: grid;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.testimonial-card {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    text-align: left;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+}
+
+.testimonial-card p {
+    color: #4b5563;
+    font-style: italic;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.author-name {
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.author-info {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+/* ===== Responsividade ===== */
+@media (min-width: 768px) {
+    .testimonial-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+    .mission-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .pet-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .testimonials { padding: 2rem 1rem; }
+    .testimonial-card {
+        text-align: center;
+        padding: 1.5rem;
+    }
+    .testimonial-author {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .testimonial-author img { margin: 0; }
+}
+
+/* ===== Rodapé ===== */
+.footer {
+    background: #1f2937;
+    color: white;
+    text-align: center;
+    padding: 2rem 0;
+}
+.footer a {
+    color: #9ca3af;
+    margin: 0 0.5rem;
+    text-decoration: none;
+}
+.footer a:hover { color: white; }
+
+/* ===== Matching Form - Checkboxes ===== */
+.companheiros-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.checkbox-label:hover {
+    background: #e0f2fe;
+    border-color: #0ea5e9;
+    color: #0c4a6e;
+}
+
+.checkbox-label input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    font-size: 1.1rem;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.checkbox-label:has(input:checked) .checkmark {
+    opacity: 1;
+    font-weight: bold;
+}
+
+.checkbox-label:has(input:checked) {
+    background: #dbeafe;
+    border-color: #2563eb;
+    color: #1e40af;
+    font-weight: 600;
+}
+
+/* ===== Responsivo ===== */
+@media (max-width: 767px) {
+    .companheiros-options {
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+    }
+    .checkbox-label {
+        font-size: 0.85rem;
+        padding: 0.6rem;
+    }
+}

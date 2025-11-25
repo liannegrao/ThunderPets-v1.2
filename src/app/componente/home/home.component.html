@@ -1,0 +1,201 @@
+<main>
+  <!-- Hero Section with Carousel -->
+  <section class="hero">
+    <div class="carousel-fade">
+      <div class="slide" [style.background-image]="'url(/img/Design%20sem%20nome.jpg)'"></div>
+      <div class="slide" [style.background-image]="'url(/img/raca-de-cachorro_2.jpg)'"></div>
+      <div class="slide" [style.background-image]="'url(/img/shihtzunsc.jpg)'"></div>
+    </div>
+    <div class="container">
+      <h1>Transforme Vidas,<br>Encontre Alegria Duradoura.</h1>
+      <p>Na ThunderPets, acreditamos que a adoção permanente de um animal é um tratamento natural poderoso contra a depressão. Conectamos pessoas a parceiros terapêuticos que combatem a solidão e restauram a alegria de viver.</p>
+      <a href="#adote" class="button button-primary">Quero Adotar e Transformar Minha Vida!</a>
+    </div>
+  </section>
+
+  <!-- Mission Section -->
+  <section class="section container">
+    <div id="missao" class="mission section-highlight">
+      <div class="section-header">
+        <h2>Nossa Missão</h2>
+        <p>Promover bem-estar emocional através da conexão terapêutica entre humanos e animais.</p>
+      </div>
+      <div class="mission-grid">
+        <div class="mission-item">
+          <div class="icon-wrapper" style="background-color: var(--color-teal-100); color: var(--color-teal-600);">
+            <svg style="width: 2rem; height: 2rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm4 14-4-2v-6l4 4v4z"></path>
+            </svg>
+          </div>
+          <h3>Terapia e Apoio Emocional</h3>
+          <p>Utilizamos animais como co-terapeutas naturais para ajudar pessoas com depressão, ansiedade e solidão através de conexões significativas.</p>
+        </div>
+        <div class="mission-item">
+          <div class="icon-wrapper" style="background-color: var(--color-orange-100); color: var(--color-orange-600);">
+            <svg style="width: 2rem; height: 2rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>
+          </div>
+          <h3>Cuidados Terapêuticos e Bem-estar</h3>
+          <p>Fornecemos ambiente seguro e cuidados especializados para que tanto pessoas quanto animais encontrem paz emocional e recuperação.</p>
+        </div>
+        <div class="mission-item">
+          <div class="icon-wrapper" style="background-color: var(--color-sky-100); color: var(--color-sky-600);">
+            <svg style="width: 2rem; height: 2rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+          </div>
+          <h3>Conexão Emocional Duradoura</h3>
+          <p>Criamos laços terapêuticos significativos que promovem felicidade sustentável e bem-estar mental para ambas as partes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pet Matching Section -->
+  <section class="match-section container">
+    <div class="match-box">
+      <h2>💙 Encontre seu Terapeuta Emocional</h2>
+      <p>Descreva suas necessidades emocionais e encontraremos o companheiro terapêutico ideal para sua jornada de cura!</p>
+
+      <form class="match-form" id="petMatchingForm">
+        <label for="situacao">Qual sua situação emocional atual?</label>
+        <select id="situacao" name="situacao" required>
+          <option value="">Selecione...</option>
+          <option value="depressao">Luto ou Depressão</option>
+          <option value="ansiedade">Ansiedade ou Stress</option>
+          <option value="solidao">Solidão e Isolamento</option>
+          <option value="mudanca">Momentos de Mudança</option>
+          <option value="terapia">Suporte Terapêutico Adicional</option>
+        </select>
+
+        <label for="energia">Que tipo de energia terapêutica você precisa?</label>
+        <select id="energia" name="energia" required>
+          <option value="">Selecione...</option>
+          <option value="calmo-caseiro">Calma e Serenidade</option>
+          <option value="moderado">Energia Equilibrada</option>
+          <option value="ativo-aventurado">Energia Viva e Motivadora</option>
+        </select>
+
+        <label>Sua disponibilidade para interação:</label>
+        <div class="companheiros-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="poucas-horas" name="disponibilidade" value="poucas-horas">
+            <span class="checkmark">⏰</span>
+            Poucas horas/dia
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="metade-dia" name="disponibilidade" value="metade-dia">
+            <span class="checkmark">🌙</span>
+            Meia jornada
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="todo-dia" name="disponibilidade" value="todo-dia">
+            <span class="checkmark">🏠</span>
+            Todo o dia
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="flexivel" name="disponibilidade" value="flexivel">
+            <span class="checkmark">🔄</span>
+            Horário flexível
+          </label>
+        </div>
+
+        <button type="submit" class="button-primary" id="matchBtn">
+          💚 Encontrar meu Terapeuta Emocional!
+        </button>
+      </form>
+
+      <!-- Results Section -->
+      <div id="matching-results" style="display: none; margin-top: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: #14b8a6;">💝 Terapeutas Emocionais Compatíveis!</h3>
+        <div id="results-container"></div>
+        <div style="text-align: center; margin-top: 1.5rem;">
+          <button id="showMoreResults" style="display: none; background: #f97316; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; cursor: pointer;">
+            Ver Mais Opções Terapêuticas
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Adoption Section -->
+  <section id="adote" class="section container">
+    <div class="section-header">
+      <h2>Disponíveis para Adoção</h2>
+      <p>Cada animal aqui pode se tornar seu parceiro terapêutico permanente. A adoção é um compromisso sério que gera benefícios emocionais duradouros para ambos.</p>
+    </div>
+    <div class="pet-grid">
+      <div class="pet-card">
+        <img src="/img/cachorro-caramelo-Petlove.jpg" alt="Foto do Biscoito, companheiro terapêutico energético">
+        <div class="pet-card-content">
+          <h3>Biscoito</h3>
+          <p><span style="font-weight: 600;">Benefício Emocional:</span> Energia & Alegria<br><span style="font-weight: 600;">Perfil:</span> Extrovertido Ativo</p>
+          <p>Perfeito para combater inércia depressiva e isolamento. Sua energia contagiante ajuda a estabelecer rotina, exercícios e socialização, fundamentais para recuperação emocional.</p>
+          <button onclick="new AdoptionRequestForm('1', 'Biscoito')" class="button button-secondary">❤️ Quero Adotar Biscoito</button>
+        </div>
+      </div>
+      <div class="pet-card">
+        <img src="/img/pexels-photo-2247894.jpeg" alt="Foto da Lua, companheira terapêutica calma">
+        <div class="pet-card-content">
+          <h3>Lua</h3>
+          <p><span style="font-weight: 600;">Benefício Emocional:</span> Calma & Serenidade<br><span style="font-weight: 600;">Perfil:</span> Pacífica Independente</p>
+          <p>Ideal para ansiedade e insônia. Sua presença constante e ronronar terapêutico ajudam a criar ambiente de paz, essencial para reorganização emocional e relaxamento.</p>
+          <button onclick="new AdoptionRequestForm('2', 'Lua')" class="button button-secondary">❤️ Quero Adotar Lua</button>
+        </div>
+      </div>
+      <div class="pet-card">
+        <img src="/img/raca-de-cachorro-preto.jpg" alt="Foto do Thor, companheiro terapêutico social">
+        <div class="pet-card-content">
+          <h3>Thor</h3>
+          <p><span style="font-weight: 600;">Benefício Emocional:</span> Socialização & Conexão<br><span style="font-weight: 600;">Perfil:</span> Sociável Brincalhão</p>
+          <p>Especialista em combater isolamento social. Sua alegria e brincadeiras ajudam a reconstruir conexões emocionais, trazendo vida e propósito diário para qualquer lar.</p>
+          <button onclick="new AdoptionRequestForm('3', 'Thor')" class="button button-secondary">❤️ Quero Adotar Thor</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="section container">
+    <div id="depoimentos" class="testimonials section-highlight">
+      <div class="section-header">
+        <h2>Transformações que Mudam Vidas</h2>
+        <p>Veja como nossos companheiros terapêuticos trouxeram luz aos dias mais difíceis.</p>
+      </div>
+      <div class="testimonial-grid">
+        <div class="testimonial-card">
+          <p>"Estava em profunda depressão após perder meu marido. O Luna me deu uma razão para acordar todos os dias. Seu amor incondicional e ronronar suave me ajudaram a reconstruir minha capacidade de amar. Hoje, me sinto pronta para viver novamente!"</p>
+          <div class="testimonial-author">
+            <img src="https://placehold.co/100x100/CBD5E0/333333?text=Ana+Maria" alt="Ana Maria">
+            <div>
+              <p class="author-name">Ana Maria Santos</p>
+              <p class="author-info">Superou Depressão com Luna</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <p>"Ansiedade me consumia diariamente. O Thor, com sua alegria contagiante, me lembrou como sorrir novamente. Ele me acompanhou em consultas de terapia e até no trabalho. Hoje eu consigo controlar melhor minhas emoções!"</p>
+          <div class="testimonial-author">
+            <img src="https://placehold.co/100x100/EDF2F7/333333?text=Rafael" alt="Rafael">
+            <div>
+              <p class="author-name">Rafael Pedrosa</p>
+              <p class="author-info">Venceu Ansiedade com Thor</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Help Section -->
+  <section id="ajude" class="section container help-section">
+    <h2>Como Você Pode Ajudar</h2>
+    <p>Existem várias formas de contribuir com a saúde emocional de pessoas e animais. Escolha a modalidade que melhor se adequa às suas possibilidades.</p>
+    <div class="help-buttons">
+      <a href="/cadastrar-pet" class="button button-primary">🐾 Sou Doador: Cadastrar Pet</a>
+      <a href="/doar" class="button button-primary">Cuide Temporariamente</a>
+      <a href="/voluntario" class="button button-secondary">Seja Voluntário Terapêutico</a>
+    </div>
+  </section>
+</main>
