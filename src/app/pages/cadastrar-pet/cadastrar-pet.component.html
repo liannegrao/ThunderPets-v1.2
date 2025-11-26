@@ -53,7 +53,7 @@
           <p>Conte-nos sobre seu amigo de quatro patas</p>
         </div>
 
-        <form class="step-form">
+        <form [formGroup]="petForm" class="step-form">
           <div class="form-row">
             <div class="form-group">
               <label for="nome">Nome do Pet *</label>
@@ -73,10 +73,14 @@
             <div class="form-group">
               <label for="especie">Espécie *</label>
               <select id="especie" formControlName="especie" (change)="getEspecieIcon()">
+                <option value="" disabled>Selecione uma espécie</option>
                 <option *ngFor="let especie of especiesDisponiveis" [value]="especie.value">
                   {{ especie.icon }} {{ especie.label }}
                 </option>
               </select>
+              <div class="field-error" *ngIf="petForm.get('especie')?.invalid && petForm.get('especie')?.touched">
+                Espécie é obrigatória
+              </div>
             </div>
           </div>
 
@@ -111,6 +115,9 @@
                   <option value="anos">anos</option>
                 </select>
               </div>
+              <div class="field-error" *ngIf="petForm.get('idade')?.invalid && petForm.get('idade')?.touched">
+                Idade é obrigatória
+              </div>
             </div>
           </div>
 
@@ -127,6 +134,9 @@
                   <div class="option-icon">{{ porte.icon }}</div>
                   <div class="option-text">{{ porte.label }}</div>
                 </div>
+              </div>
+              <div class="field-error" *ngIf="petForm.get('porte')?.invalid && petForm.get('porte')?.touched">
+                Porte é obrigatório
               </div>
             </div>
 
@@ -150,6 +160,9 @@
                   <div class="option-text">Fêmea</div>
                 </div>
               </div>
+              <div class="field-error" *ngIf="petForm.get('genero')?.invalid && petForm.get('genero')?.touched">
+                Gênero é obrigatório
+              </div>
             </div>
           </div>
         </form>
@@ -162,7 +175,7 @@
           <p>Ajude potenciais adotantes a conhecerem melhor seu pet</p>
         </div>
 
-        <form class="step-form">
+        <form [formGroup]="petForm" class="step-form">
           <div class="form-section">
             <h3>💊 Informações de Saúde</h3>
             <div class="checkbox-grid">
@@ -198,7 +211,7 @@
             <h3>🎭 Temperamento e Personalidade</h3>
 
             <div class="form-group">
-              <label>Nível de Energia</label>
+              <label>Nível de Energia *</label>
               <div class="option-grid">
                 <div
                   class="option-card"
@@ -224,6 +237,9 @@
                   <div class="option-icon">⚡</div>
                   <div class="option-text">Alta</div>
                 </div>
+              </div>
+              <div class="field-error" *ngIf="petForm.get('energia')?.invalid && petForm.get('energia')?.touched">
+                Nível de energia é obrigatório
               </div>
             </div>
 
@@ -252,7 +268,7 @@
           <p>Complete o cadastro para conectar com futuros tutores</p>
         </div>
 
-        <form class="step-form">
+        <form [formGroup]="petForm" class="step-form">
           <div class="form-row">
             <div class="form-group full-width">
               <label for="descricao">Descrição do Pet *</label>

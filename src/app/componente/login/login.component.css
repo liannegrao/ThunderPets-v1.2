@@ -51,7 +51,7 @@
   font-weight: bold;
   cursor: pointer;
   padding: 0.5rem;
-  border-radius: 50%;
+  border-radius: 53%;
   color: #6b7280;
   transition: background 0.2s;
   z-index: 2;
@@ -91,7 +91,7 @@
 /* Right Column - Forms */
 .modal-right {
   flex: 1;
-  padding: 2rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
 }

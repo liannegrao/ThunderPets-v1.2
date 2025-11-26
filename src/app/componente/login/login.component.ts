@@ -42,7 +42,7 @@ export class LoginComponent implements OnInit {
   private createLoginForm(): FormGroup {
     return this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required]]
     });
   }
 
@@ -78,7 +78,7 @@ export class LoginComponent implements OnInit {
     this.successMessage = '';
   }
 
-  // Login method - migrated from original JS
+  // Login using AuthService properly
   async onLogin() {
     this.isSubmitted = true;
     this.hideMessages();
@@ -90,32 +90,16 @@ export class LoginComponent implements OnInit {
     try {
       const { email, password } = this.loginForm.value;
 
-      // Get stored user from localStorage (original logic)
-      const usuarioCadastradoJSON = localStorage.getItem('usuarioCadastrado');
+      const result = await this.authService.login({ email, password });
 
-      // Check if user exists
-      if (!usuarioCadastradoJSON) {
-        this.showMessage('Nenhum usuário cadastrado ainda!', 'error');
-        return;
-      }
-
-      // Parse stored user
-      const usuarioCadastrado = JSON.parse(usuarioCadastradoJSON);
-
-      // Check email and password
-      if (email === usuarioCadastrado.email && password === usuarioCadastrado.senha) {
-        // Store logged user (original logic)
-        localStorage.setItem('usuarioLogado', usuarioCadastrado.nome);
-        localStorage.setItem('tipoUsuario', usuarioCadastrado.tipo);
-
+      if (result.success) {
         this.showMessage('🔒 Login realizado com sucesso!', 'success');
-
-        // Redirect after 2 seconds (like original)
         setTimeout(() => {
+          this.closeModal();
           this.router.navigate(['/']);
-        }, 2000);
+        }, 1500);
       } else {
-        this.showMessage('🔒 Email ou senha incorretos!', 'error');
+        this.showMessage(result.error || 'Erro no login', 'error');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -125,7 +109,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  // Cadastro method - migrated from original JS
+  // Cadastro using AuthService properly
   async onCadastro() {
     this.isSubmitted = true;
     this.hideMessages();
@@ -137,19 +121,25 @@ export class LoginComponent implements OnInit {
     try {
       const { nome, email, password, tipo } = this.cadastroForm.value;
 
-      // Create user object (like original)
-      const usuario = { nome, email, senha: password, tipo };
+      // Convert tipo to role format expected by AuthService
+      const role = tipo === 'Administrador' ? 'mediador' : 'doador';
 
-      // Store in localStorage (original logic)
-      localStorage.setItem('usuarioCadastrado', JSON.stringify(usuario));
-      localStorage.setItem('usuarioLogado', nome);
+      const result = await this.authService.register({
+        nome,
+        email,
+        password,
+        role: role as any
+      });
 
-      this.showMessage('✅ Conta criada com sucesso!', 'success');
-
-      // Redirect after 2 seconds (like original)
-      setTimeout(() => {
-        this.router.navigate(['/']);
-      }, 2000);
+      if (result.success) {
+        this.showMessage('✅ Conta criada com sucesso!', 'success');
+        setTimeout(() => {
+          this.closeModal();
+          this.router.navigate(['/']);
+        }, 1500);
+      } else {
+        this.showMessage(result.error || 'Erro no cadastro', 'error');
+      }
     } catch (error) {
       console.error('Cadastro error:', error);
       this.showMessage('Erro inesperado', 'error');

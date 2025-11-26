@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './componente/home/home.component';
 import { LoginComponent } from './componente/login/login.component';
 import { CadastrarPetComponent } from './pages/cadastrar-pet/cadastrar-pet.component';
+import { DoarComponent } from './pages/doar/doar.component';
 import { PainelMediadorComponent } from './componente/painel-mediador/painel-mediador.component';
 import { PainelVoluntarioComponent } from './componente/painel-voluntario/painel-voluntario.component';
 import { PainelDoadorComponent } from './componente/painel-doador/painel-doador.component';
@@ -26,8 +27,8 @@ export const routes: Routes = [
     component: PainelDoadorComponent,
     canActivate: [AuthGuard]
   },
+  { path: 'doar', component: DoarComponent },
   // Routes para futuras páginas - redirecionam para home por enquanto
-  { path: 'doar', redirectTo: '' },
   { path: 'voluntario', redirectTo: '' },
   { path: '**', redirectTo: '' }
 ];

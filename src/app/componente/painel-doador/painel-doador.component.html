@@ -1,1 +1,151 @@
-<p>painel-doador works!</p>
+<!-- ===== PAINEL DOADOR CABEÇALHO ===== -->
+<div class="painel-doadores container">
+  <header class="painel-header">
+    <h1>🐾 Meu Painel Doador</h1>
+    <p>Gerencie seus pets cadastrados e acompanhe adoções</p>
+  </header>
+
+  <!-- ===== ESTATÍSTICAS RÁPIDAS ===== -->
+  <section class="stats-section" *ngIf="meusPets.length > 0">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ getEstatisticas().totalPets }}</div>
+          <div class="stat-label">Pets Cadastrados</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💚</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ getEstatisticas().petsDisponiveis }}</div>
+          <div class="stat-label">Disponíveis</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">❤️</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ getEstatisticas().petsAdotados }}</div>
+          <div class="stat-label">Adotados</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <div class="stat-number">{{ getEstatisticas().totalInteressados }}</div>
+          <div class="stat-label">Interessados</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SEÇÃO PRINCIPAL ===== -->
+  <main class="painel-main">
+
+    <!-- AÇÕES RÁPIDAS -->
+    <section class="actions-section">
+      <button class="btn-primary" (click)="adicionarNovoPet()">
+        🐶 Adicionar Novo Pet
+      </button>
+    </section>
+
+    <!-- LISTA DE PETS -->
+    <section class="pets-section">
+      <div class="section-header">
+        <h2>Meus Pets Cadastrados</h2>
+      </div>
+
+      <!-- Estado vazio -->
+      <div class="empty-state" *ngIf="meusPets.length === 0">
+        <div class="empty-icon">🐕‍🦺</div>
+        <h3>Ainda não há pets cadastrados</h3>
+        <p>Cadastre seu primeiro companheiro terapêutico!</p>
+        <button class="btn-primary" (click)="adicionarNovoPet()">
+          📝 Cadastrar Primeiro Pet
+        </button>
+      </div>
+
+      <!-- Lista de pets -->
+      <div class="pets-grid" *ngIf="meusPets.length > 0">
+        <div class="pet-card" *ngFor="let pet of meusPets">
+          <div class="pet-header">
+            <img [src]="pet.foto" [alt]="pet.nome" class="pet-image">
+            <div class="pet-status-badge" [ngClass]="getStatusBadge(pet.status).class">
+              {{ getStatusBadge(pet.status).text }}
+            </div>
+          </div>
+
+          <div class="pet-content">
+            <h3>{{ pet.nome }}</h3>
+            <div class="pet-details">
+              <span>{{ pet.especie }} • {{ pet.raca }}</span>
+              <span>{{ pet.porte }} • {{ pet.energia }}</span>
+              <span>Cadastrado: {{ formatarData(pet.dataCadastro) }}</span>
+            </div>
+            <p class="pet-description">{{ pet.descricao | slice:0:100 }}...</p>
+          </div>
+
+          <div class="pet-actions" *ngIf="pet.status === 'disponivel'">
+            <button class="btn-secondary" (click)="verInteressados(pet)" *ngIf="pet.interessantes && pet.interessantes > 0">
+              👥 Ver Interessados
+            </button>
+            <button class="btn-outline" (click)="editarPet(pet)">
+              ✏️ Editar
+            </button>
+            <button class="btn-success" (click)="marcarComoAdotado(pet)">
+              ✅ Marcar Adotado
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===== MODAL DE INTERESSADOS ===== -->
+<div class="modal-overlay" *ngIf="showInteressados && selectedPet" (click)="fecharModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>👥 Interessados em {{ selectedPet.nome }}</h2>
+      <button class="modal-close" (click)="fecharModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="interessados-list" *ngIf="interessados.length > 0">
+        <div class="interessado-card" *ngFor="let interessado of interessados">
+          <div class="interessado-header">
+            <div class="interessado-avatar">
+              {{ interessado.nome.charAt(0).toUpperCase() }}
+            </div>
+            <div class="interessado-info">
+              <h4>{{ interessado.nome }}</h4>
+              <span class="interesse-date">
+                Interesse em: {{ formatarData(interessado.dataInteresse) }}
+              </span>
+            </div>
+          </div>
+          <div class="interessado-contato">
+            <p><strong>Email:</strong> <a [href]="'mailto:' + interessado.email">{{ interessado.email }}</a></p>
+            <p><strong>Telefone:</strong> <a [href]="'https://wa.me/' + formatarTelefone(interessado.telefone)">{{ interessado.telefone }}</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-interessados" *ngIf="interessados.length === 0">
+        <div class="empty-icon">😴</div>
+        <h3>Nenhum interessado ainda</h3>
+        <p>Quando pessoas demonstrarem interesse, aparecerão aqui.</p>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-primary" (click)="fecharModal()">
+        Entendi
+      </button>
+    </div>
+  </div>
+</div>

@@ -108,14 +108,27 @@
       <div *ngIf="showResults" id="matching-results" style="margin-top: 2rem;">
         <h3 style="margin-bottom: 1rem; color: #14b8a6;">💝 Terapeutas Emocionais Compatíveis!</h3>
         <div id="results-container">
-          <div *ngFor="let pet of matchedPets" class="pet-result-card">
-            <img [src]="pet.foto" [alt]="pet.alt" class="pet-result-img">
-            <div class="pet-result-content">
-              <h4>{{ pet.nome }}</h4>
-              <p><strong>{{ pet.beneficio }}</strong></p>
-              <p>{{ pet.descricao }}</p>
-              <button class="button button-secondary" (click)="adoptPet(pet)">❤️ Quero Adotar {{ pet.nome }}</button>
+          <div *ngFor="let pet of matchedPets" class="pet-result-card" style="border: 2px solid #e5e7eb; padding: 1rem; border-radius: 12px; background: white; margin-bottom: 1rem; display: flex; gap: 1rem;">
+            <img [src]="pet.foto" [alt]="'Foto de ' + pet.nome" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
+            <div class="pet-result-content" style="flex: 1;">
+              <h4 style="margin: 0 0 0.5rem 0; color: #1f2937;">{{ pet.nome }}</h4>
+              <p style="margin: 0 0 0.25rem 0; font-weight: 600; color: #059669;">{{ pet.beneficioEmocional || 'Companheiro Terapêutico' }}</p>
+              <p style="margin: 0 0 0.25rem 0; font-size: 0.9rem; color: #6b7280;">{{ pet.raca }} • {{ pet.idade }} meses • {{ pet.porte }}</p>
+              <p style="margin: 0 0 1rem 0; font-size: 0.9rem; color: #374151; line-height: 1.4;">
+                {{ pet.personalidade }}
+              </p>
+              <button class="button button-secondary" (click)="openPetDetails(pet)" style="background: #14b8a6; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer;">
+                ❤️ Conhecer {{ pet.nome }}
+              </button>
             </div>
+          </div>
+          <div *ngIf="matchedPets.length === 0" style="text-align: center; padding: 3rem; background: #fef3c7; border-radius: 12px; border: 2px solid #f59e0b; margin-top: 2rem;">
+            <p style="color: #92400e; font-weight: bold; font-size: 1.1rem; margin-bottom: 0.5rem;">
+              😔 Nenhum pet compatível encontrado
+            </p>
+            <p style="color: #78350f; margin: 0;">
+              Tente ajustar suas preferências ou entre em contato conosco para ajuda personalizada.
+            </p>
           </div>
         </div>
         <div *ngIf="hasMoreResults" style="text-align: center; margin-top: 1.5rem;">
@@ -123,6 +136,7 @@
             id="showMoreResults"
             class="button button-primary"
             (click)="onShowMoreResults()"
+            style="background: #f97316; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;"
           >
             Ver Mais Opções Terapêuticas
           </button>
@@ -139,11 +153,11 @@
     </div>
     <div class="pet-grid">
       <div *ngFor="let pet of showcasedPets" class="pet-card">
-        <img [src]="pet.foto" [alt]="pet.alt">
+        <img [src]="pet.foto" [alt]="'Foto de ' + pet.nome">
         <div class="pet-card-content">
           <h3>{{ pet.nome }}</h3>
-          <p><span style="font-weight: 600;">Benefício Emocional:</span> {{ pet.beneficio }}<br><span style="font-weight: 600;">Perfil:</span> {{ pet.perfil }}</p>
-          <p>{{ pet.descricao }}</p>
+          <p><span style="font-weight: 600;">Benefício Emocional:</span> {{ pet.beneficioEmocional || 'Companheiro Terapêutico' }}<br><span style="font-weight: 600;">Perfil:</span> {{ pet.porte }} • {{ pet.idade }} meses</p>
+          <p>{{ pet.personalidade }}</p>
           <button class="button button-secondary" (click)="adoptPet(pet)">❤️ Quero Adotar {{ pet.nome }}</button>
         </div>
       </div>
@@ -188,8 +202,98 @@
     <p>Existem várias formas de contribuir com a saúde emocional de pessoas e animais. Escolha a modalidade que melhor se adequa às suas possibilidades.</p>
     <div class="help-buttons">
       <a href="/cadastrar-pet" class="button button-primary">🐾 Sou Doador: Cadastrar Pet</a>
-      <a href="/doar" class="button button-primary">Cuide Temporariamente</a>
-      <a href="/voluntario" class="button button-secondary">Seja Voluntário Terapêutico</a>
+      <router-link [routerLink]="['/doar']" class="button button-primary">🤝 Cuide Temporariamente</router-link>
+      <router-link [routerLink]="['/voluntario']" class="button button-secondary">⭐ Seja Voluntário Terapêutico</router-link>
     </div>
   </section>
 </main>
+
+<!-- Pet Details Modal -->
+<div *ngIf="showPetModal && selectedPet" class="pet-modal-overlay" (click)="onBackdropClick($event)">
+  <div class="pet-modal-content">
+    <div class="pet-modal-header">
+      <h2>🐾 {{ selectedPet.nome }}</h2>
+      <button class="modal-close-btn" (click)="closePetModal()" aria-label="Fechar">✕</button>
+    </div>
+
+    <div class="pet-modal-body">
+      <div class="pet-modal-main">
+        <div class="pet-modal-image">
+          <img [src]="selectedPet.foto" [alt]="'Foto de ' + selectedPet.nome" class="pet-large-image">
+        </div>
+
+        <div class="pet-modal-info">
+          <div class="pet-info-grid">
+            <div class="info-card">
+              <h3>🐕 Dados Básicos</h3>
+              <p><strong>Raça:</strong> {{ selectedPet.raca }}</p>
+              <p><strong>Idade:</strong> {{ getFormattedAge(selectedPet.idade) }}</p>
+              <p><strong>Porte:</strong> {{ capitalize(selectedPet.porte) }}</p>
+              <p><strong>Perfil:</strong> {{ capitalize(selectedPet.energia) }}</p>
+            </div>
+
+            <div class="info-card">
+              <h3>💚 Benefícios Terapêuticos</h3>
+              <p>{{ selectedPet.beneficioEmocional || 'Companheiro terapêutico de confiança e amor incondicional' }}</p>
+              <div class="compat-score">
+                <h4>Compatibilidade Emocional</h4>
+                <div class="score-item">
+                  <span>Depressão:</span>
+                  <div class="score-bar">
+                    <div class="score-fill" [style.width.%]="selectedPet.compatibilidadeScore.depressao"></div>
+                  </div>
+                  <span>{{ selectedPet.compatibilidadeScore.depressao }}%</span>
+                </div>
+                <div class="score-item">
+                  <span>Ansiedade:</span>
+                  <div class="score-bar">
+                    <div class="score-fill" [style.width.%]="selectedPet.compatibilidadeScore.ansiedade"></div>
+                  </div>
+                  <span>{{ selectedPet.compatibilidadeScore.ansiedade }}%</span>
+                </div>
+                <div class="score-item">
+                  <span>Solidão:</span>
+                  <div class="score-bar">
+                    <div class="score-fill" [style.width.%]="selectedPet.compatibilidadeScore.solidao"></div>
+                  </div>
+                  <span>{{ selectedPet.compatibilidadeScore.solidao }}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <h3>❤️ Personalidade</h3>
+              <p>{{ selectedPet.personalidade }}</p>
+            </div>
+
+            <div class="info-card">
+              <h3>🏥 Saúde</h3>
+              <p>{{ selectedPet.saude }}</p>
+              <h4>Cuidados Específicos</h4>
+              <p>{{ selectedPet.cuidados }}</p>
+            </div>
+
+            <div class="info-card full-width">
+              <h3>🏠 Lar Ideal</h3>
+              <p>{{ selectedPet.casaIdeal }}</p>
+            </div>
+
+            <div class="info-card full-width">
+              <h3>📖 História</h3>
+              <p>{{ selectedPet.historia }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pet-modal-actions">
+        <button class="button-primary" (click)="adoptPet(selectedPet)">
+          ❤️ Quero Adotar {{ selectedPet.nome }}
+        </button>
+        <button class="button-secondary" (click)="closePetModal()">
+          ❌ Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

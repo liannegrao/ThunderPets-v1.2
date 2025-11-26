@@ -1,0 +1,389 @@
+<!-- ===== CABEÇALHO DA PAGINA DOAR ===== -->
+<header class="doar-page-header">
+  <div class="container">
+    <div class="header-content">
+      <h1 class="page-title">Doação de Animal Terapêutico</h1>
+      <button class="btn-home" (click)="voltarAoInicio()">
+        🏠 Voltar ao Início
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== PROGRESS INDICATOR ===== -->
+<section class="progress-section">
+  <div class="container">
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 100%"></div>
+      </div>
+      <div class="progress-steps">
+        <div class="step active completed">
+          <div class="step-number">1</div>
+          <div class="step-label">Solicitar Doação Terapêutica</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FORM CONTEUDO ===== -->
+<main class="main-content">
+  <div class="container">
+    <div class="form-card">
+
+      <!-- ===== SEÇÃO PRINCIPAL ===== -->
+      <div class="form-step">
+        <form [formGroup]="doarForm" class="step-form" *ngIf="doarForm">
+
+          <!-- ===== MOTIVAÇÃO EMOCIONAL ===== -->
+          <div class="form-section">
+            <h3>💝 Motivações Emocionais</h3>
+            <p>Conte-nos quais necessidades emocionais gostaria de suprir com o pet (selecione todas que se aplicam)</p>
+
+            <div class="motivacao-grid">
+              <div class="motivacao-item"
+                   [class.selected]="isMotivacaoSelected('depressao')"
+                   (click)="toggleMotivacao('depressao')">
+                <div class="motivacao-icon">💙</div>
+                <div class="motivacao-label">Depressão</div>
+              </div>
+
+              <div class="motivacao-item"
+                   [class.selected]="isMotivacaoSelected('ansiedade')"
+                   (click)="toggleMotivacao('ansiedade')">
+                <div class="motivacao-icon">🧠</div>
+                <div class="motivacao-label">Ansiedade</div>
+              </div>
+
+              <div class="motivacao-item"
+                   [class.selected]="isMotivacaoSelected('solidao')"
+                   (click)="toggleMotivacao('solidao')">
+                <div class="motivacao-icon">🌙</div>
+                <div class="motivacao-label">Solidão</div>
+              </div>
+
+              <div class="motivacao-item"
+                   [class.selected]="isMotivacaoSelected('mudanca')"
+                   (click)="toggleMotivacao('mudanca')">
+                <div class="motivacao-icon">🔄</div>
+                <div class="motivacao-label">Mudanças de Vida</div>
+              </div>
+
+              <div class="motivacao-item"
+                   [class.selected]="isMotivacaoSelected('terapia')"
+                   (click)="toggleMotivacao('terapia')">
+                <div class="motivacao-icon">💭</div>
+                <div class="motivacao-label">Suporte Terapêutico</div>
+              </div>
+            </div>
+
+            <div formGroupName="motivacao" class="form-row">
+              <div class="form-group full-width">
+                <label for="documentoSuporte">Documento de suporte emocional (opcional)</label>
+                <textarea
+                  id="documentoSuporte"
+                  formControlName="documentoSuporte"
+                  placeholder="Caso tenha acompanhamento psicológico, referência médica ou outros documentos que comprovem suas necessidades emocionais, descreva brevemente."
+                  rows="3"
+                ></textarea>
+                <small class="field-hint">Essa informação é confidencial e será usada apenas para validação pela equipe do ThunderPets.</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== PREFERÊNCIAS DO PET TERAPÊUTICO ===== -->
+          <div class="form-section">
+            <h3>🐾 Preferências do Pet Terapêutico</h3>
+            <p>Que tipo de pet gostaria de receber para ajudar sua recuperação emocional?</p>
+
+            <div formGroupName="petPreferencias">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Espécie preferida *</label>
+                  <div class="option-grid">
+                    <div
+                      *ngFor="let especie of especiesDisponiveis"
+                      class="option-card option-card-large"
+                      [class.selected]="isEspecieSelecionada(especie.value)"
+                      (click)="togglePetEspecie(especie.value)"
+                    >
+                      <div class="option-icon">{{ especie.icon }}</div>
+                      <div class="option-text">{{ especie.label }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Porte preferido</label>
+                  <div class="option-grid">
+                    <div
+                      *ngFor="let porte of portesDisponiveis"
+                      class="option-card"
+                      [class.selected]="doarForm.get('petPreferencias.porte')?.value === porte.value"
+                      (click)="doarForm.get('petPreferencias.porte')?.setValue(porte.value)"
+                    >
+                      <div class="option-icon">{{ porte.icon }}</div>
+                      <div class="option-text">{{ porte.value === 'qualquer' ? 'Qualquer porte' : porte.label }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Nível de energia</label>
+                  <div class="option-grid">
+                    <div
+                      *ngFor="let energia of energiaDisponivel"
+                      class="option-card"
+                      [class.selected]="doarForm.get('petPreferencias.energia')?.value === energia.value"
+                      (click)="doarForm.get('petPreferencias.energia')?.setValue(energia.value)"
+                    >
+                      <div class="option-icon">{{ energia.icon }}</div>
+                      <div class="option-text">{{ energia.label }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="checkbox-row">
+                  <label class="checkbox-item">
+                    <input type="checkbox" formControlName="idoso">
+                    <span class="checkmark"></span>
+                    <span>Estou aberto a adotar pets idosos (melhor compatibilidade emocional)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== INFORMAÇÕES PESSOAIS ===== -->
+          <div class="form-section">
+            <h3>👤 Informações Pessoais</h3>
+            <p>Dados necessários para o processo de doação terapêutica</p>
+
+            <div class="info-section">
+              <h4>ℹ️ Por que precisamos dessas informações?</h4>
+              <p>As adoções terapêuticas do ThunderPets são realizadas após avaliação cuidadosa. As informações ajudam nossa equipe a entender melhor o perfil do futuro tutor e garantir que o pet vá para um lar apropriado e terapêutico.</p>
+            </div>
+
+            <div formGroupName="informacoesPessoais">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="nome">Nome completo *</label>
+                  <input
+                    type="text"
+                    id="nome"
+                    formControlName="nome"
+                    placeholder="Seu nome completo"
+                    [class.error]="doarForm.get('informacoesPessoais.nome')?.invalid && doarForm.get('informacoesPessoais.nome')?.touched"
+                  >
+                  <div class="field-error" *ngIf="doarForm.get('informacoesPessoais.nome')?.invalid && doarForm.get('informacoesPessoais.nome')?.touched">
+                    Nome é obrigatório
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="idade">Idade *</label>
+                  <input
+                    type="number"
+                    id="idade"
+                    formControlName="idade"
+                    placeholder="Sua idade"
+                    min="18"
+                    max="120"
+                    [class.error]="doarForm.get('informacoesPessoais.idade')?.invalid && doarForm.get('informacoesPessoais.idade')?.touched"
+                  >
+                  <div class="field-error" *ngIf="doarForm.get('informacoesPessoais.idade')?.invalid && doarForm.get('informacoesPessoais.idade')?.touched">
+                    Idade é obrigatória e deve ser maior que 18
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="localizacao">Localização *</label>
+                  <input
+                    type="text"
+                    id="localizacao"
+                    formControlName="localizacao"
+                    placeholder="Cidade - Estado (Ex: São Paulo - SP)"
+                    [class.error]="doarForm.get('informacoesPessoais.localizacao')?.invalid && doarForm.get('informacoesPessoais.localizacao')?.touched"
+                  >
+                  <div class="field-error" *ngIf="doarForm.get('informacoesPessoais.localizacao')?.invalid && doarForm.get('informacoesPessoais.localizacao')?.touched">
+                    Localização é obrigatória
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group full-width">
+                  <label for="situacaoAtual">Situação atual *</label>
+                  <textarea
+                    id="situacaoAtual"
+                    formControlName="situacaoAtual"
+                    placeholder="Conte-nos brevemente sobre sua situação atual e como um pet terapêutico pode ajudar. Ex: Passando por tratamento de depressão, isolamento social devido a trabalho remoto, apoio emocional durante mudança de cidade, etc."
+                    rows="3"
+                    [class.error]="doarForm.get('informacoesPessoais.situacaoAtual')?.invalid && doarForm.get('informacoesPessoais.situacaoAtual')?.touched"
+                  ></textarea>
+                  <div class="field-error" *ngIf="doarForm.get('informacoesPessoais.situacaoAtual')?.invalid && doarForm.get('informacoesPessoais.situacaoAtual')?.touched">
+                    Descrição da situação atual é obrigatória
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group full-width">
+                  <label for="experienciaRelacionamento">Experiência anterior com animais</label>
+                  <textarea
+                    id="experienciaRelacionamento"
+                    formControlName="experienciaRelacionamento"
+                    placeholder="Conte sobre suas experiências anteriores com animais (não obrigatória, mas ajuda muito nossa avaliação)"
+                    rows="2"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== CONTATO ===== -->
+          <div class="form-section">
+            <h3>📞 Informações de Contato</h3>
+
+            <div formGroupName="contato">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="email">E-mail *</label>
+                  <input
+                    type="email"
+                    id="email"
+                    formControlName="email"
+                    placeholder="seu@email.com"
+                    [class.error]="doarForm.get('contato.email')?.invalid && doarForm.get('contato.email')?.touched"
+                  >
+                  <div class="field-error" *ngIf="doarForm.get('contato.email')?.invalid && doarForm.get('contato.email')?.touched">
+                    <div *ngIf="doarForm.get('contato.email')?.errors?.['required']">E-mail é obrigatório</div>
+                    <div *ngIf="doarForm.get('contato.email')?.errors?.['email']">Formato de e-mail inválido</div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="telefone">Telefone/WhatsApp *</label>
+                  <input
+                    type="text"
+                    id="telefone"
+                    formControlName="telefone"
+                    placeholder="(11) 99999-9999"
+                    [class.error]="doarForm.get('contato.telefone')?.invalid && doarForm.get('contato.telefone')?.touched"
+                  >
+                  <div class="field-error" *ngIf="doarForm.get('contato.telefone')?.invalid && doarForm.get('contato.telefone')?.touched">
+                    <div *ngIf="doarForm.get('contato.telefone')?.errors?.['required']">Telefone é obrigatório</div>
+                    <div *ngIf="doarForm.get('contato.telefone')?.errors?.['pattern']">Formato: (11) 99999-9999 ou 11999999999</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group full-width">
+                  <label for="emergencia">Telefone de emergência (opcional)</label>
+                  <input
+                    type="text"
+                    id="emergencia"
+                    formControlName="emergencia"
+                    placeholder="Contato para situações de emergência"
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== COMPROMISSOS E ACORDO ===== -->
+          <div class="form-section">
+            <h3>🤝 Compromissos do Tutor Terapêutico</h3>
+            <p>Para adoções terapêuticas, precisamos confirmar seu compromisso, pois este é um vínculo que impactará vidas (sua e do pet)</p>
+
+            <div formGroupName="compromisso" class="compromissos-grid">
+              <label class="checkbox-item">
+                <input type="checkbox" formControlName="cuidados">
+                <span class="checkmark"></span>
+                <span class="compromisso-text">
+                  <strong>Cuidado Responsável:</strong> Comprometo-me a fornecer cuidados adequados, alimentação balanceada e ambiente seguro
+                </span>
+              </label>
+
+              <label class="checkbox-item">
+                <input type="checkbox" formControlName="tratamentoVeterinario">
+                <span class="checkmark"></span>
+                <span class="compromisso-text">
+                  <strong>Cuidados Veterinários:</strong> Estou preparado para arcar com despesas veterinárias (vacinas, medicações, emergências)
+                </span>
+              </label>
+
+              <label class="checkbox-item">
+                <input type="checkbox" formControlName="visitasMediador">
+                <span class="checkmark"></span>
+                <span class="compromisso-text">
+                  <strong>Visitas de Acompanhamento:</strong> Aceito receber visitas periódicas do mediador do ThunderPets para avaliar o progresso terapêutico
+                </span>
+              </label>
+
+              <label class="checkbox-item">
+                <input type="checkbox" formControlName="acompanhamento">
+                <span class="checkmark"></span>
+                <span class="compromisso-text">
+                  <strong>Acompanhamento Terapêutico:</strong> Comprometo-me a compartilhar feedback sobre como o pet está ajudando minha saúde emocional
+                </span>
+              </label>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Urgência da necessidade</label>
+                <div class="urgency-grid">
+                  <div
+                    *ngFor="let urgencia of urgenciaDisponivel"
+                    class="urgency-card"
+                    [class.selected]="doarForm.get('urgencia')?.value === urgencia.value"
+                    [style.background-color]="getUrgenciaColor()"
+                    (click)="doarForm.get('urgencia')?.setValue(urgencia.value)"
+                  >
+                    {{ urgencia.label }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label for="observacoes">Observações finais</label>
+                <textarea
+                  id="observacoes"
+                  formControlName="observacoes"
+                  placeholder="Há algo mais que gostaria de compartilhar? Preferências específicas, disponibilidade de tempo, restrições ou qualquer informação relevante para o matching terapêutico."
+                  rows="3"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- ===== NAVEGAÇÃO ===== -->
+      <div class="step-navigation">
+        <div class="nav-center">
+          <button
+            type="button"
+            class="btn-primary large"
+            (click)="onSubmit()"
+          >
+            🚀 Enviar Solicitação Terapêutica
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>

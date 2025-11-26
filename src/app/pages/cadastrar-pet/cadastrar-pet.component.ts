@@ -39,6 +39,7 @@ export class CadastrarPetComponent implements OnInit {
 
   currentStep: number = 1;
   totalSteps: number = 3;
+  usuarioAtual: any;
 
   petForm: FormGroup;
   temperamentosDisponiveis: string[] = [
@@ -63,11 +64,18 @@ export class CadastrarPetComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Verificar se usuário está logado
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    if (!usuarioLogado) {
-      this.router.navigate(['/auth']);
+    const usuarioLogadoStr = localStorage.getItem('usuarioLogado');
+    if (!usuarioLogadoStr) {
+      this.router.navigate([''], { queryParams: { login: 'required' } });
       return;
+    }
+
+    // Recuperar dados completos do usuário
+    try {
+      this.usuarioAtual = JSON.parse(usuarioLogadoStr);
+    } catch (error) {
+      console.error('Erro ao recuperar dados do usuário:', error);
+      this.router.navigate([''], { queryParams: { login: 'required' } });
     }
   }
 
@@ -170,7 +178,7 @@ export class CadastrarPetComponent implements OnInit {
 
   // Salvar cadastro
   async onSubmit(): Promise<void> {
-    if (this.petForm.valid) {
+    if (this.petForm.valid && this.usuarioAtual) {
       try {
         const petData: PetData = this.petForm.value;
 
@@ -179,7 +187,9 @@ export class CadastrarPetComponent implements OnInit {
         petsExistentes.push({
           ...petData,
           id: Date.now(),
-          usuario: localStorage.getItem('usuarioLogado'),
+          usuarioEmail: this.usuarioAtual.email,
+          usuarioNome: this.usuarioAtual.nome,
+          usuarioTipo: this.usuarioAtual.role,
           dataCadastro: new Date().toISOString(),
           status: 'disponivel'
         });

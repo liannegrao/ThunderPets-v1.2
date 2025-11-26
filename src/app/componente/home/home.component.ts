@@ -2,16 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-
-interface Pet {
-  nome: string;
-  foto: string;
-  alt: string;
-  beneficio: string;
-  perfil: string;
-  descricao: string;
-  personalidade?: string;
-}
+import { PetsService, Pet } from '../../services/pets.service';
 
 interface Testimonial {
   text: string;
@@ -60,19 +51,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   matchedPets: Pet[] = [];
   hasMoreResults = false;
 
-  // Example available pets
-  availablePets: Pet[] = [
-    {
-      nome: 'Buddy',
-      foto: '/img/cachorro-caramelo-Petlove.jpg',
-      alt: 'Cachorro Buddy',
-      beneficio: 'Apoio contra ansiedade',
-      perfil: 'Cachorro de porte médio',
-      descricao: 'Buddy é um cachorro muito afetuoso e ideal para quem precisa de companhia em momentos de stress.',
-      personalidade: 'Calmo e terno'
-    },
-    // Add more pets as needed
-  ];
+  // Modal for pet details
+  showPetModal = false;
+  selectedPet: Pet | null = null;
+
+  // Matched pets will be loaded from service
 
   testimonials: Testimonial[] = [
     {
@@ -84,37 +67,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     // Add more testimonials
   ];
 
-  showcasedPets: Pet[] = [
-    {
-      nome: 'Biscoito',
-      foto: '/img/cachorro-caramelo-Petlove.jpg',
-      alt: 'Foto do Biscoito, companheiro terapêutico energético',
-      beneficio: 'Energia & Alegria',
-      perfil: 'Extrovertido Ativo',
-      descricao: 'Perfeito para combater inércia depressiva e isolamento. Sua energia contagiante ajuda a estabelecer rotina, exercícios e socialização, fundamentais para recuperação emocional.',
-      personalidade: 'Energético'
-    },
-    {
-      nome: 'Lua',
-      foto: '/img/pexels-photo-2247894.jpeg',
-      alt: 'Foto da Lua, companheira terapêutica calma',
-      beneficio: 'Calma & Serenidade',
-      perfil: 'Pacífica Independente',
-      descricao: 'Ideal para ansiedade e insônia. Sua presença constante e ronronar terapêutico ajudam a criar ambiente de paz, essencial para reorganização emocional e relaxamento.',
-      personalidade: 'Calma'
-    },
-    {
-      nome: 'Thor',
-      foto: '/img/raca-de-cachorro-preto.jpg',
-      alt: 'Foto do Thor, companheiro terapêutico social',
-      beneficio: 'Socialização & Conexão',
-      perfil: 'Sociável Brincalhão',
-      descricao: 'Especialista em combater isolamento social. Sua alegria e brincadeiras ajudam a reconstruir conexões emocionais, trazendo vida e propósito diário para qualquer lar.',
-      personalidade: 'Sociável'
-    }
-  ];
+  showcasedPets: Pet[] = [];
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private petsService: PetsService) {}
 
   ngOnInit() {
     this.matchingForm = this.fb.group({
@@ -125,6 +80,13 @@ export class HomeComponent implements OnInit, OnDestroy {
       'todo-dia': [false],
       'flexivel': [false]
     });
+
+    // Load showcased pets (hardcoded selection for main page)
+    this.showcasedPets = [
+      this.petsService.getPetById(1), // Biscoito
+      this.petsService.getPetById(4), // Luna (wait, Biscoito is 1, Thor is 2, Buddy is 3, Luna is 4)
+      this.petsService.getPetById(2), // Thor
+    ].filter(pet => pet !== undefined) as Pet[];
 
     // Start carousel
     this.startCarousel();
@@ -157,29 +119,105 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   onMatchSubmit() {
+    if (this.matchingForm.invalid) {
+      console.log('Formulário inválido');
+      return;
+    }
+
     this.isMatching = true;
-    // Simulate matching process
+    this.showResults = false;
+
+    // Coletar dados do formulário
+    const formValue = this.matchingForm.value;
+    const disponibilidadeSelecionada = Object.keys(formValue)
+      .filter(key => key !== 'situacao' && key !== 'energia' && formValue[key])
+      .map(key => key);
+
+    const userPreferences = {
+      situacao: formValue.situacao,
+      energia: formValue.energia,
+      disponibilidade: disponibilidadeSelecionada
+    };
+
+    // Forçar recarga de pets externos antes do matching
+    this.petsService.refreshExternalPets();
+    console.log('🎯 Buscando matches com', this.petsService.getTotalPets());
+    console.log('Preferências:', userPreferences);
+
+    // Simular análise terapêutica
     setTimeout(() => {
-      this.isMatching = false;
-      this.showResults = true;
-      // Basic matching logic - return first 2 pets
-      this.matchedPets = this.availablePets.slice(0, 2);
-      this.hasMoreResults = this.availablePets.length > 2;
-    }, 2000);
+      try {
+        // Usar o serviço de pets para matching real
+        const matches = this.petsService.findTherapeuticMatches(userPreferences);
+
+        this.isMatching = false;
+        this.showResults = true;
+        this.matchedPets = matches.slice(0, 3); // Mostrar 3 primeiros
+        this.hasMoreResults = matches.length > 3;
+
+    console.log(`💚 Encontrados ${matches.length} pets compatíveis` + (this.petsService.getAllPets().length > 6 ? ' (incluindo pets cadastrados)' : ''));
+      } catch (error) {
+        console.error('Erro no matching:', error);
+        this.isMatching = false;
+        // Fallback: mostrar pets de showcase
+        this.matchedPets = this.petsService.getAllPets().slice(0, 3);
+        this.hasMoreResults = false;
+      }
+    }, 2000); // 2 segundos para simular análise
+  }
+
+  openPetDetails(pet: Pet) {
+    this.selectedPet = pet;
+    this.showPetModal = true;
+    // Impedir scroll do body quando modal está aberto
+    document.body.style.overflow = 'hidden';
+  }
+
+  closePetModal() {
+    this.showPetModal = false;
+    this.selectedPet = null;
+    // Reabilitar scroll do body
+    document.body.style.overflow = 'auto';
+  }
+
+  // Event listener para fechar modal quando clicar no overlay
+  onBackdropClick(event: MouseEvent) {
+    if ((event.target as HTMLElement).classList.contains('pet-modal-overlay')) {
+      this.closePetModal();
+    }
   }
 
   adoptPet(pet: Pet) {
-    console.log('Adotar pet:', pet);
-    // Implement adoption flow
-  }
-
-  showMoreResults() {
-    // Show all matched pets
-    this.matchedPets = this.availablePets;
-    this.hasMoreResults = false;
+    console.log('Processando adoção:', pet);
+    // TODO: Implementar fluxo de adoção
+    // Por enquanto, só log
+    alert(`Obrigado por se interessar pelo ${pet.nome}! Em breve implementaremos o processo de adoção.`);
   }
 
   onShowMoreResults() {
-    this.showMoreResults();
+    // Mostrar todos os pets matched
+    const allMatches = this.petsService.getAllPets().filter(pet =>
+      this.matchedPets.some(matched => matched.id === pet.id)
+    );
+    this.matchedPets = allMatches;
+    this.hasMoreResults = false;
+  }
+
+  // Método auxiliar para calcular idade formatada
+  getFormattedAge(idadeMeses: number): string {
+    const anos = Math.floor(idadeMeses / 12);
+    const meses = idadeMeses % 12;
+    if (anos === 0) {
+      return `${meses} meses`;
+    } else if (meses === 0) {
+      return `${anos} ${anos === 1 ? 'ano' : 'anos'}`;
+    } else {
+      return `${anos} ${anos === 1 ? 'ano' : 'anos'} e ${meses} meses`;
+    }
+  }
+
+  // Método auxiliar para capitalizar primeira letra
+  capitalize(text: string): string {
+    return text.charAt(0).toUpperCase() + text.slice(1);
   }
 }
