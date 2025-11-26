@@ -1,69 +1,299 @@
-<main class="container" style="padding: 2rem;">
-  <div style="text-align: center; margin-bottom: 2rem;">
-    <h1>🏠 Painel do Mediador</h1>
-    <p>Bem-vindo ao seu painel de controle! Aqui você pode gerenciar adoções, acompanhar conexões terapêuticas e acessar estatísticas importantes.</p>
+<!-- Header -->
+<div class="painel-header">
+  <div class="container">
+    <div class="header-content">
+      <div class="header-text">
+        <h1>🎛️ Painel do Mediador</h1>
+        <p class="header-subtitle">Gerencie adoções, usuários e acompanhe as conexões terapêuticas</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-secondary" (click)="logout()">Sair</button>
+      </div>
+    </div>
   </div>
+</div>
 
-  <div style="display: grid; gap: 2rem; max-width: 1200px; margin: 0 auto;">
+<main class="painel-main">
+  <div class="container">
 
-    <!-- Stats Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-      <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
-        <h3 style="color: var(--color-primary);">🔗 Conexões Ativas</h3>
-        <p style="font-size: 2rem; font-weight: bold; color: var(--color-secondary);">42</p>
-        <p>Adoções com terapia ativa</p>
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button
+        class="nav-tab"
+        [class.active]="activeTab === 'dashboard'"
+        (click)="setActiveTab('dashboard')"
+      >
+        📊 Dashboard
+      </button>
+      <button
+        class="nav-tab"
+        [class.active]="activeTab === 'pets'"
+        (click)="setActiveTab('pets')"
+      >
+        🐾 Gerenciar Pets
+      </button>
+      <button
+        class="nav-tab"
+        [class.active]="activeTab === 'usuarios'"
+        (click)="setActiveTab('usuarios')"
+      >
+        👥 Usuários
+      </button>
+      <button
+        class="nav-tab"
+        [class.active]="activeTab === 'relatorios'"
+        (click)="setActiveTab('relatorios')"
+      >
+        📈 Relatórios
+      </button>
+    </div>
+
+    <!-- Dashboard Tab -->
+    <div *ngIf="activeTab === 'dashboard'" class="tab-content">
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div *ngFor="let stat of estatisticas" class="stat-card">
+          <div class="stat-icon">{{ stat.icone }}</div>
+          <div class="stat-content">
+            <h3 class="stat-value" [style.color]="stat.cor">{{ stat.valor }}</h3>
+            <p class="stat-title">{{ stat.titulo }}</p>
+          </div>
+        </div>
       </div>
 
-      <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
-        <h3 style="color: var(--color-primary);">❤️ Sucesso de Ações</h3>
-        <p style="font-size: 2rem; font-weight: bold; color: var(--color-accent);">96%</p>
-        <p>Taxa de recuperação emocional</p>
+      <!-- Quick Overview Cards -->
+      <div class="overview-grid">
+        <div class="overview-card warning">
+          <h3>📋 Pets Pendentes</h3>
+          <p class="overview-number">{{ getPendingPetsCount() }}</p>
+          <p class="overview-desc">Aguardando aprovação</p>
+        </div>
+        <div class="overview-card success">
+          <h3>🐾 Pets Disponíveis</h3>
+          <p class="overview-number">{{ getAvailablePetsCount() }}</p>
+          <p class="overview-desc">Prontos para adoção</p>
+        </div>
+        <div class="overview-card info">
+          <h3>❤️ Pets Adotados</h3>
+          <p class="overview-number">{{ getAdoptedPetsCount() }}</p>
+          <p class="overview-desc">Conexões terapêuticas realizadas</p>
+        </div>
       </div>
 
-      <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
-        <h3 style="color: var(--color-primary);">😐 Casos Monitorados</h3>
-        <p style="font-size: 2rem; font-weight: bold; color: var(--color-warning);">15</p>
-        <p>Acompanhamento especial</p>
+      <!-- Recent Activity -->
+      <div class="activity-card">
+        <h3>📱 Atividade Recente</h3>
+        <div class="activity-list">
+          <div class="activity-item">
+            <span class="activity-icon">✅</span>
+            <div class="activity-content">
+              <p class="activity-title">Nova adoção terapêutica</p>
+              <p class="activity-desc">João adotou Luna há 2 horas</p>
+            </div>
+          </div>
+          <div class="activity-item">
+            <span class="activity-icon">❤️</span>
+            <div class="activity-content">
+              <p class="activity-title">Avaliação positiva</p>
+              <p class="activity-desc">Maria deu 5 estrelas para Thor</p>
+            </div>
+          </div>
+          <div class="activity-item">
+            <span class="activity-icon">🔄</span>
+            <div class="activity-content">
+              <p class="activity-title">Pet aprovado</p>
+              <p class="activity-desc">Cachorro Buddy agora está disponível</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-      <h3 style="color: var(--color-primary); margin-bottom: 1rem;">🚀 Ações Rápidas</h3>
-      <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
-        <button class="button button-primary">📋 Novos Matches</button>
-        <button class="button button-secondary">📊 Relatórios</button>
-        <button class="button button-secondary">✨ Agendamentos</button>
-        <button class="button button-secondary">📞 Suporte</button>
+    <!-- Pets Management Tab -->
+    <div *ngIf="activeTab === 'pets'" class="tab-content">
+      <!-- Pets Summary -->
+      <div class="pets-summary">
+        <div class="summary-item">
+          <h3>📋 Pendentes ({{ getPendingPetsCount() }})</h3>
+          <p>Aguardando sua aprovação</p>
+        </div>
+        <div class="summary-item">
+          <h3>🐾 Disponíveis ({{ getAvailablePetsCount() }})</h3>
+          <p>Prontos para adoção</p>
+        </div>
+        <div class="summary-item">
+          <h3>❤️ Adotados ({{ getAdoptedPetsCount() }})</h3>
+          <p>Conexões realizadas</p>
+        </div>
+      </div>
+
+      <!-- Pets Lists -->
+      <div class="pets-section">
+        <!-- Pending Pets -->
+        <div *ngIf="getPendingPetsCount() > 0" class="pets-list">
+          <h3>🔔 Pets Aguardando Aprovação</h3>
+          <div class="pets-grid">
+            <div *ngFor="let pet of getPetsPorStatus('pendente')" class="pet-card-mediador">
+              <div class="pet-header">
+                <img [src]="pet.foto" [alt]="pet.nome" class="pet-foto">
+                <div class="pet-info">
+                  <h4>{{ pet.nome }}</h4>
+                  <p>{{ pet.raca }} • {{ pet.idade }} meses • {{ pet.porte }}</p>
+                  <p class="pet-doador" *ngIf="pet.doador">👤 {{ pet.doador.nome }}</p>
+                </div>
+                <div class="pet-status" [style.background-color]="getStatusColor(pet.status)">
+                  {{ getStatusLabel(pet.status) }}
+                </div>
+              </div>
+              <div class="pet-description">
+                <p>{{ pet.personalidade }}</p>
+              </div>
+              <div class="pet-actions">
+                <button class="btn-approve" (click)="aprovarPet(pet)">✅ Aprovar</button>
+                <button class="btn-reject" (click)="rejeitarPet(pet)">❌ Rejeitar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Available Pets -->
+        <div class="pets-list">
+          <h3>🐾 Pets Disponíveis</h3>
+          <div class="pets-grid">
+            <div *ngFor="let pet of getPetsPorStatus('aprovado')" class="pet-card-mediador">
+              <div class="pet-header">
+                <img [src]="pet.foto" [alt]="pet.nome" class="pet-foto">
+                <div class="pet-info">
+                  <h4>{{ pet.nome }}</h4>
+                  <p>{{ pet.raca }} • {{ pet.idade }} meses • {{ pet.porte }}</p>
+                  <p class="pet-doador" *ngIf="pet.doador">👤 {{ pet.doador.nome }}</p>
+                </div>
+                <div class="pet-status" [style.background-color]="getStatusColor(pet.status)">
+                  {{ getStatusLabel(pet.status) }}
+                </div>
+              </div>
+              <div class="pet-description">
+                <p>{{ pet.personalidade }}</p>
+              </div>
+              <div class="pet-actions">
+                <button class="btn-adopt" (click)="marcarComoAdotado(pet)">❤️ Marcar como Adotado</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Adopted Pets -->
+        <div class="pets-list">
+          <h3>❤️ Pets Adotados</h3>
+          <div class="pets-grid">
+            <div *ngFor="let pet of getPetsPorStatus('adotado')" class="pet-card-mediador">
+              <div class="pet-header">
+                <img [src]="pet.foto" [alt]="pet.nome" class="pet-foto">
+                <div class="pet-info">
+                  <h4>{{ pet.nome }}</h4>
+                  <p>{{ pet.raca }} • {{ pet.idade }} meses • {{ pet.porte }}</p>
+                  <p class="pet-doador" *ngIf="pet.doador">👤 {{ pet.doador.nome }}</p>
+                </div>
+                <div class="pet-status" [style.background-color]="getStatusColor(pet.status)">
+                  {{ getStatusLabel(pet.status) }}
+                </div>
+              </div>
+              <div class="pet-description">
+                <p>{{ pet.personalidade }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Recent Activity -->
-    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-      <h3 style="color: var(--color-primary); margin-bottom: 1rem;">📱 Atividade Recente</h3>
-      <div style="display: flex; flex-direction: column; gap: 1rem;">
-        <div style="display: flex; align-items: center; gap: 1rem; padding: 0.5rem; border-left: 4px solid var(--color-accent);">
-          <span>✅</span>
-          <div>
-            <p style="font-weight: 600; margin: 0;">Nova adoção terapêutica</p>
-            <p style="margin: 0; color: var(--color-gray-600); font-size: 0.9rem;">João adotou Luna há 2 horas</p>
+    <!-- Users Management Tab -->
+    <div *ngIf="activeTab === 'usuarios'" class="tab-content">
+      <!-- Users Summary -->
+      <div class="users-summary">
+        <div class="summary-item">
+          <h3>🎯 Mediadores</h3>
+          <p>{{ getUsuariosPorRole('mediador').length }} usuários</p>
+        </div>
+        <div class="summary-item">
+          <h3>🤝 Voluntários</h3>
+          <p>{{ getUsuariosPorRole('voluntario').length }} usuários</p>
+        </div>
+        <div class="summary-item">
+          <h3>🐾 Doadores</h3>
+          <p>{{ getUsuariosPorRole('doador').length }} usuários</p>
+        </div>
+      </div>
+
+      <!-- Users Lists -->
+      <div class="users-section">
+        <!-- Mediadores -->
+        <div class="users-list">
+          <h3>🎯 Mediadores</h3>
+          <div class="users-grid">
+            <div *ngFor="let user of getUsuariosPorRole('mediador')" class="user-card">
+              <div class="user-avatar">🎯</div>
+              <div class="user-info">
+                <h4>{{ user.nome }}</h4>
+                <p>{{ user.email }}</p>
+                <p class="user-role">{{ getRoleLabel(user.role) }}</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 1rem; padding: 0.5rem; border-left: 4px solid var(--color-secondary);">
-          <span>❤️</span>
-          <div>
-            <p style="font-weight: 600; margin: 0;">Avaliação positiva</p>
-            <p style="margin: 0; color: var(--color-gray-600); font-size: 0.9rem;">Maria deu 5 estrelas para Thor</p>
+        <!-- Voluntários -->
+        <div class="users-list">
+          <h3>🤝 Voluntários</h3>
+          <div class="users-grid">
+            <div *ngFor="let user of getUsuariosPorRole('voluntario')" class="user-card">
+              <div class="user-avatar">🤝</div>
+              <div class="user-info">
+                <h4>{{ user.nome }}</h4>
+                <p>{{ user.email }}</p>
+                <p class="user-role">{{ getRoleLabel(user.role) }}</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 1rem; padding: 0.5rem; border-left: 4px solid var(--color-warning);">
-          <span>📞</span>
-          <div>
-            <p style="font-weight: 600; margin: 0;">Acompanhamento necessário</p>
-            <p style="margin: 0; color: var(--color-gray-600); font-size: 0.9rem;">Carlos precisa de check-in</p>
+        <!-- Doadores -->
+        <div class="users-list">
+          <h3>🐾 Doadores</h3>
+          <div class="users-grid">
+            <div *ngFor="let user of getUsuariosPorRole('doador')" class="user-card">
+              <div class="user-avatar">🐾</div>
+              <div class="user-info">
+                <h4>{{ user.nome }}</h4>
+                <p>{{ user.email }}</p>
+                <p class="user-role">{{ getRoleLabel(user.role) }}</p>
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports Tab -->
+    <div *ngIf="activeTab === 'relatorios'" class="tab-content">
+      <div class="reports-card">
+        <h3>📊 Relatórios de Adoções</h3>
+        <div class="report-stats">
+          <div class="report-stat">
+            <h4>Total de Pets</h4>
+            <p class="stat-number">{{ pets.length }}</p>
+          </div>
+          <div class="report-stat">
+            <h4>Taxa de Adoção</h4>
+            <p class="stat-number">{{ estatisticas[3].valor }}</p>
+          </div>
+          <div class="report-stat">
+            <h4>Usuários Ativos</h4>
+            <p class="stat-number">{{ usuarios.length }}</p>
+          </div>
+        </div>
+        <div class="report-message">
+          <p>Funcionalidades avançadas de relatórios estarão disponíveis em versões futuras.</p>
         </div>
       </div>
     </div>

@@ -64,7 +64,7 @@ export class CadastrarPetComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const usuarioLogadoStr = localStorage.getItem('usuarioLogado');
+    const usuarioLogadoStr = localStorage.getItem('thunderpets_users');
     if (!usuarioLogadoStr) {
       this.router.navigate([''], { queryParams: { login: 'required' } });
       return;

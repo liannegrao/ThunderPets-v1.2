@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap, catchError } from 'rxjs';
 
 export interface Pet {
   id: number;
   nome: string;
+  especie: 'cachorro' | 'gato';
   raca: string;
   idade: number; // em meses
   porte: 'pequeno' | 'medio' | 'grande';
@@ -34,6 +36,7 @@ const PETS_DATABASE = {
     {
       id: 1,
       nome: "Biscoito",
+      especie: "cachorro" as const,
       raca: "Golden Retriever",
       idade: 24,
       porte: "medio" as const,
@@ -60,6 +63,7 @@ const PETS_DATABASE = {
     {
       id: 2,
       nome: "Thor",
+      especie: "cachorro" as const,
       raca: "Labrador",
       idade: 36,
       porte: "medio" as const,
@@ -86,6 +90,7 @@ const PETS_DATABASE = {
     {
       id: 3,
       nome: "Buddy",
+      especie: "cachorro" as const,
       raca: "Poodle",
       idade: 60,
       porte: "pequeno" as const,
@@ -112,6 +117,7 @@ const PETS_DATABASE = {
     {
       id: 4,
       nome: "Luna",
+      especie: "cachorro" as const,
       raca: "Beagle",
       idade: 48,
       porte: "pequeno" as const,
@@ -134,12 +140,95 @@ const PETS_DATABASE = {
         ansiedade: 95,
         solidao: 70
       }
+    },
+    // ⭐ PETS ADICIONAIS ⭐
+    {
+      id: 103,
+      nome: "Max",
+      especie: "cachorro" as const,
+      raca: "Bulldog Francês",
+      idade: 32,
+      porte: "pequeno" as const,
+      energia: "moderado" as const,
+      personalidade: "Alegre e infantil, ajuda a resgatar alegria perdida",
+      beneficioEmocional: "Alegria Recuperada",
+      saude: "Vacinas atualizadas, saúde ótima",
+      cuidados: "Passeios diários curtos",
+      historia: "Bulldog resgatado de canil",
+      casaIdeal: "Apartamentos acolhedores",
+      foto: "/img/Filhote-labrador-5.jpg",
+      adotado: false,
+      compatibilidade: {
+        emocao: ["depressao", "solidao"],
+        energia: ["moderado"],
+        disponibilidade: ["metade-dia", "flexivel"]
+      },
+      compatibilidadeScore: {
+        depressao: 80,
+        ansiedade: 70,
+        solidao: 75
+      }
+    },
+    {
+      id: 104,
+      nome: "Bella",
+      especie: "cachorro" as const,
+      raca: "Border Collie",
+      idade: 28,
+      porte: "medio" as const,
+      energia: "ativo-aventurado" as const,
+      personalidade: "Alta energia, combate depressão através de atividades",
+      beneficioEmocional: "Energia Mental",
+      saude: "Excelente saúde física",
+      cuidados: "Exercícios intensos diários",
+      historia: "Athlete Border Collie",
+      casaIdeal: "Casas com espaço para atividades",
+      foto: "/img/homem-abracando-seu-pitbull-amigavel.jpg",
+      adotado: false,
+      compatibilidade: {
+        emocao: ["depressao"],
+        energia: ["ativo-aventurado"],
+        disponibilidade: ["todo-dia"]
+      },
+      compatibilidadeScore: {
+        depressao: 90,
+        ansiedade: 40,
+        solidao: 85
+      }
+    },
+    {
+      id: 105,
+      nome: "Charlie",
+      especie: "cachorro" as const,
+      raca: "Shih Tzu",
+      idade: 54,
+      porte: "pequeno" as const,
+      energia: "calmo-caseiro" as const,
+      personalidade: "Muito pacífico, reduz ansiedade por presença constante",
+      beneficioEmocional: "Serenidade Diária",
+      saude: "Saúde perfeita",
+      cuidados: "Cuidados especiais felpudos",
+      historia: "Companion perfeito",
+      casaIdeal: "Qualquer lar amoroso",
+      foto: "/img/shihtzunsc.jpg",
+      adotado: false,
+      compatibilidade: {
+        emocao: ["ansiedade", "terapia"],
+        energia: ["calmo-caseiro"],
+        disponibilidade: ["poucas-horas", "metade-dia"]
+      },
+      compatibilidadeScore: {
+        depressao: 45,
+        ansiedade: 92,
+        solidao: 75
+      }
     }
-  ],
+  ];
   gatos: [
     {
       id: 101,
       nome: "Purês",
+      especie: "gato" as const,
       raca: "Vira-lata laranja",
       idade: 24,
       porte: "medio" as const,
@@ -166,6 +255,7 @@ const PETS_DATABASE = {
     {
       id: 102,
       nome: "Sonecas",
+      especie: "gato" as const,
       raca: "Vira-lata cinza",
       idade: 36,
       porte: "medio" as const,
@@ -196,12 +286,29 @@ const PETS_DATABASE = {
   providedIn: 'root'
 })
 export class PetsService {
+  private apiUrl = 'http://localhost:3001/api';
   private petsData = new BehaviorSubject<Pet[]>([]);
   public pets$ = this.petsData.asObservable();
 
-  constructor() {
-    this.initializePets();
-    this.loadExternalPets();
+  constructor(private http: HttpClient) {
+    this.loadPetsFromAPI();
+  }
+
+  // Carregar pets da API
+  private loadPetsFromAPI(): void {
+    this.http.get<Pet[]>(`${this.apiUrl}/pets`).pipe(
+      tap(pets => {
+        console.log('🐾 Pets carregados da API:', pets.length);
+        this.petsData.next(pets);
+      }),
+      catchError(error => {
+        console.error('❌ Erro carregando pets da API:', error);
+        // Fallback: usar dados locais
+        console.log('⚠️ Usando dados locais como fallback');
+        this.initializePets();
+        return [];
+      })
+    ).subscribe();
   }
 
   private initializePets(): void {
@@ -361,80 +468,80 @@ export class PetsService {
     }
   }
 
-  // Sistema de matching terapêutico inteligente
+  // Sistema de matching terapêutico inteligente - API
   findTherapeuticMatches(userPreferences: {
     situacao: string; // 'depressao' | 'ansiedade' | 'solidao' | 'mudanca' | 'terapia'
     energia: string;  // 'calmo-caseiro' | 'moderado' | 'ativo-aventurado'
     disponibilidade: string[]; // Array de opções selecionadas
-  }): Pet[] {
-    const { situacao, energia, disponibilidade } = userPreferences;
-    const allPets = this.petsData.value;
+  }): Observable<Pet[]> {
+    const params = new HttpParams()
+      .set('situacao', userPreferences.situacao)
+      .set('energia', userPreferences.energia)
+      .set('disponibilidade', userPreferences.disponibilidade.join(','));
 
-    console.log('🔍 Buscando matches terapêuticos:', userPreferences);
-
-    const matches = allPets.filter(pet => {
-      if (pet.adotado) return false;
-
-      let score = 0;
-
-      // 1. Compatibilidade emocional (peso alto - 40%)
-      if (situacao === 'depressao' && pet.compatibilidadeScore.depressao >= 70) score += 40;
-      else if (situacao === 'ansiedade' && pet.compatibilidadeScore.ansiedade >= 70) score += 40;
-      else if (situacao === 'solidao' && pet.compatibilidadeScore.solidao >= 70) score += 40;
-      else if ((situacao === 'mudanca' || situacao === 'terapia')) {
-        // Para mudanças ou terapia, média dos scores
-        const mediaEmocional = (pet.compatibilidadeScore.depressao +
-                               pet.compatibilidadeScore.ansiedade +
-                               pet.compatibilidadeScore.solidao) / 3;
-        if (mediaEmocional >= 70) score += 40;
-      }
-
-      // 2. Compatibilidade energética (peso médio - 30%)
-      if (pet.compatibilidade.energia.includes(energia)) score += 30;
-
-      // 3. Disponibilidade (peso baixo - 20%)
-      const temCompatibilidadeDisponibilidade = disponibilidade.some(disp =>
-        pet.compatibilidade.disponibilidade.includes(disp)
-      );
-      if (temCompatibilidadeDisponibilidade) score += 20;
-
-      // 4. Pelo menos 70 pontos para ser considerado match
-      console.log(`🐾 ${pet.nome}: Pontuação ${score}/90`);
-      return score >= 70;
-    });
-
-    // Ordenar por compatibilidade emocional específica
-    const sorted = matches.sort((a, b) => {
-      let scoreA = 0, scoreB = 0;
-
-      if (situacao === 'depressao') {
-        scoreA = a.compatibilidadeScore.depressao;
-        scoreB = b.compatibilidadeScore.depressao;
-      } else if (situacao === 'ansiedade') {
-        scoreA = a.compatibilidadeScore.ansiedade;
-        scoreB = b.compatibilidadeScore.ansiedade;
-      } else if (situacao === 'solidao') {
-        scoreA = a.compatibilidadeScore.solidao;
-        scoreB = b.compatibilidadeScore.solidao;
-      } else {
-        // Para casos gerais, média dos scores
-        scoreA = (a.compatibilidadeScore.depressao + a.compatibilidadeScore.ansiedade + a.compatibilidadeScore.solidao) / 3;
-        scoreB = (b.compatibilidadeScore.depressao + b.compatibilidadeScore.ansiedade + b.compatibilidadeScore.solidao) / 3;
-      }
-
-      return scoreB - scoreA; // Descending order
-    });
-
-    console.log(`💚 Encontrados ${sorted.length} pets compatíveis para situação de ${situacao}`);
-    return sorted.slice(0, 6); // Máximo 6 matches iniciais
+    return this.http.get<Pet[]>(`${this.apiUrl}/pets/matching`, { params }).pipe(
+      tap(matches => console.log(`💚 API: ${matches.length} pets compatíveis encontrados`)),
+      catchError(error => {
+        console.error('❌ Erro no matching via API:', error);
+        return [];
+      })
+    );
   }
 
-  getPetById(id: number): Pet | undefined {
-    return this.petsData.value.find(pet => pet.id === id);
+  getPetById(id: number): Observable<Pet | null> {
+    return this.http.get<Pet>(`${this.apiUrl}/pets/${id}`).pipe(
+      tap(pet => console.log('🐾 API: Pet encontrado:', pet.nome)),
+      catchError(error => {
+        console.error('❌ Erro buscando pet:', error);
+        return [null];
+      })
+    );
   }
 
-  getAllPets(): Pet[] {
-    return this.petsData.value;
+  getAllPets(): Observable<Pet[]> {
+    return this.http.get<Pet[]>(`${this.apiUrl}/pets`).pipe(
+      tap(pets => {
+        this.petsData.next(pets); // Atualizar BehaviorSubject
+        console.log('🐕 API: Todos os pets carregados:', pets.length);
+      }),
+      catchError(error => {
+        console.error('❌ Erro carregando todos os pets:', error);
+        return [];
+      })
+    );
+  }
+
+  // Adicionar novo pet
+  createPet(petData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/pets`, petData).pipe(
+      tap(result => console.log('✅ Pet criado na API:', result)),
+      catchError(error => {
+        console.error('❌ Erro criando pet:', error);
+        throw error;
+      })
+    );
+  }
+
+  // Marcar pet como adotado via API
+  adoptPet(id: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/mediators/adopt/${id}`, {}, {
+      headers: { 'x-api-key': 'thunderpets-2024-mediator-secret' }
+    }).pipe(
+      tap(result => {
+        console.log('✅ Pet adotado na API:', result);
+        // Atualizar local
+        const pets = this.petsData.value;
+        const petIndex = pets.findIndex(p => p.id === id);
+        if (petIndex !== -1) {
+          pets[petIndex].adotado = true;
+          this.petsData.next([...pets]);
+        }
+      }),
+      catchError(error => {
+        console.error('❌ Erro adotando pet:', error);
+        throw error;
+      })
+    );
   }
 
   getDogs(): Pet[] {
@@ -454,16 +561,7 @@ export class PetsService {
     this.saveToLocalStorage(updatedPets);
   }
 
-  // Para futuro - quando implementar adoção
-  adoptPet(id: number): boolean {
-    const pet = this.getPetById(id);
-    if (pet && !pet.adotado) {
-      pet.adotado = true;
-      this.updatePets();
-      return true;
-    }
-    return false;
-  }
+
 
   private updatePets(): void {
     this.petsData.next([...this.petsData.value]);

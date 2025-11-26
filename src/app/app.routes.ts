@@ -29,6 +29,6 @@ export const routes: Routes = [
   },
   { path: 'doar', component: DoarComponent },
   // Routes para futuras páginas - redirecionam para home por enquanto
-  { path: 'voluntario', redirectTo: '' },
+  { path: 'voluntario', redirectTo: 'painel-voluntario' },
   { path: '**', redirectTo: '' }
 ];

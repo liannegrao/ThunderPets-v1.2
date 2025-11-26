@@ -1,0 +1,631 @@
+/* ===== PAINEL VOLUNTÁRIO - ADOÇÃO TERAPÊUTICA ===== */
+.painel-voluntario {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--color-background) 0%, var(--color-surface) 100%);
+  padding: 2rem 1rem;
+}
+
+.painel-voluntario .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* ===== CABEÇALHO ===== */
+.painel-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem 0;
+}
+
+.painel-header h1 {
+  font-size: 2.5rem;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.painel-header p {
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ===== SEÇÃO MATCHING ===== */
+.matching-section {
+  margin-bottom: 3rem;
+}
+
+.matching-card {
+  background: var(--color-surface);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  border: 2px solid var(--color-border);
+}
+
+.matching-card h2 {
+  font-size: 1.8rem;
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.matching-description {
+  text-align: center;
+  color: var(--color-text-secondary);
+  margin-bottom: 2rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* ===== FORMULÁRIO ===== */
+.matching-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Grupos de formulário */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Grade de checkboxes */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--color-background);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.checkbox-item:hover {
+  border-color: var(--color-primary);
+  background: rgba(59, 130, 246, 0.02);
+}
+
+.checkbox-item input[type="checkbox"] {
+  display: none;
+}
+
+.checkmark {
+  font-size: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.checkbox-item:has(input:checked) .checkmark {
+  color: var(--color-primary);
+  transform: scale(1.1);
+}
+
+/* Ações do formulário */
+.form-actions {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.match-btn {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 200px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.match-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.match-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ===== RESULTADOS ===== */
+.results-section {
+  margin-bottom: 3rem;
+}
+
+.results-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.results-header h2 {
+  font-size: 1.8rem;
+  color: var(--color-success);
+  margin-bottom: 0.5rem;
+}
+
+.results-subtitle {
+  color: var(--color-text-secondary);
+  font-size: 1.05rem;
+}
+
+/* Grid de pets matched */
+.pets-matched-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.pet-match-card {
+  background: var(--color-surface);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.pet-match-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  border-color: var(--color-primary);
+}
+
+/* Imagem do pet */
+.pet-match-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.pet-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pet-status-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Badge styles */
+.badge-excelente { background: var(--color-success); color: white; }
+.badge-bom { background: var(--color-accent); color: white; }
+.badge-medio { background: var(--color-warning); color: white; }
+.badge-baixo { background: var(--color-error); color: white; }
+
+/* Conteúdo do pet */
+.pet-match-content {
+  padding: 1.5rem;
+}
+
+.pet-match-header {
+  margin-bottom: 1rem;
+}
+
+.pet-match-header h3 {
+  font-size: 1.3rem;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.pet-species {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+/* Benefício */
+.pet-benefits {
+  margin-bottom: 1.25rem;
+}
+
+.benefit-chip {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Scores de compatibilidade */
+.compatibility-scores {
+  margin-bottom: 1.25rem;
+}
+
+.score-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.score-label {
+  flex: 0 0 80px;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.score-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--color-background);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.score-value {
+  flex: 0 0 50px;
+  text-align: right;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Descrição */
+.pet-description {
+  color: var(--color-text-secondary);
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+/* Ações */
+.pet-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.pet-actions button {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pet-actions .btn-secondary {
+  background: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.pet-actions .btn-secondary:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.pet-actions .btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.pet-actions .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Show more */
+.show-more {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+/* ===== ESTATÍSTICAS ===== */
+.stats-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.stats-section h2 {
+  font-size: 1.8rem;
+  color: var(--color-primary);
+  margin-bottom: 2rem;
+}
+
+.impact-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.impact-card {
+  padding: 1.5rem;
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.impact-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+}
+
+.impact-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.impact-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.impact-label {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+/* ===== MODAL ===== */
+.pet-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.pet-modal {
+  background: white;
+  border-radius: 16px;
+  max-width: 800px;
+  width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modal-header-pet {
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid var(--color-background);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header-pet h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--color-primary);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+  background: var(--color-background);
+  color: var(--color-error);
+}
+
+.modal-body-pet {
+  padding: 2rem;
+}
+
+.pet-gallery {
+  margin-bottom: 2rem;
+}
+
+.pet-main-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.pet-details-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.pet-info-terapy,
+.pet-therapy-profile,
+.pet-health-care,
+.pet-characteristics {
+  background: var(--color-background);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 2px solid var(--color-border);
+}
+
+.pet-info-terapy h3,
+.pet-therapy-profile h3,
+.pet-health-care h3,
+.pet-characteristics h3 {
+  margin: 0 0 1rem 0;
+  color: var(--color-primary);
+  font-size: 1.1rem;
+}
+
+.pet-info-terapy ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pet-info-terapy li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pet-info-terapy li:last-child {
+  border-bottom: none;
+}
+
+.score-category {
+  margin-bottom: 1.25rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--color-background);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.benefit-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.modal-actions-pet {
+  padding: 1.5rem 2rem;
+  border-top: 2px solid var(--color-background);
+  text-align: center;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .painel-header h1 {
+    font-size: 2rem;
+  }
+
+  .matching-card {
+    padding: 1.5rem;
+  }
+
+  .pets-matched-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .impact-stats {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .pet-modal {
+    width: 95vw;
+    margin: 1rem;
+  }
+
+  .modal-body-pet {
+    padding: 1.5rem;
+  }
+
+  .pet-details-grid {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .painel-voluntario {
+    padding: 1rem 0.5rem;
+  }
+
+  .checkbox-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pet-actions {
+    flex-direction: column;
+  }
+
+  .impact-stats {
+    grid-template-columns: 1fr;
+  }
+}

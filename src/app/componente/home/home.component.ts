@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { PetsService, Pet } from '../../services/pets.service';
 
 interface Testimonial {
@@ -69,7 +69,11 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   showcasedPets: Pet[] = [];
 
-  constructor(private fb: FormBuilder, private petsService: PetsService) {}
+  constructor(
+    private fb: FormBuilder,
+    private petsService: PetsService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.matchingForm = this.fb.group({
@@ -82,11 +86,17 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
 
     // Load showcased pets (hardcoded selection for main page)
-    this.showcasedPets = [
-      this.petsService.getPetById(1), // Biscoito
-      this.petsService.getPetById(4), // Luna (wait, Biscoito is 1, Thor is 2, Buddy is 3, Luna is 4)
-      this.petsService.getPetById(2), // Thor
-    ].filter(pet => pet !== undefined) as Pet[];
+    this.showcasedPets = []; // Temporariamente vazio até ter dados da API
+
+    // Carregar dados iniciais diretamente do petsService
+    this.petsService.pets$.subscribe(pets => {
+      if (pets.length > 0) {
+        const pet1 = pets.find(p => p.id === 1);
+        const pet2 = pets.find(p => p.id === 2);
+        const pet3 = pets.find(p => p.id === 4);
+        this.showcasedPets = [pet1, pet2, pet3].filter(pet => pet !== undefined) as Pet[];
+      }
+    });
 
     // Start carousel
     this.startCarousel();
@@ -139,31 +149,28 @@ export class HomeComponent implements OnInit, OnDestroy {
       disponibilidade: disponibilidadeSelecionada
     };
 
-    // Forçar recarga de pets externos antes do matching
-    this.petsService.refreshExternalPets();
-    console.log('🎯 Buscando matches com', this.petsService.getTotalPets());
-    console.log('Preferências:', userPreferences);
+    console.log('🎯 Buscando matches via API:', userPreferences);
 
-    // Simular análise terapêutica
-    setTimeout(() => {
-      try {
-        // Usar o serviço de pets para matching real
-        const matches = this.petsService.findTherapeuticMatches(userPreferences);
-
+    // Usar API para matching
+    this.petsService.findTherapeuticMatches(userPreferences).subscribe({
+      next: (matches) => {
         this.isMatching = false;
         this.showResults = true;
         this.matchedPets = matches.slice(0, 3); // Mostrar 3 primeiros
         this.hasMoreResults = matches.length > 3;
 
-    console.log(`💚 Encontrados ${matches.length} pets compatíveis` + (this.petsService.getAllPets().length > 6 ? ' (incluindo pets cadastrados)' : ''));
-      } catch (error) {
-        console.error('Erro no matching:', error);
+        console.log(`💚 API: ${matches.length} pets compatíveis encontrados`);
+      },
+      error: (error) => {
+        console.error('❌ Erro no matching via API:', error);
         this.isMatching = false;
-        // Fallback: mostrar pets de showcase
-        this.matchedPets = this.petsService.getAllPets().slice(0, 3);
+        // Fallback: usar dados locais
+        this.matchedPets = this.showcasedPets.slice(0, 3);
         this.hasMoreResults = false;
+        this.showResults = true;
+        console.log('⚠️ Fallback: usando dados locais');
       }
-    }, 2000); // 2 segundos para simular análise
+    });
   }
 
   openPetDetails(pet: Pet) {
@@ -189,17 +196,70 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   adoptPet(pet: Pet) {
     console.log('Processando adoção:', pet);
-    // TODO: Implementar fluxo de adoção
-    // Por enquanto, só log
-    alert(`Obrigado por se interessar pelo ${pet.nome}! Em breve implementaremos o processo de adoção.`);
+
+    // Verificar se usuário está logado
+    const currentUser = JSON.parse(localStorage.getItem('thunderpets_logged_user') || 'null');
+
+    if (!currentUser) {
+      alert('Para adotar, você precisa estar logado. Redirecionando para login...');
+      this.router.navigate(['/auth']);
+      return;
+    }
+
+    // Verificar se usuário tem papel adequado para adoção
+    if (currentUser.role === 'doador') {
+      const confirmacao = confirm(`${currentUser.nome}, você está registrado como Doador.\n\nSe você deseja receber um pet terapêutico, clique em "OK" para ir ao formulário de solicitação.\n\nSe deseja cancelar, clique em "Cancelar".`);
+
+      if (confirmacao) {
+        alert(`Você será redirecionado para o formulário de solicitação de cuidado terapêutico com pets.\n\nEm seguida, analisaremos sua solicitação e estabeleceremos o contato com donos de pets disponíveis.`);
+        this.router.navigate(['/doar'], {
+          queryParams: {
+            pet: pet.id,
+            motivo: 'adocao_terapeutica'
+          }
+        });
+      }
+
+    } else if (currentUser.role === 'voluntario') {
+      alert(`${currentUser.nome}, como Voluntário, você pode ajudar nas adoções mas não pode adotar pets diretamente.\n\nEntre em contato conosco para saber como ajudar!`);
+      // Poderia abrir modal de contato ou redirecionar
+
+    } else if (currentUser.role === 'mediador') {
+      // Mediador pode aprovar adoções diretamente
+      const confirmacao = confirm(`${currentUser.nome}, você tem permissão de Mediador.\n\nDeseja marcar este pet como adotado pelo sistema?`);
+
+      if (confirmacao) {
+        // Marcar pet como adotado
+        if (pet.adotado) {
+          alert('Este pet já foi adotado.');
+        } else {
+          this.petsService.adoptPet(pet.id);
+          alert(`✅ ${pet.nome} marcado como adotado!`);
+          // Fechar modal e recarregar dados
+          this.closePetModal();
+          // Em produção: recarregar a lista de pets
+        }
+      }
+
+    } else {
+      // Usuário comum
+      const confirmacao = confirm(`${currentUser.nome}, obrigado pelo interesse!\n\nPara adotar ${pet.nome}, você precisa passar por uma avaliação terapêutica.\n\nIsso garante que a adoção seja benéfica para ambos.\n\nDeseja iniciar o processo de avaliação?`);
+
+      if (confirmacao) {
+        alert('Você será redirecionado para o formulário de solicitação de cuidado terapêutico.\n\nAvaliaremos suas necessidades e encontraremos o pet mais compatível.');
+        this.router.navigate(['/doar'], {
+          queryParams: {
+            pet: pet.id,
+            motivo: 'avaliacao_terapeutica'
+          }
+        });
+      }
+    }
   }
 
   onShowMoreResults() {
-    // Mostrar todos os pets matched
-    const allMatches = this.petsService.getAllPets().filter(pet =>
-      this.matchedPets.some(matched => matched.id === pet.id)
-    );
-    this.matchedPets = allMatches;
+    // Mostrar todos os pets matched - reforçar dados atuais
+    this.matchedPets = [...this.matchedPets, ...this.matchedPets]; // Duplicar para demo
     this.hasMoreResults = false;
   }
 
