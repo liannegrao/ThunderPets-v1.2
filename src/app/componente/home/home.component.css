@@ -3,24 +3,26 @@
 /* Hero Section Mobile */
 .hero {
   position: relative;
-  height: 95vh;
+  min-height: 68vh; /* slightly larger hero for better visual balance */
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   color: white;
+  padding: clamp(24px, 8vw, 64px) 0;
   overflow: hidden;
 }
 
 .hero h1 {
-  font-size: 2.2rem;
+  font-size: clamp(1.6rem, 6vw, 2.6rem);
   font-weight: 700;
   margin-bottom: 1rem;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .hero p {
-  font-size: 1.2rem;
+  font-size: clamp(0.95rem, 3vw, 1.2rem);
   line-height: 1.6;
   margin-bottom: 2rem;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
@@ -455,6 +457,11 @@
   .hero p {
     font-size: 1.5rem;
     max-width: 700px;
+  }
+
+  /* Slightly increase hero height on larger screens for balance */
+  .hero {
+    min-height: 74vh;
   }
 
   .section {

@@ -132,8 +132,9 @@ export class PainelDoadorComponent implements OnInit, OnDestroy {
 
   // Editar informações do pet
   editarPet(pet: PetCadastrado): void {
-    // Por enquanto, apenas mostrar mensagem
-    alert(`Funcionalidade de edição será implementada em breve.\n\nPara editar ${pet.nome}, você poderá:\n- Alterar descrição\n- Atualizar fotos\n- Modificar localização\n- Ajustar outras informações`);
+    this.router.navigate(['/cadastrar-pet'], {
+      queryParams: { edit: 'true', id: pet.id }
+    });
   }
 
   // Removido: Marcar como adotado - só mediadores podem fazer isso

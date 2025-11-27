@@ -46,6 +46,11 @@ export class PainelAdotanteComponent implements OnInit {
   petsDisponiveis: Pet[] = [];
   isLoadingPets = true;
 
+  // Propriedades para estatísticas (para evitar ExpressionChangedAfterItHasBeenCheckedError)
+  totalPetsDisponiveis = 0;
+  taxaSucesso = 75;
+  totalAdocoes = 0;
+
   constructor(
     private fb: FormBuilder,
     private petsService: PetsService,
@@ -56,6 +61,9 @@ export class PainelAdotanteComponent implements OnInit {
     this.initForm();
     this.carregarPetsDisponiveis();
     this.aplicarFiltros(); // Inicializa filtros
+
+    // Inicializar estatísticas
+    this.atualizarEstatisticas();
   }
 
   private initForm() {
@@ -315,6 +323,7 @@ export class PainelAdotanteComponent implements OnInit {
       }
 
       this.petsDisponiveis = todosPets.filter(pet => !pet.adotado);
+      this.totalPetsDisponiveis = this.petsDisponiveis.length; // Atualizar propriedade para estatísticas
       this.isLoadingPets = false;
       this.aplicarFiltros();
 
@@ -415,31 +424,62 @@ export class PainelAdotanteComponent implements OnInit {
       return;
     }
 
-    const confirmacao = confirm(`🗑️ Tem certeza que deseja excluir "${pet.nome}"?\n\nEsta ação não pode ser desfeita e o pet será removido permanentemente do sistema.`);
+    // Verificar se é um pet da API (IDs pequenos) ou cadastrado (IDs grandes)
+    const isApiPet = pet.id < 100; // IDs da API são pequenos (1, 2, 3...), cadastrados usam Date.now()
+
+    let confirmMessage = `🗑️ Tem certeza que deseja excluir "${pet.nome}"?\n\n`;
+    if (isApiPet) {
+      confirmMessage += 'Este é um pet da base de dados principal. A exclusão será apenas visual (não afeta o banco de dados real).\n\n';
+    } else {
+      confirmMessage += 'Esta ação não pode ser desfeita e o pet será removido permanentemente do sistema.\n\n';
+    }
+    confirmMessage += 'Deseja continuar?';
+
+    const confirmacao = confirm(confirmMessage);
 
     if (!confirmacao) return;
 
     try {
-      // Remover do localStorage dos pets cadastrados
-      const petsCadastrados = JSON.parse(localStorage.getItem('petsCadastrados') || '[]');
-      const petIndex = petsCadastrados.findIndex((p: any) => p.id === pet.id);
-
-      if (petIndex !== -1) {
-        petsCadastrados.splice(petIndex, 1);
-        localStorage.setItem('petsCadastrados', JSON.stringify(petsCadastrados));
-
-        // Atualizar listas locais
+      if (isApiPet) {
+        // Para pets da API: apenas remover da lista local (não afeta banco de dados)
         this.petsDisponiveis = this.petsDisponiveis.filter(p => p.id !== pet.id);
         this.aplicarFiltros();
-
-        console.log(`✅ Pet "${pet.nome}" excluído pelo mediador`);
-        alert(`✅ "${pet.nome}" foi excluído com sucesso do sistema.`);
+        console.log(`✅ Pet da API "${pet.nome}" removido da visualização`);
+        alert(`✅ "${pet.nome}" foi removido da lista de pets disponíveis (exclusão visual apenas).`);
       } else {
-        alert('❌ Pet não encontrado no sistema.');
+        // Para pets cadastrados: remover do localStorage
+        const petsCadastrados = JSON.parse(localStorage.getItem('petsCadastrados') || '[]');
+        const petIndex = petsCadastrados.findIndex((p: any) => p.id === pet.id);
+
+        if (petIndex !== -1) {
+          petsCadastrados.splice(petIndex, 1);
+          localStorage.setItem('petsCadastrados', JSON.stringify(petsCadastrados));
+
+          // Atualizar listas locais
+          this.petsDisponiveis = this.petsDisponiveis.filter(p => p.id !== pet.id);
+          this.aplicarFiltros();
+
+          console.log(`✅ Pet "${pet.nome}" excluído pelo mediador`);
+          alert(`✅ "${pet.nome}" foi excluído com sucesso do sistema.`);
+        } else {
+          alert('❌ Pet não encontrado no sistema.');
+        }
       }
     } catch (error) {
       console.error('Erro ao excluir pet:', error);
       alert('❌ Erro ao excluir pet. Tente novamente.');
+    }
+  }
+
+  // Atualizar estatísticas (para evitar ExpressionChangedAfterItHasBeenCheckedError)
+  private atualizarEstatisticas(): void {
+    try {
+      const petsAdotados = JSON.parse(localStorage.getItem('petsCadastrados') || '[]')
+        .filter((pet: any) => pet.status === 'adotado');
+
+      this.totalAdocoes = petsAdotados.length + 25; // Simulação com base fixa
+    } catch (error) {
+      this.totalAdocoes = 25; // Valor padrão
     }
   }
 

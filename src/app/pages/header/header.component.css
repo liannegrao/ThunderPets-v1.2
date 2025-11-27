@@ -1,0 +1,64 @@
+/* Header component specific styles (mobile-first additions) */
+
+.navbar { width: 100%; }
+
+.nav-toggle {
+	display: none; /* visible only on small screens via media query */
+	background: transparent;
+	border: none;
+	padding: 0.5rem;
+	cursor: pointer;
+}
+
+.hamburger {
+	display: inline-block;
+	width: 24px;
+	height: 2px;
+	background: var(--color-gray-700);
+	position: relative;
+	transition: transform var(--transition-fast), background var(--transition-fast);
+}
+.hamburger::before,
+.hamburger::after {
+	content: '';
+	position: absolute;
+	width: 24px;
+	height: 2px;
+	background: var(--color-gray-700);
+	left: 0;
+	transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+.hamburger::before { top: -8px; }
+.hamburger::after { top: 8px; }
+
+.nav-toggle.open .hamburger { background: transparent; }
+.nav-toggle.open .hamburger::before { transform: translateY(8px) rotate(45deg); }
+.nav-toggle.open .hamburger::after { transform: translateY(-8px) rotate(-45deg); }
+
+.nav-collapse { display: flex; gap: 1rem; align-items: center; transition: max-height var(--transition-fast) ease, opacity var(--transition-fast) ease; }
+
+/* Make nav items vertical on small screens */
+@media (max-width: 768px) {
+	.nav-toggle { display: block; }
+	.nav-collapse {
+		display: flex; /* keep layout but collapsed with max-height */
+		width: 100%;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.6rem;
+		margin-top: 0.5rem;
+		max-height: 0;
+		overflow: hidden;
+		opacity: 0;
+	}
+	.nav-collapse.open { max-height: 800px; opacity: 1; }
+	.nav-links { display: flex; flex-direction: column; gap: 0.6rem; align-items: center; }
+	.nav-buttons { display: flex; flex-direction: column; gap: 0.6rem; align-items: center; }
+	.nav-links a { padding: 0.45rem 0.6rem; display:block; width:100%; text-align:center; }
+	.logo { flex-direction: row; align-items: center; gap: 0.6rem; }
+	.logo-img { width: 56px; }
+}
+
+/* Ensure the state of the nav-toggle visually changes based on isMenuOpen */
+.nav-toggle.open { outline: 2px solid rgba(37, 99, 235, 0.1); }
+

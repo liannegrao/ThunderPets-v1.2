@@ -3,8 +3,8 @@
   <div class="container">
     <div class="header-content">
       <div class="header-text">
-        <h1>🐕 Cadastrar Pet para Adoção</h1>
-        <p>Preencha as informações e encontre um lar amoroso para seu pet</p>
+        <h1>🐕 {{ isEditMode ? 'Editar Pet' : 'Cadastrar Pet para Adoção' }}</h1>
+        <p>{{ isEditMode ? 'Atualize as informações do seu pet' : 'Preencha as informações e encontre um lar amoroso para seu pet' }}</p>
       </div>
       <div class="header-actions">
         <button class="btn-cancel" (click)="cancelCadastro()">
@@ -336,10 +336,27 @@
               <h3>📷 Fotos do Pet</h3>
               <p>(opcional - você pode adicionar depois no painel)</p>
             </div>
-            <div class="photo-upload-placeholder">
+            <div class="photo-upload-placeholder" (click)="triggerFileInput()">
               <div class="upload-icon">📸</div>
               <p>Clique para adicionar fotos do pet</p>
               <small>Faça fotos com boa iluminação</small>
+            </div>
+            <input
+              type="file"
+              #fileInput
+              multiple
+              accept="image/jpeg,image/png"
+              (change)="onFileSelected($event)"
+              style="display: none;"
+            />
+            <div class="selected-images" *ngIf="selectedImages.length > 0">
+              <h4>📸 Fotos Selecionadas:</h4>
+              <div class="image-preview-grid">
+                <div class="image-preview" *ngFor="let image of selectedImages; let i = index">
+                  <img [src]="image" alt="Foto do pet {{ i + 1 }}" />
+                  <button type="button" class="remove-image-btn" (click)="removeImage(i)">❌</button>
+                </div>
+              </div>
             </div>
           </div>
         </form>
@@ -379,7 +396,7 @@
             *ngIf="currentStep === totalSteps"
             [disabled]="!petForm.valid"
           >
-            🎉 Finalizar Cadastro
+            🎉 {{ isEditMode ? 'Salvar Alterações' : 'Finalizar Cadastro' }}
           </button>
         </div>
       </div>

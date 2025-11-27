@@ -1,34 +1,41 @@
-<header class="header">
+<header #headerRef class="header">
   <div class="container">
-    <nav class="navbar">
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
       <a href="/" class="logo">
         <img src="/img/THUNDERPETS (4) (1).png" class="logo-img" alt="logo">
         ThunderPets
       </a>
-      <div class="nav-links" *ngIf="(currentUser$ | async); else linksNoAuth">
-        <a href="#missao">Nossa Missão</a>
-        <a href="#adote">Adote</a>
-        <a [routerLink]="['painel-' + (currentUser$ | async)?.role]">Meu Painel</a>
-        <a href="#ajude">Ajude</a>
+      <!-- Mobile hamburger menu button -->
+      <button class="nav-toggle" aria-controls="navCollapse" (click)="toggleMenu()" [attr.aria-expanded]="isMenuOpen" [class.open]="isMenuOpen">
+        <span class="hamburger" aria-hidden="true"></span>
+      </button>
+
+      <div id="navCollapse" class="nav-collapse" [class.open]="isMenuOpen">
+        <div class="nav-links" *ngIf="(currentUser$ | async); else linksNoAuth">
+        <a href="#missao" (click)="closeMenu()">Nossa Missão</a>
+        <a href="#adote" (click)="closeMenu()">Adote</a>
+        <a [routerLink]="['painel-' + (currentUser$ | async)?.role]" (click)="closeMenu()">Meu Painel</a>
+        <a href="#ajude" (click)="closeMenu()">Ajude</a>
       </div>
       <ng-template #linksNoAuth>
         <div class="nav-links">
-          <a href="#missao">Nossa Missão</a>
-          <a href="#adote">Adote</a>
-          <a href="#ajude">Ajude</a>
+          <a href="#missao" (click)="closeMenu()">Nossa Missão</a>
+          <a href="#adote" (click)="closeMenu()">Adote</a>
+          <a href="#ajude" (click)="closeMenu()">Ajude</a>
         </div>
       </ng-template>
-      <div class="nav-buttons" *ngIf="(currentUser$ | async) as user; else buttonsNoAuth">
+        <div class="nav-buttons" *ngIf="(currentUser$ | async) as user; else buttonsNoAuth">
         <span class="user-welcome">Olá, {{ user.nome }} ({{ getRoleLabel(user.role) }})</span>
-        <button class="button button-primary" [routerLink]="['painel-' + user.role]">Painel</button>
-        <button class="button button-secondary" (click)="logout()">Sair</button>
+        <button class="button button-primary" [routerLink]="['painel-' + user.role]" (click)="closeMenu()">Painel</button>
+        <button class="button button-secondary" (click)="logout(); closeMenu()">Sair</button>
       </div>
       <ng-template #buttonsNoAuth>
         <div class="nav-buttons">
-          <button class="button button-secondary" (click)="openAuthModal()">Entrar</button>
-          <button class="button button-primary" (click)="openAuthModal()">Cadastrar</button>
+          <button class="button button-secondary" (click)="openAuthModal(); closeMenu()">Entrar</button>
+          <button class="button button-primary" (click)="openAuthModal(); closeMenu()">Cadastrar</button>
         </div>
       </ng-template>
+      </div>
     </nav>
   </div>
 

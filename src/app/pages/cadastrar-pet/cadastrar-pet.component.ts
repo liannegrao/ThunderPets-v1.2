@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 export interface PetData {
   nome: string;
@@ -37,9 +37,14 @@ export interface PetData {
 })
 export class CadastrarPetComponent implements OnInit {
 
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
   currentStep: number = 1;
   totalSteps: number = 3;
   usuarioAtual: any;
+  selectedImages: string[] = [];
+  isEditMode: boolean = false;
+  editingPetId: number | null = null;
 
   petForm: FormGroup;
   temperamentosDisponiveis: string[] = [
@@ -59,7 +64,7 @@ export class CadastrarPetComponent implements OnInit {
     { value: 'outros', label: 'Outros', icon: '🐾' }
   ];
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {
     this.petForm = this.createPetForm();
   }
 
@@ -75,6 +80,16 @@ export class CadastrarPetComponent implements OnInit {
     try {
       this.usuarioAtual = JSON.parse(usuarioLogadoStr);
       console.log('🐕 Usuário logado para cadastrar pet:', this.usuarioAtual);
+
+      // Verificar se está em modo de edição
+      this.route.queryParams.subscribe(params => {
+        this.isEditMode = params['edit'] === 'true';
+        this.editingPetId = params['id'] ? +params['id'] : null;
+
+        if (this.isEditMode && this.editingPetId && this.usuarioAtual) {
+          this.loadPetForEditing();
+        }
+      });
     } catch (error) {
       console.error('Erro ao recuperar dados do usuário:', error);
       this.router.navigate([''], { queryParams: { login: 'required' } });
@@ -178,39 +193,47 @@ export class CadastrarPetComponent implements OnInit {
     return current.includes(temperamento);
   }
 
-  // Salvar cadastro
+  // Salvar cadastro ou atualização
   async onSubmit(): Promise<void> {
     if (this.petForm.valid && this.usuarioAtual) {
       try {
         const petData: PetData = this.petForm.value;
-
-        // Salvar no localStorage (por hora)
         const petsExistentes = JSON.parse(localStorage.getItem('petsCadastrados') || '[]');
-        petsExistentes.push({
-          ...petData,
-          id: Date.now(),
-          usuarioEmail: this.usuarioAtual.email,
-          usuarioNome: this.usuarioAtual.nome,
-          usuarioTipo: this.usuarioAtual.role,
-          dataCadastro: new Date().toISOString(),
-          status: 'disponivel'
-        });
+
+        if (this.isEditMode && this.editingPetId) {
+          // Atualizar pet existente
+          const petIndex = petsExistentes.findIndex((p: any) => p.id === this.editingPetId);
+          if (petIndex !== -1) {
+            petsExistentes[petIndex] = {
+              ...petsExistentes[petIndex],
+              ...petData,
+              foto: petData.fotos.length > 0 ? petData.fotos[0] : '/img/THUNDERPETS (4) (1).png'
+            };
+          }
+        } else {
+          // Adicionar novo pet
+          petsExistentes.push({
+            ...petData,
+            foto: petData.fotos.length > 0 ? petData.fotos[0] : '/img/THUNDERPETS (4) (1).png',
+            id: Date.now(),
+            usuarioEmail: this.usuarioAtual.email,
+            usuarioNome: this.usuarioAtual.nome,
+            usuarioTipo: this.usuarioAtual.role,
+            dataCadastro: new Date().toISOString(),
+            status: 'disponivel'
+          });
+        }
 
         localStorage.setItem('petsCadastrados', JSON.stringify(petsExistentes));
 
         // Mostrar sucesso e redirecionar
-        alert('✅ Pet cadastrado com sucesso!');
+        const message = this.isEditMode ? '✅ Pet atualizado com sucesso!' : '✅ Pet cadastrado com sucesso!';
+        alert(message);
 
-        // Redirecionar baseado no tipo do usuário
-        if (this.usuarioAtual.role === 'mediador') {
-          this.router.navigate(['/painel-mediador']);
-        } else if (this.usuarioAtual.role === 'doador') {
-          this.router.navigate(['/painel-doador']); // Volta para o painel do doador
-        } else {
-          this.router.navigate(['/painel-adotante']);
-        }
+        // Sempre redirecionar para o painel do doador
+        this.router.navigate(['/painel-doador']);
       } catch (error) {
-        alert('❌ Erro ao cadastrar pet. Tente novamente.');
+        alert('❌ Erro ao salvar pet. Tente novamente.');
       }
     } else {
       alert('❌ Preencha todos os campos obrigatórios corretamente.');
@@ -224,8 +247,9 @@ export class CadastrarPetComponent implements OnInit {
 
   // Cancelar cadastro
   cancelCadastro(): void {
-    if (confirm('Tem certeza que deseja cancelar o cadastro? Os dados não salvos serão perdidos.')) {
-      this.router.navigate(['/']);
+    const message = this.isEditMode ? 'cancelar a edição' : 'cancelar o cadastro';
+    if (confirm(`Tem certeza que deseja ${message}? Os dados não salvos serão perdidos.`)) {
+      this.router.navigate(['/painel-doador']);
     }
   }
 
@@ -260,5 +284,87 @@ export class CadastrarPetComponent implements OnInit {
   getEspecieIcon(): string {
     const especie = this.petForm.get('especie')?.value;
     return this.especiesDisponiveis.find(e => e.value === especie)?.icon || '🐾';
+  }
+
+  triggerFileInput(): void {
+    this.fileInput.nativeElement.click();
+  }
+
+  async onFileSelected(event: any): Promise<void> {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const promises: Promise<string>[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.type.startsWith('image/') && (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg')) {
+          promises.push(new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const dataUrl = e.target?.result as string;
+              resolve(dataUrl);
+            };
+            reader.readAsDataURL(file);
+          }));
+        }
+      }
+      const dataUrls = await Promise.all(promises);
+      this.selectedImages.push(...dataUrls);
+      const currentFotos = this.petForm.get('fotos')?.value || [];
+      currentFotos.push(...dataUrls);
+      this.petForm.get('fotos')?.setValue(currentFotos);
+    }
+  }
+
+  removeImage(index: number): void {
+    this.selectedImages.splice(index, 1);
+    const currentFotos = this.petForm.get('fotos')?.value || [];
+    currentFotos.splice(index, 1);
+    this.petForm.get('fotos')?.setValue(currentFotos);
+  }
+
+  // Carregar dados do pet para edição
+  loadPetForEditing(): void {
+    if (!this.editingPetId || !this.usuarioAtual) return;
+
+    try {
+      const petsCadastrados = JSON.parse(localStorage.getItem('petsCadastrados') || '[]');
+      const pet = petsCadastrados.find((p: any) => p.id === this.editingPetId && p.usuarioEmail === this.usuarioAtual.email);
+
+      if (pet) {
+        // Preencher o formulário com os dados do pet
+        this.petForm.patchValue({
+          nome: pet.nome,
+          especie: pet.especie,
+          raca: pet.raca,
+          idade: pet.idade,
+          unidade_idade: pet.unidade_idade,
+          porte: pet.porte,
+          genero: pet.genero,
+          temperamento: pet.temperamento || [],
+          vacinado: pet.vacinado || false,
+          vermifugado: pet.vermifugado || false,
+          castrado: pet.castrado || false,
+          necessidades_especiais: pet.necessidades_especiais || '',
+          energia: pet.energia,
+          fotos: pet.fotos || [],
+          descricao: pet.descricao,
+          caracteristicas_positivas: pet.caracteristicas_positivas || '',
+          localizacao: pet.localizacao,
+          contato: pet.contato
+        });
+
+        // Se há fotos existentes, mostrar como selectedImages
+        if (pet.fotos && pet.fotos.length > 0) {
+          this.selectedImages = [...pet.fotos];
+        }
+      } else {
+        alert('Pet não encontrado ou você não tem permissão para editá-lo.');
+        this.router.navigate(['/painel-doador']);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar pet para edição:', error);
+      alert('Erro ao carregar dados do pet.');
+      this.router.navigate(['/painel-doador']);
+    }
   }
 }

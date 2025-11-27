@@ -142,6 +142,9 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Ensure browsers offset anchor jumps to account for sticky header */
+html { scroll-padding-top: calc(var(--header-height, 56px) + 8px); }
+
 /* Background Pattern Professional */
 body::before {
     content: "";
@@ -257,12 +260,15 @@ header {
 /* ===== Hero / Carrossel ===== */
 .hero {
     position: relative;
-    height: 95vh;
+    min-height: calc(60vh - var(--header-height, 56px)); /* account for sticky header */
+    height: auto;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     color: white;
+    padding-top: calc(var(--header-height, 56px) + 0.75rem);
+    padding-bottom: clamp(24px, 8vw, 64px);
     overflow: hidden;
 }
 .carousel-fade {
@@ -285,7 +291,7 @@ header {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.12); /* lighter overlay, home component adds a stronger gradient with ::before */
 }
 .hero .container {
     position: relative;
@@ -295,10 +301,15 @@ header {
     color: #fff;
     text-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
+.hero h1 {
+    font-size: clamp(1.6rem, 6.5vw, 2.6rem);
+    line-height: 1.1;
+    margin-bottom: 0.6rem;
+}
 .hero p {
-    max-width: 600px;
+    max-width: 70ch;
     margin: 1rem auto 2rem;
-    font-size: larger;
+    font-size: clamp(0.95rem, 3.2vw, 1.1rem);
 }
 
 /* ===== Seções ===== */
@@ -312,6 +323,14 @@ header {
     color: #4b5563;
     max-width: 700px;
     margin: 0.5rem auto 2rem;
+}
+
+/* Prevent anchor targets and sections from being hidden under a sticky header */
+:target {
+    scroll-margin-top: calc(var(--header-height, 56px) + 8px);
+}
+.section, .section:target {
+    scroll-margin-top: calc(var(--header-height, 56px) + 8px);
 }
 
 /* ===== Missão ===== */
@@ -409,6 +428,7 @@ header {
 .pet-grid {
     display: grid;
     gap: 2rem;
+
 }
 
 .pet-card {
@@ -416,12 +436,14 @@ header {
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     overflow: hidden;
+
 }
 
 .pet-card img {
-    width: 100%;
+    width: 30px;
     height: 200px;
     object-fit: cover;
+   object-position: 50% 30%;
 }
 
 .pet-card-content {
