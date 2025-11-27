@@ -24,10 +24,19 @@ class DatabaseManager {
     async initDatabase() {
         await this.init();
 
-        // Execute schema
+        // Execute schema (split by semicolons for multiple statements)
         const schemaPath = './schema.sql';
         const schema = fs.readFileSync(schemaPath, 'utf8');
-        await this.run(schema);
+
+        // Split by semicolons and filter out empty statements
+        const statements = schema.split(';').map(s => s.trim()).filter(s => s.length > 0);
+
+        for (const statement of statements) {
+            if (statement.trim()) {
+                await this.run(statement);
+            }
+        }
+
         console.log('✅ Schema inicializado com dados de exemplo');
     }
 

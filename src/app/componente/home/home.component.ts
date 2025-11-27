@@ -200,60 +200,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     // Verificar se usuário está logado
     const currentUser = JSON.parse(localStorage.getItem('thunderpets_logged_user') || 'null');
 
-    if (!currentUser) {
+    console.log('👤 Usuário no home:', currentUser);
+
+    // Se não tem usuário no localStorage, mostrar mensagem de login
+    if (!currentUser || !currentUser.nome) {
       alert('Para adotar, você precisa estar logado. Redirecionando para login...');
       this.router.navigate(['/auth']);
       return;
     }
 
-    // Verificar se usuário tem papel adequado para adoção
-    if (currentUser.role === 'doador') {
-      const confirmacao = confirm(`${currentUser.nome}, você está registrado como Doador.\n\nSe você deseja receber um pet terapêutico, clique em "OK" para ir ao formulário de solicitação.\n\nSe deseja cancelar, clique em "Cancelar".`);
+    console.log('✅ Usuário validado no home:', currentUser.nome, 'Role:', currentUser.role);
 
-      if (confirmacao) {
-        alert(`Você será redirecionado para o formulário de solicitação de cuidado terapêutico com pets.\n\nEm seguida, analisaremos sua solicitação e estabeleceremos o contato com donos de pets disponíveis.`);
-        this.router.navigate(['/doar'], {
-          queryParams: {
-            pet: pet.id,
-            motivo: 'adocao_terapeutica'
-          }
-        });
-      }
+    // Para TODOS os usuários logados: mostrar mensagem simples e redirecionar
+    const confirmacao = confirm(`${pet.nome} foi adicionado ao seu painel de adotante! 🍇\n\nVocê pode visualizar todas as suas solicitações de adoção no seu painel personalizado.`);
 
-    } else if (currentUser.role === 'voluntario') {
-      alert(`${currentUser.nome}, como Voluntário, você pode ajudar nas adoções mas não pode adotar pets diretamente.\n\nEntre em contato conosco para saber como ajudar!`);
-      // Poderia abrir modal de contato ou redirecionar
-
-    } else if (currentUser.role === 'mediador') {
-      // Mediador pode aprovar adoções diretamente
-      const confirmacao = confirm(`${currentUser.nome}, você tem permissão de Mediador.\n\nDeseja marcar este pet como adotado pelo sistema?`);
-
-      if (confirmacao) {
-        // Marcar pet como adotado
-        if (pet.adotado) {
-          alert('Este pet já foi adotado.');
-        } else {
-          this.petsService.adoptPet(pet.id);
-          alert(`✅ ${pet.nome} marcado como adotado!`);
-          // Fechar modal e recarregar dados
-          this.closePetModal();
-          // Em produção: recarregar a lista de pets
-        }
-      }
-
-    } else {
-      // Usuário comum
-      const confirmacao = confirm(`${currentUser.nome}, obrigado pelo interesse!\n\nPara adotar ${pet.nome}, você precisa passar por uma avaliação terapêutica.\n\nIsso garante que a adoção seja benéfica para ambos.\n\nDeseja iniciar o processo de avaliação?`);
-
-      if (confirmacao) {
-        alert('Você será redirecionado para o formulário de solicitação de cuidado terapêutico.\n\nAvaliaremos suas necessidades e encontraremos o pet mais compatível.');
-        this.router.navigate(['/doar'], {
-          queryParams: {
-            pet: pet.id,
-            motivo: 'avaliacao_terapeutica'
-          }
-        });
-      }
+    if (confirmacao) {
+      // Redirecionar para painel adotante
+      this.router.navigate(['/painel-adotante']);
     }
   }
 
@@ -261,6 +224,21 @@ export class HomeComponent implements OnInit, OnDestroy {
     // Mostrar todos os pets matched - reforçar dados atuais
     this.matchedPets = [...this.matchedPets, ...this.matchedPets]; // Duplicar para demo
     this.hasMoreResults = false;
+  }
+
+  // Método auxiliar para obter top scores de compatibilidade
+  getTopScores(pet: Pet): { label: string, value: number }[] {
+    // Proteção contra compatibilidadeScore undefined ou propriedades individuais undefined
+    const scoreDepressao = pet?.compatibilidadeScore?.depressao || 50;
+    const scoreAnsiedade = pet?.compatibilidadeScore?.ansiedade || 50;
+    const scoreSolidao = pet?.compatibilidadeScore?.solidao || 50;
+
+    const scores = [
+      { label: 'Depressão', value: scoreDepressao },
+      { label: 'Ansiedade', value: scoreAnsiedade },
+      { label: 'Solidão', value: scoreSolidao }
+    ];
+    return scores.sort((a, b) => b.value - a.value).slice(0, 3);
   }
 
   // Método auxiliar para calcular idade formatada
@@ -279,5 +257,21 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Método auxiliar para capitalizar primeira letra
   capitalize(text: string): string {
     return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  // Método para obter o papel do usuário logado
+  getUserRole(): string | null {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('thunderpets_logged_user') || 'null');
+      return currentUser?.role || null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Método para verificar se usuário está logado
+  isUserLoggedIn(): boolean {
+    const userRole = this.getUserRole();
+    return userRole !== null && userRole !== undefined;
   }
 }

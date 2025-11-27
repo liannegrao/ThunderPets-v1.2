@@ -73,7 +73,7 @@ INSERT OR IGNORE INTO pets (nome, especie, raca, idade_meses, porte, energia, pe
     saude, cuidados, historia, casa_ideal, foto_url) VALUES
 
 -- CACHORROS
-('Biscoito', 'cachorro', 'Golden Retriever', 24, 'medio', 'ativo-aventurado',
+('Caramelo', 'cachorro', 'Golden Retriever', 24, 'medio', 'ativo-aventurado',
     'Energético e brincalhão, perfeito para combater inércia depressiva', 85, 60, 80,
     'Energia & Alegria', 'Vacinado, esterilizado', 'Exercícios diários moderados',
     'Encontrado ainda filhote', 'Qualquer lar com disposição para caminhadas', '/img/cachorro-caramelo-Petlove.jpg'),
@@ -88,13 +88,13 @@ INSERT OR IGNORE INTO pets (nome, especie, raca, idade_meses, porte, energia, pe
     'Apoio contra Ansiedade', 'Saudável, vacinado', 'Cuidados veterinários regulares',
     'Companion dog cuidado', 'Apartamentos ou casas pequenas', '/img/cachorro-_1750287085273-750x375.webp'),
 
-('Luna', 'cachorro', 'Beagle', 48, 'pequeno', 'calmo-caseiro',
+('Lua', 'cachorro', 'Beagle', 48, 'pequeno', 'calmo-caseiro',
     'Dócil e carinhosa, ideal para insônia e ansiedade', 40, 95, 70,
     'Calma & Serenidade', 'Excelente saúde', 'Ração premium',
     'Encontrada abandonada', 'Ambientes calmos', '/img/pexels-photo-2247894.jpeg'),
 
 -- GATOS
-('Purês', 'gato', 'Vira-lata laranja', 24, 'medio', 'moderado',
+('Lua', 'gato', 'Vira-lata laranja', 24, 'medio', 'moderado',
     'Muito afetuoso, adora colo humano', 60, 80, 85,
     'Afeto & Companheirismo', 'Esterilizado, vacinas', 'Limpeza diária caixa areia',
     'Resgatado filhote', 'Qualquer ambiente doméstico', '/img/Design sem nome.jpg'),
@@ -104,26 +104,78 @@ INSERT OR IGNORE INTO pets (nome, especie, raca, idade_meses, porte, energia, pe
     'Paz & Serenidade', 'Esterilizada, vacinas', 'Água sempre fresca',
     'Gata independente', 'Apartamentos silenciosos', '/img/patas.png'),
 
--- ⭐ PETS ADICIONAIS PARA DEMOSTRAÇÕES ⭐
-('Max', 'cachorro', 'Bulldog Francês', 32, 'pequeno', 'moderado',
+-- ⭐ PETS ADICIONAIS VARIADOS ⭐
+('Maxwell', 'cachorro', 'Bulldog Francês', 32, 'pequeno', 'moderado',
     'Alegre e infantil, ajuda a resgatar alegria perdida', 80, 70, 75,
     'Alegria Recuperada', 'Vacinas atualizadas, saúde ótima', 'Passeios diários curtos',
     'Bulldog resgatado de canil', 'Apartamentos acolhedores', '/img/Filhote-labrador-5.jpg'),
 
-('Bella', 'cachorro', 'Border Collie', 28, 'medio', 'ativo-aventurado',
+('Isabela', 'cachorro', 'Border Collie', 28, 'medio', 'ativo-aventurado',
     'Alta energia, combate depressão através de atividades', 90, 40, 85,
     'Energia Mental', 'Excelente saúde física', 'Exercícios intensos diários',
     'Athlete Border Collie', 'Casas com espaço para atividades', '/img/homem-abracando-seu-pitbull-amigavel.jpg'),
 
-('Charlie', 'cachorro', 'Shih Tzu', 54, 'pequeno', 'calmo-caseiro',
+('Carlos', 'cachorro', 'Shih Tzu', 54, 'pequeno', 'calmo-caseiro',
     'Muito pacífico, reduz ansiedade por presença constante', 45, 92, 75,
     'Serenidade Diária', 'Saúde perfeita', 'Cuidados especiais felpudos',
     'Companion perfeito', 'Qualquer lar amoroso', '/img/shihtzunsc.jpg'),
 
-('Mimi', 'gato', 'Persa', 42, 'medio', 'calmo-caseiro',
+('Cristal', 'gato', 'Persa', 42, 'medio', 'calmo-caseiro',
     'Doce e calma, ajuda na ansiedade durante crises', 30, 95, 80,
     'Redução da Ansiedade', 'Cuidado veterinário regular', 'Escovação diária',
-    'Gata de rua resgatada', 'Ambientes calmos, interiores', '/img/mulher-feliz-com-seu-cachorro-fofo_23-2148345885.avif');
+    'Gata de rua resgatada', 'Ambientes calmos, interiores', '/img/mulher-feliz-com-seu-cachorro-fofo_23-2148345885.avif'),
+
+-- Novos Pets - 5 CACHORROS + 5 GATOS ⭐⭐
+('Bella Jr', 'cachorro', 'Bulldog Ingles', 30, 'medio', 'moderado',
+    'Brincalhona e calma, perfeita para famílias com crianças', 75, 65, 70,
+    'Diversão Familiar', 'Vacinado, saudável', 'Passeios diários leves',
+    'Resgatada de abrigo', 'Famílias acolhedoras', '/img/THUNDERPETS (4) (1).png'),
+
+('Rex Bonito', 'cachorro', 'Pastor Alemão', 40, 'grande', 'ativo-aventurado',
+    'Leal e protetor, ajuda a combater ansiedade através de estrutura', 55, 80, 85,
+    'Proteção & Segurança', 'Precisa treinamento básico', 'Exercícios intensos',
+    'Doado por família', 'Lares responsáveis', '/img/THUNDERPETS (4) (1).png'),
+
+('Nina Serena', 'cachorro', 'Chow Chow', 28, 'medio', 'calmo-caseiro',
+    'Muito serena e independente, ideal para meditadores', 60, 90, 65,
+    'Serenidade Interior', 'Saudável, pelagem especial', 'Escovação frequente',
+    'Criança abandonada', 'Ambientes tranquilos', '/img/THUNDERPETS (4) (1).png'),
+
+('Pipoca Alegre', 'cachorro', 'Basset Hound', 35, 'pequeno', 'moderado',
+    'Sempre sorrindo, contagia alegria por onde passa', 88, 45, 78,
+    'Fonte de Alegria', 'Excelente saúde', 'Passeios moderados',
+    'Encontrada perdida', 'Quartos aconchegantes', '/img/THUNDERPETS (4) (1).png'),
+
+('Zoe Inteligente', 'cachorro', 'Malamute do Alasca', 45, 'grande', 'ativo-aventurado',
+    'Muito esperta, ajuda na confiança através de desafios', 82, 35, 75,
+    'Motivação & Confiança', 'Precisa atividades físicas', 'Exercícios pesados',
+    'Resgatada de situação ruim', 'Espaços amplos', '/img/THUNDERPETS (4) (1).png'),
+
+-- Novos GATOS
+('Mimi Doce', 'gato', 'Siamês', 28, 'medio', 'calmo-caseiro',
+    'Vocal e carinhosa, ajuda na expressão emocional através de conversas', 50, 88, 72,
+    'Comunicação Emocional', 'Vacinado, esterilizado', 'Atenção diária',
+    'Abandonada jovem', 'Lares atenciosos', '/img/THUNDERPETS (4) (1).png'),
+
+('Luna Mística', 'gato', 'Sphynx', 32, 'pequeno', 'moderado',
+    'Espiritual e observadora, ajuda na consciência plena', 52, 85, 68,
+    'Presença Consciente', 'Cuidado especial com pele', 'Higiene rigorosa',
+    'Doada por dono que não podia cuidar', 'Ambientes limpos', '/img/THUNDERPETS (4) (1).png'),
+
+('Simba Poderoso', 'gato', 'Maine Coon', 42, 'grande', 'calmo-caseiro',
+    'Imponente e calmo, ajuda a encontrar paz interior', 58, 78, 82,
+    'Força Interna', 'Saudável, escovação diária', 'Espaço para se movimentar',
+    'Encontrado adulto', 'Casas espaçosas', '/img/THUNDERPETS (4) (1).png'),
+
+('Pandora Curiosa', 'gato', 'Ragdoll', 26, 'medio', 'moderado',
+    'Muito curiosa, ajuda a resgatar a criança interior', 68, 55, 80,
+    'Redescoberta da Alegria', 'Vacinado completo', 'Brincadeiras diárias',
+    'De família amorosa', 'Ambientes brandos', '/img/THUNDERPETS (4) (1).png'),
+
+('Nala Feroz', 'gato', 'Bengal', 31, 'medio', 'ativo-aventurado',
+    'Energética e selvagem, ajuda a sair da zona de conforto', 83, 42, 76,
+    'Libertação Emocional', 'Pronto para aventuras', 'Estimulação mental',
+    'Nascida em abrigo', 'Lares dinâmicos', '/img/THUNDERPETS (4) (1).png');
 
 -- Usuários iniciais
 INSERT OR IGNORE INTO usuarios (nome, email, password_hash, role) VALUES

@@ -64,15 +64,17 @@ export class CadastrarPetComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const usuarioLogadoStr = localStorage.getItem('thunderpets_users');
+    // Buscar usuário LOGADO (não usuários cadastrados no sistema)
+    const usuarioLogadoStr = localStorage.getItem('thunderpets_logged_user');
     if (!usuarioLogadoStr) {
       this.router.navigate([''], { queryParams: { login: 'required' } });
       return;
     }
 
-    // Recuperar dados completos do usuário
+    // Recuperar dados do usuário logado
     try {
       this.usuarioAtual = JSON.parse(usuarioLogadoStr);
+      console.log('🐕 Usuário logado para cadastrar pet:', this.usuarioAtual);
     } catch (error) {
       console.error('Erro ao recuperar dados do usuário:', error);
       this.router.navigate([''], { queryParams: { login: 'required' } });
@@ -198,7 +200,15 @@ export class CadastrarPetComponent implements OnInit {
 
         // Mostrar sucesso e redirecionar
         alert('✅ Pet cadastrado com sucesso!');
-        this.router.navigate(['/']);
+
+        // Redirecionar baseado no tipo do usuário
+        if (this.usuarioAtual.role === 'mediador') {
+          this.router.navigate(['/painel-mediador']);
+        } else if (this.usuarioAtual.role === 'doador') {
+          this.router.navigate(['/painel-doador']); // Volta para o painel do doador
+        } else {
+          this.router.navigate(['/painel-adotante']);
+        }
       } catch (error) {
         alert('❌ Erro ao cadastrar pet. Tente novamente.');
       }

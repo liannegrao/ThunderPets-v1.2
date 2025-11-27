@@ -590,3 +590,72 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
+
+/* ===== SECTION HEADER WITH ACTIONS ===== */
+.section-header-with-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--color-gray-200);
+}
+
+.section-header-with-actions h3 {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 1.3rem;
+}
+
+/* ===== BOTÃO LIMPAR PETS ADOTADOS ===== */
+.btn-cleanup {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.btn-cleanup:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
+}
+
+.btn-cleanup:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+/* ===== EMPTY SECTION ===== */
+.empty-section {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--color-gray-50);
+  border-radius: 12px;
+  border: 2px dashed var(--color-gray-300);
+}
+
+.empty-section .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.empty-section h3 {
+  color: var(--color-gray-800);
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.empty-section p {
+  color: var(--color-gray-600);
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}

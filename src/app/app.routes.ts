@@ -4,7 +4,7 @@ import { LoginComponent } from './componente/login/login.component';
 import { CadastrarPetComponent } from './pages/cadastrar-pet/cadastrar-pet.component';
 import { DoarComponent } from './pages/doar/doar.component';
 import { PainelMediadorComponent } from './componente/painel-mediador/painel-mediador.component';
-import { PainelVoluntarioComponent } from './componente/painel-voluntario/painel-voluntario.component';
+import { PainelAdotanteComponent } from './componente/painel-adotante/painel-adotante.component';
 import { PainelDoadorComponent } from './componente/painel-doador/painel-doador.component';
 import { AuthGuard } from './guards/auth.guard';
 
@@ -18,8 +18,8 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'painel-voluntario',
-    component: PainelVoluntarioComponent,
+    path: 'painel-adotante',
+    component: PainelAdotanteComponent,
     canActivate: [AuthGuard]
   },
   {
@@ -29,6 +29,6 @@ export const routes: Routes = [
   },
   { path: 'doar', component: DoarComponent },
   // Routes para futuras páginas - redirecionam para home por enquanto
-  { path: 'voluntario', redirectTo: 'painel-voluntario' },
+  { path: 'voluntario', redirectTo: 'painel-adotante' },
   { path: '**', redirectTo: '' }
 ];

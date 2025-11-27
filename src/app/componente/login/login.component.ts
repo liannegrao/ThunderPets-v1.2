@@ -122,7 +122,7 @@ export class LoginComponent implements OnInit {
       const { nome, email, password, tipo } = this.cadastroForm.value;
 
       // Convert tipo to role format expected by AuthService
-      const role = tipo === 'Administrador' ? 'mediador' : 'doador';
+      const role = tipo === 'Administrador' ? 'mediador' : 'doador'; // Usuários comuns são "doador"
 
       const result = await this.authService.register({
         nome,
@@ -133,9 +133,39 @@ export class LoginComponent implements OnInit {
 
       if (result.success) {
         this.showMessage('✅ Conta criada com sucesso!', 'success');
-        setTimeout(() => {
-          this.closeModal();
-          this.router.navigate(['/']);
+
+        // 🔄 Fazer login automático após cadastro
+        setTimeout(async () => {
+          try {
+            const loginResult = await this.authService.login({
+              email,
+              password,
+              rememberMe: true
+            });
+
+            if (loginResult.success) {
+              console.log('✅ Login automático realizado após cadastro');
+              this.closeModal();
+
+              // Redirecionar baseado no role do usuário
+              const userRole = role; // O role que acabamos de determinar
+              if (userRole === 'mediador') {
+                this.router.navigate(['/painel-mediador']);
+              } else if (userRole === 'doador') {
+                this.router.navigate(['/painel-doador']); // Usuários doadores vão para seu painel
+              } else {
+                this.router.navigate(['/painel-adotante']); // Outros casos
+              }
+            } else {
+              console.error('❌ Falhou login automático');
+              this.closeModal();
+              this.router.navigate(['/auth']); // Volta para login se falhar
+            }
+          } catch (error) {
+            console.error('Erro no login automático:', error);
+            this.closeModal();
+            this.router.navigate(['/auth']);
+          }
         }, 1500);
       } else {
         this.showMessage(result.error || 'Erro no cadastro', 'error');
@@ -166,5 +196,15 @@ export class LoginComponent implements OnInit {
 
   closeModal(): void {
     this.closed.emit();
+    console.log('🗂️ Modal de autenticação fechado: navegando para home e seção "Disponíveis para Adoção"');
+    // Primeiro navegar para home, depois fazer scroll
+    this.router.navigate(['/']).then(() => {
+      setTimeout(() => {
+        const adoptionSection = document.getElementById('adote');
+        if (adoptionSection) {
+          adoptionSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 300);
+    });
   }
 }

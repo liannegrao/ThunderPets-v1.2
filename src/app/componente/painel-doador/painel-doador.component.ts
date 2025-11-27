@@ -136,28 +136,8 @@ export class PainelDoadorComponent implements OnInit, OnDestroy {
     alert(`Funcionalidade de edição será implementada em breve.\n\nPara editar ${pet.nome}, você poderá:\n- Alterar descrição\n- Atualizar fotos\n- Modificar localização\n- Ajustar outras informações`);
   }
 
-  // Marcar pet como adotado
-  marcarComoAdotado(pet: PetCadastrado): void {
-    if (confirm(`Tem certeza que ${pet.nome} foi adotado? Esta ação não pode ser desfeita.`)) {
-      // Atualizar status no localStorage
-      try {
-        const petsCadastrados = JSON.parse(localStorage.getItem('petsCadastrados') || '[]');
-        const petIndex = petsCadastrados.findIndex((p: any) => p.id === pet.id);
-
-        if (petIndex !== -1) {
-          petsCadastrados[petIndex].status = 'adotado';
-          localStorage.setItem('petsCadastrados', JSON.stringify(petsCadastrados));
-        }
-
-        // Atualizar lista local
-        pet.status = 'adotado';
-        alert(`✅ ${pet.nome} marcado como adotado!`);
-      } catch (error) {
-        console.error('Erro ao marcar como adotado:', error);
-        alert('❌ Erro ao atualizar status do pet.');
-      }
-    }
-  }
+  // Removido: Marcar como adotado - só mediadores podem fazer isso
+  // Os doadores só podem cadastrar e editar informações básicas dos pets
 
   // Adicionar novo pet
   adicionarNovoPet(): void {

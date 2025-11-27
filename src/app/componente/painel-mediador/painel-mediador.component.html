@@ -184,7 +184,15 @@
 
         <!-- Adopted Pets -->
         <div class="pets-list">
-          <h3>❤️ Pets Adotados</h3>
+          <div class="section-header-with-actions">
+            <h3>❤️ Pets Adotados</h3>
+            <button *ngIf="getAdoptedPetsCount() > 0"
+                    class="btn-cleanup"
+                    (click)="limparPetsAdotados()"
+                    title="Limpar/finalizar pets adotados">
+              🧹 Limpar Pets Adotados
+            </button>
+          </div>
           <div class="pets-grid">
             <div *ngFor="let pet of getPetsPorStatus('adotado')" class="pet-card-mediador">
               <div class="pet-header">
@@ -202,6 +210,10 @@
                 <p>{{ pet.personalidade }}</p>
               </div>
             </div>
+          </div>
+          <div *ngIf="getAdoptedPetsCount() === 0" class="empty-section">
+            <div class="empty-icon">🎉</div>
+            <p>Nenhum pet adotado ainda. As adoções aparecerão aqui quando forem realizadas.</p>
           </div>
         </div>
       </div>

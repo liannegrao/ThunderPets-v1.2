@@ -1,0 +1,404 @@
+<!-- ===== PAINEL DO ADOTANTE ===== -->
+<div class="painel-adotante container">
+  <header class="painel-header">
+    <h1>🏠 Painel do Adotante</h1>
+    <p>Encontre o pet perfeito para sua família</p>
+  </header>
+
+  <!-- ===== SUAS SOLICITAÇÕES ===== -->
+  <section class="solicitacoes-section">
+    <div class="solicitacoes-card">
+      <h2>📋 Suas Solicitações</h2>
+      <div class="solicitacoes-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ getSolicitacoesStats().pendentes }}</span>
+          <span class="stat-label">Aguardando Aprovação</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ getSolicitacoesStats().aprovadas }}</span>
+          <span class="stat-label">Aprovadas</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ getSolicitacoesStats().rejeitadas }}</span>
+          <span class="stat-label">Não Aprovadas</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PETS DISPONÍVEIS ===== -->
+  <section class="pets-disponiveis-section">
+    <div class="section-header">
+      <h2>❤️ Pets Disponíveis para Adoção</h2>
+      <p>Conheça nossos companheiros que aguardam um novo lar</p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-section">
+      <div class="filters-grid">
+        <select class="filter-select" [(ngModel)]="filtroEspecie" (change)="aplicarFiltros()">
+          <option value="">Todas as Espécies</option>
+          <option value="cachorro">🐕 Cachorros</option>
+          <option value="gato">🐱 Gatos</option>
+          <option value="outros">🐾 Outros</option>
+        </select>
+
+        <select class="filter-select" [(ngModel)]="filtroPorte" (change)="aplicarFiltros()">
+          <option value="">Todos os Portes</option>
+          <option value="pequeno">Miniatura (até 5kg)</option>
+          <option value="medio">Médio (5-15kg)</option>
+          <option value="grande">Grande (acima 15kg)</option>
+        </select>
+
+        <select class="filter-select" [(ngModel)]="filtroEnergia" (change)="aplicarFiltros()">
+          <option value="">Todas as Energias</option>
+          <option value="baixo">Calmo/Caseiro</option>
+          <option value="medio">Moderado/Ativo</option>
+          <option value="alto">Hiperativo</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Lista de Pets -->
+    <div class="pets-showcase-grid">
+      <div class="pet-showcase-card" *ngFor="let pet of petsFiltrados; let i = index; trackBy: trackByPet">
+        <div class="pet-showcase-image">
+          <img [src]="pet.foto" [alt]="pet.nome" class="pet-showcase-img">
+          <div class="pet-showcase-overlay">
+            <button class="btn-view-details" (click)="openPetDetails(pet)">
+              📋 Ver Detalhes
+            </button>
+            <button class="btn-adopt-now" (click)="requestAdoption(pet)">
+              ❤️ Quero Adotar!
+            </button>
+          </div>
+        </div>
+
+        <div class="pet-showcase-content">
+          <div class="pet-showcase-header">
+            <h3>{{ pet.nome }}</h3>
+            <span class="pet-showcase-species">{{ pet.especie | titlecase }} • {{ pet.raca }}</span>
+            <!-- Botão de exclusão para mediadores -->
+            <button *ngIf="isUserMediator()" class="btn-delete-pet" (click)="excluirPet($event, pet)"
+                    title="Excluir pet (Apenas Mediadores)">
+              🗑️
+            </button>
+          </div>
+
+          <div class="pet-showcase-info">
+            <span class="pet-info-item">📏 {{ pet.porte | titlecase }}</span>
+            <span class="pet-info-item">⚡ {{ pet.energia || 'Moderado' }}</span>
+            <span class="pet-info-item">🎂 {{ getFormattedAge(pet.idade) }}</span>
+          </div>
+
+          <p class="pet-showcase-description">{{ pet.personalidade | slice:0:100 }}...</p>
+
+          <div class="pet-showcase-benefits">
+            <span class="benefit-tag">{{ pet.beneficioEmocional || 'Companheiro Fiel' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carregamento -->
+    <div class="loading-section" *ngIf="isLoadingPets">
+      <div class="loading-spinner">🔄</div>
+      <p>Carregando pets disponíveis...</p>
+    </div>
+
+    <!-- Nenhum pet encontrado -->
+    <div class="empty-section" *ngIf="!isLoadingPets && petsFiltrados.length === 0 && petsDisponiveis.length > 0">
+      <div class="empty-icon">😔</div>
+      <h3>Nenhum pet encontrado</h3>
+      <p>Tente ajustar os filtros ou remover algumas restrições.</p>
+      <button class="btn-secondary" (click)="limparFiltros()">
+        🔄 Limpar Filtros
+      </button>
+    </div>
+
+    <!-- Ainda nenhum pet no sistema -->
+    <div class="empty-section" *ngIf="!isLoadingPets && petsDisponiveis.length === 0">
+      <div class="empty-icon">🐾</div>
+      <h3>Em breve teremos pets disponíveis</h3>
+      <p>Estamos aguardando novos cadastros de doadores. Volte em breve!</p>
+    </div>
+  </section>
+
+  <!-- ===== MATCHING TERAPÊUTICO (SEÇÃO EXPANDÍVEL) ===== -->
+  <section class="matching-section">
+    <div class="matching-card expandable">
+      <div class="matching-header" (click)="toggleMatching()">
+        <h2>🎯 Matching Terapêutico Personalizado</h2>
+        <button class="expand-btn">
+          {{ showMatching ? '➖' : '➕' }} Encontre pets compatíveis com suas necessidades emocionais
+        </button>
+      </div>
+
+      <div class="matching-content" *ngIf="showMatching">
+        <p class="matching-description">
+          Responda a algumas perguntas rápidas e encontraremos os pets mais compatíveis com sua situação emocional atual.
+        </p>
+
+        <form [formGroup]="matchingForm" (ngSubmit)="onMatchSubmit()" class="matching-form">
+          <!-- Situação Emocional -->
+          <div class="form-group">
+            <label class="form-label">Como você está se sentindo? 😊</label>
+            <select formControlName="situacao" class="form-select">
+              <option value="">Selecione sua situação...</option>
+              <option value="depressao">Lutando com depressão/inércia</option>
+              <option value="ansiedade">Ansiedade elevada/stress</option>
+              <option value="solidao">Sentindo-me sozinho(isolamento)</option>
+              <option value="mudanca">Passando por mudança dolorosa</option>
+              <option value="terapia">Buscando apoio terapêutico geral</option>
+            </select>
+          </div>
+
+          <!-- Energia Disponível -->
+          <div class="form-group">
+            <label class="form-label">Quanto tempo você dedica? ⏰</label>
+            <select formControlName="energia" class="form-select">
+              <option value="">Nível de energia desejado...</option>
+              <option value="baixo">Pequeno esforço (animal calmo)</option>
+              <option value="medio">Esforço médio (animal ativo)</option>
+              <option value="alto">Alto esforço (animal muito ativo)</option>
+            </select>
+          </div>
+
+          <!-- Disponibilidade Horária -->
+          <div class="form-group">
+            <label class="form-label">Sua disponibilidade diária? 📅</label>
+            <div class="checkbox-grid">
+              <label class="checkbox-item" *ngFor="let opcao of disponibilidadeOptions">
+                <input type="checkbox" [value]="opcao.value"
+                       [formControlName]="opcao.value">
+                <span class="checkmark">{{opcao.emoji}}</span>
+                <span>{{opcao.label}}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Botão Matching -->
+          <div class="form-actions">
+            <button type="submit" [disabled]="matchingForm.invalid || isMatching"
+                    class="btn-primary match-btn">
+              <span *ngIf="isMatching" class="spinner">🔄</span>
+              {{ isMatching ? 'Analisando compatibilidade...' : '🔍 Encontre Meu Pet Ideal' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== RESULTADOS DO MATCHING ===== -->
+  <section class="results-section" *ngIf="showResults">
+    <div class="results-header">
+      <h2>💚 Pets Compatíveis Encontrados</h2>
+      <p class="results-subtitle">{{ matchedPets.length }} pets ideias para sua situação terapêutica</p>
+    </div>
+
+    <!-- Lista de Pets Matched -->
+    <div class="pets-matched-grid">
+      <div class="pet-match-card" *ngFor="let pet of matchedPets">
+        <div class="pet-match-image">
+          <img [src]="pet.foto" [alt]="pet.nome" class="pet-img">
+          <div class="pet-status-badge" [ngClass]="getTherapyBadge(pet)">
+            {{ getTherapyLabel(pet) }}
+          </div>
+        </div>
+
+        <div class="pet-match-content">
+          <div class="pet-match-header">
+            <h3>{{ pet.nome }}</h3>
+            <div class="pet-species">{{ pet.especie | titlecase }} • {{ pet.raca }}</div>
+          </div>
+
+          <div class="pet-benefits">
+            <span class="benefit-chip">{{ pet.beneficioEmocional }}</span>
+          </div>
+
+          <div class="compatibility-scores">
+            <div class="score-item" *ngFor="let score of getTopScores(pet)">
+              <span class="score-label">{{ score.label }}</span>
+              <div class="score-bar">
+                <div class="score-fill" [style.width.%]="score.value"></div>
+              </div>
+              <span class="score-value">{{ score.value }}%</span>
+            </div>
+          </div>
+
+          <p class="pet-description" [innerHTML]="pet.personalidade | slice:0:120"></p>
+
+          <div class="pet-actions">
+            <button class="btn-secondary" (click)="openPetDetails(pet)">
+              📋 Ver Detalhes
+            </button>
+            <button class="btn-primary" (click)="requestAdoption(pet)">
+              ❤️ Solicitar Adoção
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mostrar mais resultados -->
+    <div class="show-more" *ngIf="hasMoreResults">
+      <button class="btn-outline" (click)="showMoreResults()">
+        📈 Mostrar Todos os Resultados
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== ESTATÍSTICAS DE IMPACTO ===== -->
+  <section class="impact-section">
+    <h2>📊 Nosso Impacto na Comunidade</h2>
+    <div class="impact-stats">
+      <div class="impact-card">
+        <div class="impact-icon">🐕‍🦺</div>
+        <div class="impact-content">
+          <div class="impact-number">{{ getTotalPetsDisponiveis() }}</div>
+          <div class="impact-label">Pets Esperando Lar</div>
+        </div>
+      </div>
+
+      <div class="impact-card">
+        <div class="impact-icon">💙</div>
+        <div class="impact-content">
+          <div class="impact-number">{{ getTaxaSucesso() }}%</div>
+          <div class="impact-label">Taxa de Adoção</div>
+        </div>
+      </div>
+
+      <div class="impact-card">
+        <div class="impact-icon">🏆</div>
+        <div class="impact-content">
+          <div class="impact-number">{{ getTotalAdocoes() }}</div>
+          <div class="impact-label">Famílias Felizes</div>
+        </div>
+      </div>
+
+      <div class="impact-card">
+        <div class="impact-icon">🌟</div>
+        <div class="impact-content">
+          <div class="impact-number">4.8</div>
+          <div class="impact-label">Satisfação Média</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===== MODAL CONFIRMAÇÃO DE ADOÇÃO ===== -->
+<div class="confirmation-modal-overlay" *ngIf="showConfirmationModal && confirmationPet" (click)="cancelAdoption()">
+  <div class="confirmation-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header-pet">
+      <h2>🤔 Confirmar Solicitação de Adoção</h2>
+      <button class="modal-close" (click)="cancelAdoption()">&times;</button>
+    </div>
+
+    <div class="modal-body-pet">
+      <div class="pet-gallery">
+        <img [src]="confirmationPet.foto" [alt]="confirmationPet.nome" class="pet-main-image">
+      </div>
+
+      <div class="confirmation-content">
+        <div class="confirmation-pet-info">
+          <h3 class="confirmation-pet-title">
+            {{ confirmationPet.nome }} - {{ confirmationPet.raca }}
+          </h3>
+          <div class="benefit-badge confirmation-badge">
+            {{ confirmationPet.beneficioEmocional }}
+          </div>
+          <p class="confirmation-pet-description">
+            {{ confirmationPet.personalidade }}
+          </p>
+
+          <div class="compatibility-preview">
+            <h4 class="compatibility-title">💙 Compatibilidade com Você:</h4>
+            <div *ngFor="let score of getTopScores(confirmationPet)" class="score-row">
+              <div class="score-header">
+                <span class="score-label">{{ score.label }}</span>
+                <span class="score-value">{{ score.value }}%</span>
+              </div>
+              <div class="score-bar-container">
+                <div class="score-fill-bg" [style.width.%]="score.value"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="confirmation-message">
+            <h4 class="message-title">
+              📋 Processo de Adoção Terapêutica
+            </h4>
+            <ul class="message-list">
+              <li>✅ Sua solicitação será enviada aos <strong>mediadores</strong> para análise</li>
+              <li>✅ Os mediadores avaliarão a compatibilidade e adequação</li>
+              <li>✅ Você será contactado por email/telefone para próximos passos</li>
+              <li>⏰ <strong>Prazo:</strong> Normalmente até 48 horas para primeira resposta</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirmation-modal-actions">
+      <button class="btn-secondary" (click)="cancelAdoption()">
+        ❌ Cancelar
+      </button>
+      <button class="btn-primary" (click)="confirmAdoption()">
+        ✅ Sim, Solicitar Adoção
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL DETALHES PET ===== -->
+<div class="pet-modal-overlay" *ngIf="showPetModal && selectedPet" (click)="closePetModal()">
+  <div class="pet-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header-pet">
+      <h2>{{ selectedPet.nome }} - Companheiro Perfeito</h2>
+      <button class="modal-close" (click)="closePetModal()">&times;</button>
+    </div>
+
+    <div class="modal-body-pet">
+      <div class="pet-gallery">
+        <img [src]="selectedPet.foto" [alt]="selectedPet.nome" class="pet-main-image">
+      </div>
+
+      <div class="pet-details-grid">
+        <div class="pet-info-basic">
+          <h3>🐾 Informações Básicas</h3>
+          <ul>
+            <li><strong>Espécie:</strong> {{ selectedPet.especie | titlecase }}</li>
+            <li><strong>Raça:</strong> {{ selectedPet.raca }}</li>
+            <li><strong>Idade:</strong> {{ getFormattedAge(selectedPet.idade) }}</li>
+            <li><strong>Porte:</strong> {{ selectedPet.porte | titlecase }}</li>
+            <li><strong>Energia:</strong> {{ selectedPet.energia | titlecase }}</li>
+          </ul>
+        </div>
+
+        <div class="pet-characteristics">
+          <h3>💙 Sobre {{ selectedPet.nome }}</h3>
+          <p>{{ selectedPet.personalidade }}</p>
+          <div class="benefit-badge">
+            {{ selectedPet.beneficioEmocional }}
+          </div>
+        </div>
+
+        <div class="pet-health-care">
+          <h3>🌟 Saúde e Cuidados</h3>
+          <p><strong>Saúde:</strong> {{ selectedPet.saude || 'Boa saúde geral' }}</p>
+          <p><strong>Cuidados Especiais:</strong> {{ selectedPet.cuidados || 'Cuidados básicos de rotina' }}</p>
+          <p><strong>Casa Ideal:</strong> {{ selectedPet.casaIdeal || 'Ambiente familiar com espaço para brincar' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions-pet">
+      <button class="btn-primary" (click)="requestAdoption(selectedPet)">
+        ❤️ Solicitar Adoção
+      </button>
+    </div>
+  </div>
+</div>

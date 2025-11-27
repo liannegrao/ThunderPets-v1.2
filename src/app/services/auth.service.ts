@@ -117,12 +117,8 @@ export class AuthService {
     // Remove password before storing
     const { password, ...userWithoutPassword } = user as Usuario & { password?: string };
 
-    // Store in localStorage if persistent
-    if (persistent) {
-      localStorage.setItem(this.LOGGED_USER_KEY, JSON.stringify(userWithoutPassword));
-    } else {
-      sessionStorage.setItem(this.LOGGED_USER_KEY, JSON.stringify(userWithoutPassword));
-    }
+    // 🔄 SEMPRE salvar no localStorage por padrão (mais confiável)
+    localStorage.setItem(this.LOGGED_USER_KEY, JSON.stringify(userWithoutPassword));
 
     // Update subject
     this.currentUserSubject.next(userWithoutPassword);

@@ -21,35 +21,45 @@
     <div id="missao" class="mission section-highlight">
       <div class="section-header">
         <h2>Nossa Missão</h2>
-        <p>Promover bem-estar emocional através da conexão terapêutica entre humanos e animais.</p>
+        <p>Mediar a relação entre doadores e adotantes de cães e gatos, facilitando adoções terapêuticas que contribuem para o tratamento da saúde emocional tanto das pessoas em sofrimento psíquico quanto dos animais resgatados.</p>
       </div>
-      <div class="mission-grid">
-        <div class="mission-item">
-          <div class="icon-wrapper" style="background-color: var(--color-teal-100); color: var(--color-teal-600);">
-            <svg style="width: 2rem; height: 2rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm4 14-4-2v-6l4 4v4z"></path>
-            </svg>
-          </div>
-          <h3>Terapia e Apoio Emocional</h3>
-          <p>Utilizamos animais como co-terapeutas naturais para ajudar pessoas com depressão, ansiedade e solidão através de conexões significativas.</p>
+      <div class="vision-values-grid">
+        <div class="vision-values-item">
+          <h3>Visão</h3>
+          <p>Ser a principal plataforma de conexão entre pessoas que desejam doar ou adotar cães e gatos, promovendo vínculos afetivos que fortaleçam a saúde emocional dos adotantes e ofereçam aos animais uma vida segura, acolhedora e cheia de afeto. Almejamos tornar-nos referência em adoção responsável, cuidado emocional e bem-estar humano-animal.</p>
         </div>
-        <div class="mission-item">
-          <div class="icon-wrapper" style="background-color: var(--color-orange-100); color: var(--color-orange-600);">
-            <svg style="width: 2rem; height: 2rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-            </svg>
+        <div class="vision-values-item">
+          <h3 style="text-align: center; margin-bottom: 1.5rem;">Valores</h3>
+          <div class="values-list">
+            <div class="value-item">
+              <strong>1. Empatia</strong><br>
+              <small>Colocamos no centro a compreensão sensível das necessidades emocionais de pessoas e animais.</small>
+            </div>
+            <div class="value-item">
+              <strong>2. Bem-estar Humano-Animal</strong><br>
+              <small>Acreditamos na força terapêutica da conexão afetiva entre humanos e animais, prezando pelo cuidado e equilíbrio de ambos.</small>
+            </div>
+            <div class="value-item">
+              <strong>3. Adoção Responsável</strong><br>
+              <small>Promovemos processos transparentes, éticos e seguros, garantindo que cada adoção seja consciente e positiva.</small>
+            </div>
+            <div class="value-item">
+              <strong>4. Acolhimento</strong><br>
+              <small>Criamos um ambiente respeitoso e seguro para doadores, adotantes e animais, valorizando histórias, dores e necessidades individuais.</small>
+            </div>
+            <div class="value-item">
+              <strong>5. Compromisso com a Vida</strong><br>
+              <small>Agimos com responsabilidade em cada etapa da mediação, respeitando o valor e a dignidade de todas as vidas envolvidas.</small>
+            </div>
+            <div class="value-item">
+              <strong>6. Transparência</strong><br>
+              <small>Mantemos comunicação clara e honesta, fortalecendo a confiança entre doadores, adotantes e nossa plataforma.</small>
+            </div>
+            <div class="value-item">
+              <strong>7. Conexão Terapêutica</strong><br>
+              <small>Incentivamos laços afetivos duradouros que contribuam para o cuidado emocional e o bem-estar geral.</small>
+            </div>
           </div>
-          <h3>Cuidados Terapêuticos e Bem-estar</h3>
-          <p>Fornecemos ambiente seguro e cuidados especializados para que tanto pessoas quanto animais encontrem paz emocional e recuperação.</p>
-        </div>
-        <div class="mission-item">
-          <div class="icon-wrapper" style="background-color: var(--color-sky-100); color: var(--color-sky-600);">
-            <svg style="width: 2rem; height: 2rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-            </svg>
-          </div>
-          <h3>Conexão Emocional Duradoura</h3>
-          <p>Criamos laços terapêuticos significativos que promovem felicidade sustentável e bem-estar mental para ambas as partes.</p>
         </div>
       </div>
     </div>
@@ -201,7 +211,17 @@
     <h2>Como Você Pode Ajudar</h2>
     <p>Existem várias formas de contribuir com a saúde emocional de pessoas e animais. Escolha a modalidade que melhor se adequa às suas possibilidades.</p>
     <div class="help-buttons">
-      <a href="/cadastrar-pet" class="button button-primary">🐾 Sou Doador: Cadastrar Pet</a>
+      <!-- Botão dinâmico baseado no tipo de usuário -->
+      <a *ngIf="getUserRole() === 'doador'" href="/cadastrar-pet" class="button button-primary">
+        🐾 Sou Doador: Cadastrar Pet
+      </a>
+      <a *ngIf="getUserRole() === 'mediador'" href="/painel-mediador" class="button button-primary">
+        🎛️ Painel Administrativo
+      </a>
+      <router-link *ngIf="!isUserLoggedIn()" [routerLink]="['/auth']" class="button button-primary">
+        🔐 Faça Login para Ajudar
+      </router-link>
+
       <router-link [routerLink]="['/doar']" class="button button-primary">🤝 Cuide Temporariamente</router-link>
       <router-link [routerLink]="['/voluntario']" class="button button-secondary">⭐ Seja Voluntário Terapêutico</router-link>
     </div>
@@ -237,26 +257,12 @@
               <p>{{ selectedPet.beneficioEmocional || 'Companheiro terapêutico de confiança e amor incondicional' }}</p>
               <div class="compat-score">
                 <h4>Compatibilidade Emocional</h4>
-                <div class="score-item">
-                  <span>Depressão:</span>
+                <div *ngFor="let score of getTopScores(selectedPet)" class="score-item">
+                  <span>{{ score.label }}:</span>
                   <div class="score-bar">
-                    <div class="score-fill" [style.width.%]="selectedPet.compatibilidadeScore.depressao"></div>
+                    <div class="score-fill" [style.width.%]="score.value"></div>
                   </div>
-                  <span>{{ selectedPet.compatibilidadeScore.depressao }}%</span>
-                </div>
-                <div class="score-item">
-                  <span>Ansiedade:</span>
-                  <div class="score-bar">
-                    <div class="score-fill" [style.width.%]="selectedPet.compatibilidadeScore.ansiedade"></div>
-                  </div>
-                  <span>{{ selectedPet.compatibilidadeScore.ansiedade }}%</span>
-                </div>
-                <div class="score-item">
-                  <span>Solidão:</span>
-                  <div class="score-bar">
-                    <div class="score-fill" [style.width.%]="selectedPet.compatibilidadeScore.solidao"></div>
-                  </div>
-                  <span>{{ selectedPet.compatibilidadeScore.solidao }}%</span>
+                  <span>{{ score.value }}%</span>
                 </div>
               </div>
             </div>

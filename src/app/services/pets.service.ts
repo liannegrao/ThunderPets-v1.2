@@ -35,7 +35,7 @@ const PETS_DATABASE = {
   cachorros: [
     {
       id: 1,
-      nome: "Biscoito",
+      nome: "Caramelo",
       especie: "cachorro" as const,
       raca: "Golden Retriever",
       idade: 24,
@@ -116,7 +116,7 @@ const PETS_DATABASE = {
     },
     {
       id: 4,
-      nome: "Luna",
+      nome: "Lua",
       especie: "cachorro" as const,
       raca: "Beagle",
       idade: 48,
@@ -223,7 +223,7 @@ const PETS_DATABASE = {
         solidao: 75
       }
     }
-  ];
+  ],
   gatos: [
     {
       id: 101,
@@ -296,10 +296,43 @@ export class PetsService {
 
   // Carregar pets da API
   private loadPetsFromAPI(): void {
-    this.http.get<Pet[]>(`${this.apiUrl}/pets`).pipe(
-      tap(pets => {
-        console.log('🐾 Pets carregados da API:', pets.length);
-        this.petsData.next(pets);
+    this.http.get<any[]>(`${this.apiUrl}/pets`).pipe(
+      tap(apiPets => {
+        console.log('🐾 Pets carregados da API:', apiPets.length);
+        // Mapear campos da API para formato do frontend
+        const mappedPets: Pet[] = apiPets.map(apiPet => {
+          // Garantir compatibilidadeScore completa com valores padrão seguros
+          const compatibilidadeScore = {
+            depressao: Number(apiPet.depressao_score) || 50,
+            ansiedade: Number(apiPet.ansiedade_score) || 50,
+            solidao: Number(apiPet.solidao_score) || 50
+          };
+
+          return {
+            id: apiPet.id,
+            nome: apiPet.nome,
+            especie: apiPet.especie,
+            raca: apiPet.raca,
+            idade: apiPet.idade_meses,
+            porte: apiPet.porte,
+            energia: apiPet.energia,
+            personalidade: apiPet.personalidade,
+            beneficioEmocional: apiPet.beneficio_emocional,
+            saude: apiPet.saude,
+            cuidados: apiPet.cuidados,
+            historia: apiPet.historia,
+            casaIdeal: apiPet.casa_ideal,
+            foto: apiPet.foto_url, // Mapeamento: foto_url -> foto
+            adotado: apiPet.adotado,
+            compatibilidade: {
+              emocao: ['depressao', 'solidao', 'mudanca', 'terapia'],
+              energia: [apiPet.energia],
+              disponibilidade: ['poucas-horas', 'metade-dia', 'todo-dia', 'flexivel']
+            },
+            compatibilidadeScore: compatibilidadeScore
+          };
+        });
+        this.petsData.next(mappedPets);
       }),
       catchError(error => {
         console.error('❌ Erro carregando pets da API:', error);
