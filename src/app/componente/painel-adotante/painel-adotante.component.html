@@ -26,6 +26,59 @@
     </div>
   </section>
 
+  <!-- ===== MEU PERFIL ===== -->
+  <section class="perfil-section" *ngIf="isUserLoggedIn()">
+    <div class="perfil-card">
+      <h2>👤 Meu Perfil</h2>
+
+      <!-- Visualização do Perfil -->
+      <div *ngIf="!showEditProfile" class="perfil-display">
+        <div class="perfil-avatar">
+          <img [src]="currentUser?.foto || '/img/THUNDERPETS (4) (1).png'" [alt]="'Foto de ' + currentUser?.nome" class="avatar-img">
+        </div>
+        <div class="perfil-info">
+          <h3>{{ currentUser?.nome }}</h3>
+          <p><strong>Email:</strong> {{ currentUser?.email }}</p>
+          <p><strong>Telefone:</strong> {{ currentUser?.telefone || 'Não informado' }}</p>
+          <p><strong>Role:</strong> {{ currentUser?.role || 'adotante' }}</p>
+        </div>
+      </div>
+
+      <!-- Formulário de Edição -->
+      <form *ngIf="showEditProfile" [formGroup]="profileForm" class="perfil-edit-form" (ngSubmit)="salvarPerfil()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nome">Nome completo *</label>
+            <input type="text" id="nome" formControlName="nome" placeholder="Seu nome completo">
+          </div>
+          <div class="form-group">
+            <label for="email">E-mail *</label>
+            <input type="email" id="email" formControlName="email" placeholder="seu@email.com">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="telefone">Telefone</label>
+            <input type="text" id="telefone" formControlName="telefone" placeholder="(11) 99999-9999">
+          </div>
+          <div class="form-group">
+            <label for="foto">Foto de perfil</label>
+            <input type="file" id="foto" (change)="onFileSelected($event)" accept="image/*">
+            <small>Selecione uma nova foto (opcional)</small>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">💾 Salvar Alterações</button>
+          <button type="button" class="btn-secondary" (click)="toggleEditProfile()">❌ Cancelar</button>
+        </div>
+      </form>
+
+      <button class="btn-edit-profile" (click)="toggleEditProfile()">
+        ✏️ {{ showEditProfile ? 'Cancelar Edição' : 'Editar Perfil' }}
+      </button>
+    </div>
+  </section>
+
   <!-- ===== PETS DISPONÍVEIS ===== -->
   <section class="pets-disponiveis-section">
     <div class="section-header">

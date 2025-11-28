@@ -51,6 +51,12 @@ export class PainelAdotanteComponent implements OnInit {
   taxaSucesso = 75;
   totalAdocoes = 0;
 
+  // Propriedades para edição de perfil
+  showEditProfile = false;
+  profileForm!: FormGroup;
+  currentUser: any = null;
+  selectedFile: File | null = null;
+
   constructor(
     private fb: FormBuilder,
     private petsService: PetsService,
@@ -59,6 +65,8 @@ export class PainelAdotanteComponent implements OnInit {
 
   ngOnInit() {
     this.initForm();
+    this.initProfileForm();
+    this.loadCurrentUser();
     this.carregarPetsDisponiveis();
     this.aplicarFiltros(); // Inicializa filtros
 
@@ -75,6 +83,30 @@ export class PainelAdotanteComponent implements OnInit {
       'todo-dia': [false],
       'flexivel': [false]
     });
+  }
+
+  private initProfileForm() {
+    this.profileForm = this.fb.group({
+      nome: [''],
+      email: [''],
+      telefone: ['']
+    });
+  }
+
+  private loadCurrentUser() {
+    try {
+      this.currentUser = JSON.parse(localStorage.getItem('thunderpets_logged_user') || 'null');
+      if (this.currentUser) {
+        this.profileForm.patchValue({
+          nome: this.currentUser.nome || '',
+          email: this.currentUser.email || '',
+          telefone: this.currentUser.telefone || ''
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao carregar usuário:', error);
+      this.currentUser = null;
+    }
   }
 
   onMatchSubmit() {
@@ -196,23 +228,28 @@ export class PainelAdotanteComponent implements OnInit {
 
     console.log('👤 Usuário atual:', currentUser);
 
-    // Se não tem usuário no localStorage, mostrar mensagem de login
-    if (!currentUser || !currentUser.nome) {
-      alert('Para solicitar adoção, você precisa estar logado. Redirecionando para login...');
-      this.router.navigate(['/auth']);
-      return;
-    }
+   // Se não tem usuário no localStorage, mostrar mensagem de login
+if (!currentUser || !currentUser.nome) {
+  alert('Para solicitar adoção, você precisa estar logado. Redirecionando para login...');
+  this.router.navigate(['/auth']);
+  return;
+}
 
-    console.log('✅ Usuário validado:', currentUser.nome, 'Role:', currentUser.role);
+console.log('✅ Usuário validado:', currentUser.nome, 'Role:', currentUser.role);
 
-    // Para TODOS os usuários logados: mostrar mensagem simples e confirmar adoção imediatamente
-    const confirmacao = confirm(`${pet.nome} foi adicionado ao seu painel de adotante! 🍇\n\nVocê pode visualizar todas as suas solicitações de adoção no seu painel personalizado.`);
+// Definir o painel certo conforme o tipo de usuário
+const painel = currentUser.role === 'mediador' ? 'painel-mediador' : 'painel-adotante';
+const tipoPainel = currentUser.role === 'mediador' ? 'Painel de Mediador' : 'Painel de Adotante';
 
-    if (confirmacao) {
-      // Redirecionar para painel adotante/comum (note que no projeto, o painel adotante serve para ambos)
-      this.router.navigate(['/painel-adotante']);
-    }
-  }
+// Mensagem correta
+const confirmacao = confirm(
+  `${pet.nome} foi adicionado ao seu ${tipoPainel}! 🐾\n\nVocê pode visualizar todas as solicitações no seu painel personalizado.`
+);
+
+if (confirmacao) {
+  this.router.navigate([`/${painel}`]);
+}
+}
 
   confirmAdoption() {
     if (!this.confirmationPet) return;
@@ -495,6 +532,85 @@ export class PainelAdotanteComponent implements OnInit {
       return `${anos} ${anos === 1 ? 'ano' : 'anos'}`;
     } else {
       return `${anos} ${anos === 1 ? 'ano' : 'anos'} e ${meses} meses`;
+    }
+  }
+
+  // Verificar se usuário está logado
+  isUserLoggedIn(): boolean {
+    try {
+      const user = JSON.parse(localStorage.getItem('thunderpets_logged_user') || 'null');
+      return user && user.nome;
+    } catch {
+      return false;
+    }
+  }
+
+  // Alternar modo de edição de perfil
+  toggleEditProfile(): void {
+    this.showEditProfile = !this.showEditProfile;
+    if (!this.showEditProfile) {
+      // Se cancelando edição, recarregar dados do usuário
+      this.loadCurrentUser();
+    }
+  }
+
+  // Salvar alterações do perfil
+  salvarPerfil(): void {
+    if (this.profileForm.invalid) {
+      alert('❌ Preencha todos os campos obrigatórios corretamente.');
+      return;
+    }
+
+    try {
+      const formValue = this.profileForm.value;
+      const updatedUser = {
+        ...this.currentUser,
+        nome: formValue.nome,
+        email: formValue.email,
+        telefone: formValue.telefone
+      };
+
+      // O upload será tratado por um serviço
+      if (this.selectedFile) {
+        // Simular o upload e obter uma URL
+        // Em um app real, você chamaria this.authService.uploadProfilePic(this.selectedFile)
+        const fakeUrl = URL.createObjectURL(this.selectedFile);
+        updatedUser.foto = fakeUrl; // Usar a URL temporária como foto
+        this.saveUserToStorage(updatedUser);
+
+      } else {
+        this.saveUserToStorage(updatedUser);
+      }
+    } catch (error) {
+      console.error('Erro ao salvar perfil:', error);
+      alert('❌ Erro ao salvar alterações. Tente novamente.');
+    }
+  }
+
+  private saveUserToStorage(user: any): void {
+    localStorage.setItem('thunderpets_logged_user', JSON.stringify(user));
+    this.currentUser = user;
+    this.showEditProfile = false;
+    alert('✅ Perfil atualizado com sucesso!');
+  }
+
+  // Manipular seleção de arquivo
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Verificar tamanho (máximo 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('❌ A imagem deve ter no máximo 5MB.');
+        return;
+      }
+
+      // Verificar tipo
+      if (!file.type.startsWith('image/')) {
+        alert('❌ Selecione apenas arquivos de imagem.');
+        return;
+      }
+
+      this.selectedFile = file;
     }
   }
 }

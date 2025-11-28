@@ -257,7 +257,7 @@
         🔐 Faça Login para Ajudar
       </router-link>
 
-      <router-link [routerLink]="['/doar']" class="button button-primary">🤝 Cuide Temporariamente</router-link>
+      <router-link *ngIf="getUserRole() !== 'mediador'" [routerLink]="['/doar']" class="button button-primary">🤝 Cuide Temporariamente</router-link>
       <router-link [routerLink]="['/voluntario']" class="button button-secondary">⭐ Seja Voluntário Terapêutico</router-link>
     </div>
   </section>
