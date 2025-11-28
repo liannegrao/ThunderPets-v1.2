@@ -3,6 +3,7 @@
 /* === GERAIS === */
 .painel-adotante .painel-header {
   padding: 2rem 0;
+  z-index: 888;
   text-align: center;
   margin-bottom: 2rem;
 }

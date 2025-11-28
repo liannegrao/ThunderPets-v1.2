@@ -435,8 +435,7 @@
   }
 
   .vision-values-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 4rem;
+    gap: 2rem;
   }
 
   .pet-grid {
