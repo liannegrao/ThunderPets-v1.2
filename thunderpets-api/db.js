@@ -1,20 +1,25 @@
 // ThunderPets API - Database Manager
 const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
+const path = require('path');
 
 class DatabaseManager {
-    constructor(dbPath = './thunderpets.db') {
+    constructor(dbPath) {
         this.db = null;
-        this.dbPath = dbPath;
+        // Caminho absoluto do banco
+        this.dbPath = dbPath || path.join(__dirname, 'thunderpets.db');
     }
 
     init() {
         return new Promise((resolve, reject) => {
+            // Garante que a pasta do banco existe
+            const dir = path.dirname(this.dbPath);
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
             this.db = new sqlite3.Database(this.dbPath, (err) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    console.log('✅ SQLite conectado: ThunderPets');
+                if (err) reject(err);
+                else {
+                    console.log('✅ SQLite conectado:', this.dbPath);
                     resolve();
                 }
             });
@@ -24,23 +29,16 @@ class DatabaseManager {
     async initDatabase() {
         await this.init();
 
-        // Execute schema (split by semicolons for multiple statements)
-        const schemaPath = './schema.sql';
+        const schemaPath = path.join(__dirname, 'schema.sql');
         const schema = fs.readFileSync(schemaPath, 'utf8');
-
-        // Split by semicolons and filter out empty statements
         const statements = schema.split(';').map(s => s.trim()).filter(s => s.length > 0);
 
         for (const statement of statements) {
-            if (statement.trim()) {
-                await this.run(statement);
-            }
+            if (statement) await this.run(statement);
         }
 
         console.log('✅ Schema inicializado com dados de exemplo');
     }
-
-    get() { return this.db; }
 
     run(sql, params = []) {
         return new Promise((resolve, reject) => {
@@ -79,17 +77,3 @@ class DatabaseManager {
 }
 
 module.exports = { DatabaseManager };
-
-// Função para inicialização do banco
-async function initDatabase() {
-    try {
-        const dbManager = new DatabaseManager();
-        await dbManager.initDatabase();
-        console.log('✅ Banco de dados inicializado com sucesso!');
-    } catch (error) {
-        console.error('❌ Falha ao inicializar banco:', error);
-        throw error;
-    }
-}
-
-module.exports.initDatabase = initDatabase;

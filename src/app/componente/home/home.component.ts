@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { PetsService, Pet } from '../../services/pets.service';
 
 interface Testimonial {
@@ -50,6 +51,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   showResults = false;
   matchedPets: Pet[] = [];
   hasMoreResults = false;
+  currentOffset = 0; // Controle de paginação para "Ver Mais"
 
   // Modal for pet details
   showPetModal = false;
@@ -72,7 +74,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private petsService: PetsService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
@@ -136,6 +139,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.isMatching = true;
     this.showResults = false;
+    this.currentOffset = 0; // Reset offset para nova busca
 
     // Coletar dados do formulário
     const formValue = this.matchingForm.value;
@@ -153,7 +157,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     // Usar API para matching
     this.petsService.findTherapeuticMatches(userPreferences).subscribe({
-      next: (matches) => {
+      next: (matches: Pet[]) => {
         this.isMatching = false;
         this.showResults = true;
         this.matchedPets = matches.slice(0, 3); // Mostrar 3 primeiros
@@ -161,7 +165,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         console.log(`💚 API: ${matches.length} pets compatíveis encontrados`);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('❌ Erro no matching via API:', error);
         this.isMatching = false;
         // Fallback: usar dados locais
@@ -221,9 +225,44 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   onShowMoreResults() {
-    // Mostrar todos os pets matched - reforçar dados atuais
-    this.matchedPets = [...this.matchedPets, ...this.matchedPets]; // Duplicar para demo
-    this.hasMoreResults = false;
+    const limit = 5; // Carregar 5 pets por vez
+
+    // Fazer chamada HTTP direta ao endpoint /api/pets com paginação
+    this.http.get<{ pets: Pet[], pagination: any }>(`http://localhost:3001/api/pets?offset=${this.currentOffset}&limit=${limit}`)
+      .subscribe({
+        next: (response) => {
+          // Filtrar pets que ainda não foram mostrados (evitar duplicatas)
+          const newPets = response.pets.filter(pet =>
+            !this.matchedPets.some(shown => shown.id === pet.id)
+          );
+
+          // Adicionar os novos pets à lista
+          this.matchedPets = [...this.matchedPets, ...newPets];
+
+          // Atualizar offset para próxima chamada
+          this.currentOffset += limit;
+
+          // Atualizar se ainda há mais pets para mostrar
+          this.hasMoreResults = response.pagination.hasMore;
+
+          console.log(`📈 Carregados ${newPets.length} novos pets via API. Total: ${this.matchedPets.length}`);
+          console.log(`📄 Offset atual: ${this.currentOffset}, Has more: ${this.hasMoreResults}`);
+        },
+        error: (error) => {
+          console.error('❌ Erro ao carregar mais pets:', error);
+          // Fallback: tentar usar dados locais do serviço
+          this.petsService.pets$.subscribe(allPets => {
+            const newPets = allPets.filter(pet =>
+              !this.matchedPets.some(shown => shown.id === pet.id)
+            ).slice(0, 3);
+
+            if (newPets.length > 0) {
+              this.matchedPets = [...this.matchedPets, ...newPets];
+              console.log(`⚠️ Fallback: adicionados ${newPets.length} pets locais`);
+            }
+          }).unsubscribe();
+        }
+      });
   }
 
   // Método auxiliar para obter top scores de compatibilidade
@@ -273,5 +312,75 @@ export class HomeComponent implements OnInit, OnDestroy {
   isUserLoggedIn(): boolean {
     const userRole = this.getUserRole();
     return userRole !== null && userRole !== undefined;
+  }
+
+  // Método para obter imagem local dos pets em destaque
+  getLocalImage(pet: Pet): string {
+    const imageMap: { [key: string]: string } = {
+      'Caramelo': '/img/cachorro-caramelo-Petlove.jpg',
+      'Thor': '/img/raca-de-cachorro-preto.jpg',
+      'Luna': '/img/pexels-photo-2247894.jpeg',
+      'Buddy': '/img/cachorro-_1750287085273-750x375.webp',
+      'Sonecas': '/img/patas.png'
+    };
+
+    return imageMap[pet.nome] || pet.foto_url || '/img/THUNDERPETS (4) (1).png';
+  }
+
+  // Método para obter badge de terapia baseado na compatibilidade
+  getTherapyBadge(pet: Pet): string {
+    // Proteção contra compatibilidadeScore undefined ou propriedades individuais undefined
+    const scoreDepressao = pet?.compatibilidadeScore?.depressao || 50;
+    const scoreAnsiedade = pet?.compatibilidadeScore?.ansiedade || 50;
+    const scoreSolidao = pet?.compatibilidadeScore?.solidao || 50;
+
+    const maxScore = Math.max(scoreDepressao, scoreAnsiedade, scoreSolidao);
+
+    if (maxScore >= 85) return 'badge-excelente';
+    if (maxScore >= 70) return 'badge-bom';
+    if (maxScore >= 50) return 'badge-medio';
+    return 'badge-baixo';
+  }
+
+  // Método para obter label de terapia baseado na compatibilidade
+  getTherapyLabel(pet: Pet): string {
+    // Proteção contra compatibilidadeScore undefined ou propriedades individuais undefined
+    const scoreDepressao = pet?.compatibilidadeScore?.depressao || 50;
+    const scoreAnsiedade = pet?.compatibilidadeScore?.ansiedade || 50;
+    const scoreSolidao = pet?.compatibilidadeScore?.solidao || 50;
+
+    const maxScore = Math.max(scoreDepressao, scoreAnsiedade, scoreSolidao);
+
+    if (maxScore >= 85) return 'Excelente Match';
+    if (maxScore >= 70) return 'Bom Match';
+    if (maxScore >= 50) return 'Match Médio';
+    return 'Compatível';
+  }
+
+  // Método para solicitar adoção (similar ao adoptPet)
+  requestAdoption(pet: Pet) {
+    console.log('Processando solicitação de adoção:', pet);
+
+    // Verificar se usuário está logado
+    const currentUser = JSON.parse(localStorage.getItem('thunderpets_logged_user') || 'null');
+
+    console.log('👤 Usuário no home:', currentUser);
+
+    // Se não tem usuário no localStorage, mostrar mensagem de login
+    if (!currentUser || !currentUser.nome) {
+      alert('Para solicitar adoção, você precisa estar logado. Redirecionando para login...');
+      this.router.navigate(['/auth']);
+      return;
+    }
+
+    console.log('✅ Usuário validado no home:', currentUser.nome, 'Role:', currentUser.role);
+
+    // Para TODOS os usuários logados: mostrar mensagem simples e redirecionar
+    const confirmacao = confirm(`${pet.nome} foi adicionado ao seu painel de adotante! 🍇\n\nVocê pode visualizar todas as suas solicitações de adoção no seu painel personalizado.`);
+
+    if (confirmacao) {
+      // Redirecionar para painel adotante
+      this.router.navigate(['/painel-adotante']);
+    }
   }
 }

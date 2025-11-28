@@ -333,29 +333,27 @@
 
           <div class="photo-section">
             <div class="photo-header">
-              <h3>📷 Fotos do Pet</h3>
-              <p>(opcional - você pode adicionar depois no painel)</p>
+              <h3>📷 Foto do Pet</h3>
+              <p>(obrigatório - será enviada para o Cloudinary)</p>
             </div>
             <div class="photo-upload-placeholder" (click)="triggerFileInput()">
               <div class="upload-icon">📸</div>
-              <p>Clique para adicionar fotos do pet</p>
-              <small>Faça fotos com boa iluminação</small>
+              <p>Clique para selecionar uma foto do pet</p>
+              <small>JPG ou PNG, boa iluminação</small>
             </div>
             <input
               type="file"
               #fileInput
-              multiple
               accept="image/jpeg,image/png"
               (change)="onFileSelected($event)"
               style="display: none;"
             />
-            <div class="selected-images" *ngIf="selectedImages.length > 0">
-              <h4>📸 Fotos Selecionadas:</h4>
-              <div class="image-preview-grid">
-                <div class="image-preview" *ngFor="let image of selectedImages; let i = index">
-                  <img [src]="image" alt="Foto do pet {{ i + 1 }}" />
-                  <button type="button" class="remove-image-btn" (click)="removeImage(i)">❌</button>
-                </div>
+
+            <div class="selected-images" *ngIf="selectedImages">
+              <h4>📸 Foto Selecionada:</h4>
+              <div class="image-preview">
+                <img [src]="selectedImages" alt="Foto do pet" />
+                <button type="button" class="remove-image-btn" (click)="removeImage()">❌</button>
               </div>
             </div>
           </div>

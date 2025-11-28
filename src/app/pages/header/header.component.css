@@ -35,7 +35,7 @@
 .nav-toggle.open .hamburger::before { transform: translateY(8px) rotate(45deg); }
 .nav-toggle.open .hamburger::after { transform: translateY(-8px) rotate(-45deg); }
 
-.nav-collapse { display: flex; gap: 1rem; align-items: center; transition: max-height var(--transition-fast) ease, opacity var(--transition-fast) ease; }
+.nav-collapse { display: flex; gap: 4rem; align-items: center; transition: max-height var(--transition-fast) ease, opacity var(--transition-fast) ease; }
 
 /* Make nav items vertical on small screens */
 @media (max-width: 768px) {

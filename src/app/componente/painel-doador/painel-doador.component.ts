@@ -14,6 +14,7 @@ interface PetCadastrado {
   porte: string;
   energia: string;
   foto: string;
+  foto_url?: string; // URL do Cloudinary
   status: 'disponivel' | 'adotado' | 'em_analise';
   dataCadastro: string;
   interessantes?: number;
@@ -86,6 +87,7 @@ export class PainelDoadorComponent implements OnInit, OnDestroy {
           porte: pet.porte,
           energia: pet.energia,
           foto: pet.foto || '/img/THUNDERPETS (4) (1).png',
+          foto_url: pet.foto_url, // URL do Cloudinary se disponível
           status: pet.status || 'disponivel',
           dataCadastro: pet.dataCadastro,
           descricao: pet.descricao,

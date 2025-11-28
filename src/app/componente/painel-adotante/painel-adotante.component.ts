@@ -102,7 +102,7 @@ export class PainelAdotanteComponent implements OnInit {
 
     // Usar API para matching
     this.petsService.findTherapeuticMatches(userPreferences).subscribe({
-      next: (matches) => {
+      next: (matches: Pet[]) => {
         this.isMatching = false;
         this.showResults = true;
         this.matchedPets = matches.slice(0, 3); // Mostrar 3 primeiros
@@ -110,7 +110,7 @@ export class PainelAdotanteComponent implements OnInit {
 
         console.log(`💚 Voluntário: ${matches.length} pets compatíveis encontrados`);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('❌ Voluntário: Erro no matching via API:', error);
         this.isMatching = false;
         // Fallback: usar dados locais
@@ -307,7 +307,8 @@ export class PainelAdotanteComponent implements OnInit {
             porte: pet.porte,
             energia: pet.energia || 'medio',
             adotado: pet.status === 'adotado',
-            foto: pet.foto || '/img/THUNDERPETS (4) (1).png',
+            foto: pet.foto_url || pet.foto || '/img/THUNDERPETS (4) (1).png', // Priorizar foto_url
+            foto_url: pet.foto_url, // URL do Cloudinary se disponível
             beneficioEmocional: pet.caracteristicas_positivas || 'Companheiro terapêutico',
             personalidade: pet.descricao,
             saude: 'Boa saúde',
@@ -327,7 +328,8 @@ export class PainelAdotanteComponent implements OnInit {
       this.isLoadingPets = false;
       this.aplicarFiltros();
 
-      console.log(`🐾 ${todosPets.length} pets disponíveis carregados`);
+      // console.log(`🐾 ${todosPets.length} pets disponíveis carregados`);
+
     });
   }
 
@@ -354,7 +356,8 @@ export class PainelAdotanteComponent implements OnInit {
     });
 
     this.petsFiltrados = filtrados;
-    console.log(`🔍 Filtros aplicados: ${filtrados.length} pets mostrados`);
+    // console.log(`🔍 Filtros aplicados: ${filtrados.length} pets mostrados`);
+
   }
 
   // Limpar todos os filtros

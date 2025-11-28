@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap, catchError } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap, catchError, forkJoin } from 'rxjs';
 
 export interface Pet {
   id: number;
@@ -17,6 +17,7 @@ export interface Pet {
   historia: string;
   casaIdeal: string;
   foto: string;
+  foto_url?: string; // URL do Cloudinary
   adotado: boolean;
   compatibilidade: {
     emocao: string[]; // ['depressao', 'ansiedade', 'solidao']
@@ -30,257 +31,173 @@ export interface Pet {
   };
 }
 
-// Baseado no sistema do vanilla JS - dados hardcoded para front-end
-const PETS_DATABASE = {
-  cachorros: [
-    {
-      id: 1,
-      nome: "Caramelo",
-      especie: "cachorro" as const,
-      raca: "Golden Retriever",
-      idade: 24,
-      porte: "medio" as const,
-      energia: "ativo-aventurado" as const,
-      personalidade: "Energético e brincalhão, perfeito para combater inércia depressiva através de rotina e exercícios. Sua alegria contagiante traz vida para qualquer lar!",
-      beneficioEmocional: "Energia & Alegria",
-      saude: "Vacinado, esterilizado. Excelente saúde geral.",
-      cuidados: "Exercícios diários moderados, escovação semanal além de visitas regulares ao veterinário.",
-      historia: "Encontrado ainda filhote nas ruas. Transformado em um companheiro terapêutico amoroso.",
-      casaIdeal: "Qualquer lar com disposição para caminhadas e brincadeiras diárias.",
-      foto: "/img/cachorro-caramelo-Petlove.jpg",
-      adotado: false,
-      compatibilidade: {
-        emocao: ["depressao", "solidao"],
-        energia: ["ativo-aventurado"],
-        disponibilidade: ["todo-dia", "metade-dia"]
-      },
-      compatibilidadeScore: {
-        depressao: 85,
-        ansiedade: 60,
-        solidao: 80
-      }
+// Base hardcoded (fallback) - CARREGADA UMA ÚNICA VEZ
+const PETS_DATABASE: Pet[] = [
+  // Cachorros
+  {
+    id: 1,
+    nome: "Caramelo",
+    especie: "cachorro" as const,
+    raca: "Golden Retriever",
+    idade: 24,
+    porte: "medio" as const,
+    energia: "ativo-aventurado" as const,
+    personalidade: "Energético e brincalhão, perfeito para combater inércia depressiva através de rotina e exercícios. Sua alegria contagiante traz vida para qualquer lar!",
+    beneficioEmocional: "Energia & Alegria",
+    saude: "Vacinado, esterilizado. Excelente saúde geral.",
+    cuidados: "Exercícios diários moderados, escovação semanal além de visitas regulares ao veterinário.",
+    historia: "Encontrado ainda filhote nas ruas. Transformado em um companheiro terapêutico amoroso.",
+    casaIdeal: "Qualquer lar com disposição para caminhadas e brincadeiras diárias.",
+    foto: "/img/cachorro-caramelo-Petlove.jpg",
+    adotado: false,
+    compatibilidade: {
+      emocao: ["depressao", "solidao"],
+      energia: ["ativo-aventurado"],
+      disponibilidade: ["todo-dia", "metade-dia"]
     },
-    {
-      id: 2,
-      nome: "Thor",
-      especie: "cachorro" as const,
-      raca: "Labrador",
-      idade: 36,
-      porte: "medio" as const,
-      energia: "moderado" as const,
-      personalidade: "Sociável e carinhoso, excelente em combater isolamento social. Sua natureza brincalhona ajuda a reconstruir conexões emocionais.",
-      beneficioEmocional: "Socialização & Conexão",
-      saude: "Vacinas atualizadas, ótimo estado de saúde.",
-      cuidados: "Alimentação balanceada, exercícios diários além de acompanhamento veterinário regular.",
-      historia: "Doado por tutores que não podiam mais cuidar. Pronto para encontrar novo lar terapêutico.",
-      casaIdeal: "Famílias ou pessoas sozinhas buscando companhia ativa.",
-      foto: "/img/raca-de-cachorro-preto.jpg",
-      adotado: false,
-      compatibilidade: {
-        emocao: ["solidao", "mudanca"],
-        energia: ["moderado", "ativo-aventurado"],
-        disponibilidade: ["todo-dia", "metade-dia", "flexivel"]
-      },
-      compatibilidadeScore: {
-        depressao: 70,
-        ansiedade: 50,
-        solidao: 90
-      }
-    },
-    {
-      id: 3,
-      nome: "Buddy",
-      especie: "cachorro" as const,
-      raca: "Poodle",
-      idade: 60,
-      porte: "pequeno" as const,
-      energia: "moderado" as const,
-      personalidade: "Intelligent e fiel, perfeito para ansiedade. Sua calma presença traz paz para momentos de stress.",
-      beneficioEmocional: "Apoio contra Ansiedade",
-      saude: "Saudável, vacinado, castrado.",
-      cuidados: "Cuidados veterinários regulares, exercícios leves diarios.",
-      historia: "Companion dog bem cuidado, procura novo lar amoroso.",
-      casaIdeal: "Apartamentos ou casas pequenas com rotina estruturada.",
-      foto: "/img/cachorro-_1750287085273-750x375.webp",
-      adotado: false,
-      compatibilidade: {
-        emocao: ["ansiedade", "terapia"],
-        energia: ["moderado", "calmo-caseiro"],
-        disponibilidade: ["metade-dia", "poucas-horas", "flexivel"]
-      },
-      compatibilidadeScore: {
-        depressao: 50,
-        ansiedade: 85,
-        solidao: 60
-      }
-    },
-    {
-      id: 4,
-      nome: "Lua",
-      especie: "cachorro" as const,
-      raca: "Beagle",
-      idade: 48,
-      porte: "pequeno" as const,
-      energia: "calmo-caseiro" as const,
-      personalidade: "Dócil e carinhosa, ideal para insônia e ansiedade. Sua presença constante ajuda na reconciliação emocional.",
-      beneficioEmocional: "Calma & Serenidade",
-      saude: "Excelente saúde, vacinas em dia.",
-      cuidados: "Ração premium, carinho, escovação mensal.",
-      historia: "Encontrada abandonada, recuperada e pronta para terapia.",
-      casaIdeal: "Ambientes calmos, residências serenas.",
-      foto: "/img/pexels-photo-2247894.jpeg",
-      adotado: false,
-      compatibilidade: {
-        emocao: ["ansiedade", "terapia"],
-        energia: ["calmo-caseiro"],
-        disponibilidade: ["poucas-horas", "metade-dia", "flexivel"]
-      },
-      compatibilidadeScore: {
-        depressao: 40,
-        ansiedade: 95,
-        solidao: 70
-      }
-    },
-    // ⭐ PETS ADICIONAIS ⭐
-    {
-      id: 103,
-      nome: "Max",
-      especie: "cachorro" as const,
-      raca: "Bulldog Francês",
-      idade: 32,
-      porte: "pequeno" as const,
-      energia: "moderado" as const,
-      personalidade: "Alegre e infantil, ajuda a resgatar alegria perdida",
-      beneficioEmocional: "Alegria Recuperada",
-      saude: "Vacinas atualizadas, saúde ótima",
-      cuidados: "Passeios diários curtos",
-      historia: "Bulldog resgatado de canil",
-      casaIdeal: "Apartamentos acolhedores",
-      foto: "/img/Filhote-labrador-5.jpg",
-      adotado: false,
-      compatibilidade: {
-        emocao: ["depressao", "solidao"],
-        energia: ["moderado"],
-        disponibilidade: ["metade-dia", "flexivel"]
-      },
-      compatibilidadeScore: {
-        depressao: 80,
-        ansiedade: 70,
-        solidao: 75
-      }
-    },
-    {
-      id: 104,
-      nome: "Bella",
-      especie: "cachorro" as const,
-      raca: "Border Collie",
-      idade: 28,
-      porte: "medio" as const,
-      energia: "ativo-aventurado" as const,
-      personalidade: "Alta energia, combate depressão através de atividades",
-      beneficioEmocional: "Energia Mental",
-      saude: "Excelente saúde física",
-      cuidados: "Exercícios intensos diários",
-      historia: "Athlete Border Collie",
-      casaIdeal: "Casas com espaço para atividades",
-      foto: "/img/homem-abracando-seu-pitbull-amigavel.jpg",
-      adotado: false,
-      compatibilidade: {
-        emocao: ["depressao"],
-        energia: ["ativo-aventurado"],
-        disponibilidade: ["todo-dia"]
-      },
-      compatibilidadeScore: {
-        depressao: 90,
-        ansiedade: 40,
-        solidao: 85
-      }
-    },
-    {
-      id: 105,
-      nome: "Charlie",
-      especie: "cachorro" as const,
-      raca: "Shih Tzu",
-      idade: 54,
-      porte: "pequeno" as const,
-      energia: "calmo-caseiro" as const,
-      personalidade: "Muito pacífico, reduz ansiedade por presença constante",
-      beneficioEmocional: "Serenidade Diária",
-      saude: "Saúde perfeita",
-      cuidados: "Cuidados especiais felpudos",
-      historia: "Companion perfeito",
-      casaIdeal: "Qualquer lar amoroso",
-      foto: "/img/shihtzunsc.jpg",
-      adotado: false,
-      compatibilidade: {
-        emocao: ["ansiedade", "terapia"],
-        energia: ["calmo-caseiro"],
-        disponibilidade: ["poucas-horas", "metade-dia"]
-      },
-      compatibilidadeScore: {
-        depressao: 45,
-        ansiedade: 92,
-        solidao: 75
-      }
+    compatibilidadeScore: {
+      depressao: 85,
+      ansiedade: 60,
+      solidao: 80
     }
-  ],
-  gatos: [
-    {
-      id: 101,
-      nome: "Purês",
-      especie: "gato" as const,
-      raca: "Vira-lata laranja",
-      idade: 24,
-      porte: "medio" as const,
-      energia: "moderado" as const,
-      personalidade: "Gato muito afetuoso! Adora colo humano mas mantém personalidade independente.",
-      beneficioEmocional: "Afeto & Companheirismo",
-      saude: "Esterilizado, vacinas atualizadas. Contato muito saudável.",
-      cuidados: "Limpeza diária da caixa de areia, unhas e frequência regular. Alimentação específica felina.",
-      historia: "Resgatado ainda filhote, Purês desfrutou completo cuidado no abrigo.",
-      casaIdeal: "Qualquer ambiente doméstico, incluindo apartamentos compactos.",
-      foto: "/img/Design sem nome.jpg",
-      adotado: false,
-      compatibilidade: {
-        emocao: ["solidao", "ansiedade"],
-        energia: ["moderado", "calmo-caseiro"],
-        disponibilidade: ["todo-dia", "metade-dia", "poucas-horas"]
-      },
-      compatibilidadeScore: {
-        depressao: 60,
-        ansiedade: 80,
-        solidao: 85
-      }
+  },
+  {
+    id: 2,
+    nome: "Thor",
+    especie: "cachorro" as const,
+    raca: "Labrador",
+    idade: 36,
+    porte: "medio" as const,
+    energia: "moderado" as const,
+    personalidade: "Sociável e carinhoso, excelente em combater isolamento social. Sua natureza brincalhona ajuda a reconstruir conexões emocionais.",
+    beneficioEmocional: "Socialização & Conexão",
+    saude: "Vacinas atualizadas, ótimo estado de saúde.",
+    cuidados: "Alimentação balanceada, exercícios diários além de acompanhamento veterinário regular.",
+    historia: "Doado por tutores que não podiam mais cuidar. Pronto para encontrar novo lar terapêutico.",
+    casaIdeal: "Famílias ou pessoas sozinhas buscando companhia ativa.",
+    foto: "/img/raca-de-cachorro-preto.jpg",
+    adotado: false,
+    compatibilidade: {
+      emocao: ["solidao", "mudanca"],
+      energia: ["moderado", "ativo-aventurado"],
+      disponibilidade: ["todo-dia", "metade-dia", "flexivel"]
     },
-    {
-      id: 102,
-      nome: "Sonecas",
-      especie: "gato" as const,
-      raca: "Vira-lata cinza",
-      idade: 36,
-      porte: "medio" as const,
-      energia: "calmo-caseiro" as const,
-      personalidade: "Gata calma e observadora, prefere ficar olhando pela janela ou em cantos aquecidos. Dorme muito tempo livre.",
-      beneficioEmocional: "Paz & Serenidade",
-      saude: "Esterilizada, vacinas completas. Está saudável excelente estado.",
-      cuidados: "Areia higiênica limpa, controle peso periodicamente. Água sempre fresca.",
-      historia: "Gata independente ótima para pessoas que trabalham muito ou famílias calmas.",
-      casaIdeal: "Apartamentos silenciosos onde possa descansar sem interrupções frequentes.",
-      foto: "/img/patas.png",
-      adotado: false,
-      compatibilidade: {
-        emocao: ["ansiedade", "terapia"],
-        energia: ["calmo-caseiro"],
-        disponibilidade: ["poucas-horas", "metade-dia", "flexivel"]
-      },
-      compatibilidadeScore: {
-        depressao: 50,
-        ansiedade: 90,
-        solidao: 60
-      }
+    compatibilidadeScore: {
+      depressao: 70,
+      ansiedade: 50,
+      solidao: 90
     }
-  ]
-};
+  },
+  {
+    id: 3,
+    nome: "Buddy",
+    especie: "cachorro" as const,
+    raca: "Poodle",
+    idade: 60,
+    porte: "pequeno" as const,
+    energia: "moderado" as const,
+    personalidade: "Intelligent e fiel, perfeito para ansiedade. Sua calma presença traz paz para momentos de stress.",
+    beneficioEmocional: "Apoio contra Ansiedade",
+    saude: "Vacinas em dia, castrado.",
+    cuidados: "Cuidados veterinários regulares, exercícios leves diarios.",
+    historia: "Companion dog bem cuidado, procura novo lar amoroso.",
+    casaIdeal: "Apartamentos ou casas pequenas com rotina estruturada.",
+    foto: "/img/cachorro-_1750287085273-750x375.webp",
+    adotado: false,
+    compatibilidade: {
+      emocao: ["ansiedade", "terapia"],
+      energia: ["moderado", "calmo-caseiro"],
+      disponibilidade: ["metade-dia", "poucas-horas", "flexivel"]
+    },
+    compatibilidadeScore: {
+      depressao: 50,
+      ansiedade: 85,
+      solidao: 60
+    }
+  },
+  {
+    id: 4,
+    nome: "Lua",
+    especie: "cachorro" as const,
+    raca: "Beagle",
+    idade: 48,
+    porte: "pequeno" as const,
+    energia: "calmo-caseiro" as const,
+    personalidade: "Dócil e carinhosa, ideal para insônia e ansiedade. Sua presença constante ajuda na reconciliação emocional.",
+    beneficioEmocional: "Calma & Serenidade",
+    saude: "Excelente saúde, vacinas em dia.",
+    cuidados: "Ração premium, carinho, escovação mensal.",
+    historia: "Encontrada abandonada, recuperada e pronta para terapia.",
+    casaIdeal: "Ambientes calmos, residências serenas.",
+    foto: "/img/pexels-photo-2247894.jpeg",
+    adotado: false,
+    compatibilidade: {
+      emocao: ["ansiedade", "terapia"],
+      energia: ["calmo-caseiro"],
+      disponibilidade: ["poucas-horas", "metade-dia", "flexivel"]
+    },
+    compatibilidadeScore: {
+      depressao: 40,
+      ansiedade: 95,
+      solidao: 70
+    }
+  },
+  // Gatos
+  {
+    id: 101,
+    nome: "Purês",
+    especie: "gato" as const,
+    raca: "Vira-lata laranja",
+    idade: 24,
+    porte: "medio" as const,
+    energia: "moderado" as const,
+    personalidade: "Gato muito afetuoso! Adora colo humano mas mantém personalidade independente.",
+    beneficioEmocional: "Afeto & Companheirismo",
+    saude: "Esterilizado, vacinas atualizadas. Contato muito saudável.",
+    cuidados: "Limpeza diária da caixa de areia, unhas e frequência regular. Alimentação específica felina.",
+    historia: "Resgatado ainda filhote, Purês desfrutou completo cuidado no abrigo.",
+    casaIdeal: "Qualquer ambiente doméstico, incluindo apartamentos compactos.",
+    foto: "/img/Design sem nome.jpg",
+    adotado: false,
+    compatibilidade: {
+      emocao: ["solidao", "ansiedade"],
+      energia: ["moderado", "calmo-caseiro"],
+      disponibilidade: ["todo-dia", "metade-dia", "poucas-horas"]
+    },
+    compatibilidadeScore: {
+      depressao: 60,
+      ansiedade: 80,
+      solidao: 85
+    }
+  },
+  {
+    id: 102,
+    nome: "Sonecas",
+    especie: "gato" as const,
+    raca: "Vira-lata cinza",
+    idade: 36,
+    porte: "medio" as const,
+    energia: "calmo-caseiro" as const,
+    personalidade: "Gata calma e observadora, prefere ficar olhando pela janela ou em cantos aquecidos. Dorme muito tempo livre.",
+    beneficioEmocional: "Paz & Serenidade",
+    saude: "Esterilizada, vacinas completas. Está saudável excelente estado.",
+    cuidados: "Areia higiênica limpa, controle peso periodicamente. Água sempre fresca.",
+    historia: "Gata independente ótima para pessoas que trabalham muito ou famílias calmas.",
+    casaIdeal: "Apartamentos silenciosos onde possa descansar sem interrupções frequentes.",
+    foto: "/img/patas.png",
+    adotado: false,
+    compatibilidade: {
+      emocao: ["ansiedade", "terapia"],
+      energia: ["calmo-caseiro"],
+      disponibilidade: ["poucas-horas", "metade-dia", "flexivel"]
+    },
+    compatibilidadeScore: {
+      depressao: 50,
+      ansiedade: 90,
+      solidao: 60
+    }
+  }
+];
 
 @Injectable({
   providedIn: 'root'
@@ -290,206 +207,220 @@ export class PetsService {
   private petsData = new BehaviorSubject<Pet[]>([]);
   public pets$ = this.petsData.asObservable();
 
+  // FLAG PARA GARANTIR CARREGAMENTO ÚNICO
+  private hasLoaded = false;
+
   constructor(private http: HttpClient) {
-    this.loadPetsFromAPI();
+    // Carrega apenas uma vez
+    if (!this.hasLoaded) {
+      this.loadAllPetsOnce();
+      this.hasLoaded = true;
+    }
   }
 
-  // Carregar pets da API
-  private loadPetsFromAPI(): void {
-    this.http.get<any[]>(`${this.apiUrl}/pets`).pipe(
-      tap(apiPets => {
-        console.log('🐾 Pets carregados da API:', apiPets.length);
-        // Mapear campos da API para formato do frontend
-        const mappedPets: Pet[] = apiPets.map(apiPet => {
-          // Garantir compatibilidadeScore completa com valores padrão seguros
-          const compatibilidadeScore = {
+  // 🔥 CARREGAMENTO ÚNICO E DEFINITIVO - NENHUMA DUPLICAÇÃO
+  private loadAllPetsOnce(): void {
+    console.log('🚀 Iniciando carregamento único de pets...');
+
+    // 1️⃣ Carregar pets da API
+    const apiPets$ = this.http.get<any[]>(`${this.apiUrl}/pets`).pipe(
+      tap(apiPets => console.log('📡 API carregou:', apiPets.length, 'pets')),
+      catchError(error => {
+        console.error('❌ Erro na API, usando fallback vazio:', error);
+        return of([]);
+      })
+    );
+
+    // 2️⃣ Usar PETS_DATABASE diretamente (já é array)
+    const basePets$ = of(PETS_DATABASE).pipe(
+      tap(basePets => console.log('🏠 Base local:', basePets.length, 'pets'))
+    );
+
+    // 3️⃣ Carregar pets do localStorage
+    const localPets$ = of(this.loadPetsFromLocalStorage()).pipe(
+      tap(localPets => console.log('💾 LocalStorage:', localPets.length, 'pets'))
+    );
+
+    // 🔄 COMBINAR TUDO EM UMA ÚNICA OPERAÇÃO
+    forkJoin([apiPets$, basePets$, localPets$]).subscribe({
+      next: ([apiPets, basePets, localPets]) => {
+        console.log('🔄 Combinando fontes de dados...');
+
+        // Mapeamento da API (igual ao anterior)
+        const mappedApiPets: Pet[] = apiPets.map(apiPet => ({
+          id: apiPet.id,
+          nome: apiPet.nome,
+          especie: (apiPet.especie === 'cachorro' || apiPet.especie === 'gato') ? apiPet.especie : 'cachorro',
+          raca: apiPet.raca,
+          idade: apiPet.idade_meses,
+          porte: apiPet.porte,
+          energia: apiPet.energia,
+          personalidade: apiPet.personalidade,
+          beneficioEmocional: apiPet.beneficio_emocional,
+          saude: apiPet.saude,
+          cuidados: apiPet.cuidados,
+          historia: apiPet.historia,
+          casaIdeal: apiPet.casa_ideal,
+          foto: apiPet.foto_url || '/img/THUNDERPETS (4) (1).png',
+          foto_url: apiPet.foto_url,
+          adotado: apiPet.adotado,
+          compatibilidade: {
+            emocao: ['depressao', 'solidao', 'mudanca', 'terapia'],
+            energia: [apiPet.energia],
+            disponibilidade: ['poucas-horas', 'metade-dia', 'todo-dia', 'flexivel']
+          },
+          compatibilidadeScore: {
             depressao: Number(apiPet.depressao_score) || 50,
             ansiedade: Number(apiPet.ansiedade_score) || 50,
             solidao: Number(apiPet.solidao_score) || 50
-          };
+          }
+        }));
 
-          return {
-            id: apiPet.id,
-            nome: apiPet.nome,
-            especie: apiPet.especie,
-            raca: apiPet.raca,
-            idade: apiPet.idade_meses,
-            porte: apiPet.porte,
-            energia: apiPet.energia,
-            personalidade: apiPet.personalidade,
-            beneficioEmocional: apiPet.beneficio_emocional,
-            saude: apiPet.saude,
-            cuidados: apiPet.cuidados,
-            historia: apiPet.historia,
-            casaIdeal: apiPet.casa_ideal,
-            foto: apiPet.foto_url, // Mapeamento: foto_url -> foto
-            adotado: apiPet.adotado,
-            compatibilidade: {
-              emocao: ['depressao', 'solidao', 'mudanca', 'terapia'],
-              energia: [apiPet.energia],
-              disponibilidade: ['poucas-horas', 'metade-dia', 'todo-dia', 'flexivel']
-            },
-            compatibilidadeScore: compatibilidadeScore
-          };
-        });
-        this.petsData.next(mappedPets);
-      }),
-      catchError(error => {
-        console.error('❌ Erro carregando pets da API:', error);
-        // Fallback: usar dados locais
-        console.log('⚠️ Usando dados locais como fallback');
-        this.initializePets();
-        return [];
-      })
-    ).subscribe();
-  }
+        // 🔥 MERGE FINAL: API + BASE + LOCALSTORAGE
+        const mergedPets = [...mappedApiPets, ...basePets, ...localPets];
 
-  private initializePets(): void {
-    const allPets = [...PETS_DATABASE.cachorros, ...PETS_DATABASE.gatos];
-    this.petsData.next(allPets);
-  }
+        // 🔍 REMOVER DUPLICATAS POR ID (prioridade: API > Base > LocalStorage)
+        const uniquePets = this.removeDuplicatesById(mergedPets);
 
-  private loadExternalPets(): void {
-    const storedPets = localStorage.getItem('petsCadastrados');
-    if (storedPets) {
-      try {
-        const externalPets = JSON.parse(storedPets);
-        // Converter dados externos para formato Pet
-        const convertedPets: Pet[] = externalPets.map((externalPet: any) => {
-          // Calcular scores de compatibilidade baseado nos dados
-          const score = this.calculateCompatibilityScore(externalPet);
-
-          return {
-            id: externalPet.id || Date.now(),
-            nome: externalPet.nome,
-            raca: externalPet.raca,
-            idade: externalPet.unidade_idade === 'anos' ? externalPet.idade * 12 : externalPet.idade,
-            porte: externalPet.porte,
-            energia: this.mapEnergyLevel(externalPet.energia),
-            personalidade: this.buildPersonalityString(externalPet),
-            beneficioEmocional: this.determineEmotionalBenefit(externalPet),
-            saude: this.buildHealthString(externalPet),
-            cuidados: 'Cuidados específicos serão informados no contato.',
-            historia: externalPet.descricao || 'Pet cadastrado recentemente na ThunderPets.',
-            casaIdeal: 'Adequado às necessidades terapêuticas e estilo de vida.',
-            foto: '/img/THUNDERPETS (4) (1).png', // Placeholder
-            adotado: false,
-            compatibilidade: score.compatibilidade,
-            compatibilidadeScore: score.scores
-          };
+        console.log('✅ Merge final:', {
+          api: mappedApiPets.length,
+          base: basePets.length,
+          local: localPets.length,
+          merged: mergedPets.length,
+          unique: uniquePets.length
         });
 
-        // Adicionar aos pets existentes
-        const currentPets = this.petsData.value;
-        const updatedPets = [...currentPets, ...convertedPets.filter(newPet =>
-          !currentPets.some(existingPet => existingPet.id === newPet.id)
-        )];
-
-        this.petsData.next(updatedPets);
-        console.log(`🐕 Carregados ${convertedPets.length} pets externos do localStorage!`);
-      } catch (error) {
-        console.error('Erro carregando pets externos:', error);
+        // 🎯 ÚNICA CHAMADA PARA petsData.next() - APENAS AQUI!
+        this.petsData.next(uniquePets);
+        console.log('🎉 Carregamento único concluído! Total pets:', uniquePets.length);
+      },
+      error: (error) => {
+        console.error('💥 Erro crítico no carregamento:', error);
+        // Fallback mínimo
+        this.petsData.next(PETS_DATABASE);
       }
+    });
+  }
+
+  // 🔧 REMOVER DUPLICATAS POR ID (mantém a primeira ocorrência)
+  private removeDuplicatesById(pets: Pet[]): Pet[] {
+    const seen = new Set<number>();
+    return pets.filter(pet => {
+      if (seen.has(pet.id)) {
+        return false;
+      }
+      seen.add(pet.id);
+      return true;
+    });
+  }
+
+  // 📱 CARREGAR PETS DO LOCALSTORAGE (simples, sem conversão complexa)
+  private loadPetsFromLocalStorage(): Pet[] {
+    try {
+      const stored = localStorage.getItem('petsCadastrados');
+      if (!stored) return [];
+
+      const externalPets = JSON.parse(stored);
+      return externalPets.map((externalPet: any) => {
+        // Conversão simplificada para evitar complexidade
+        const score = this.calculateCompatibilityScore(externalPet);
+        return {
+          id: externalPet.id || Date.now(),
+          nome: externalPet.nome,
+          raca: externalPet.raca,
+          especie: (externalPet.especie === 'cachorro' || externalPet.especie === 'gato') ? externalPet.especie : 'cachorro',
+          idade: externalPet.unidade_idade === 'anos' ? externalPet.idade * 12 : externalPet.idade,
+          porte: (externalPet.porte === 'pequeno' || externalPet.porte === 'medio' || externalPet.porte === 'grande') ? externalPet.porte : 'medio',
+          energia: this.mapEnergyLevel(externalPet.energia),
+          personalidade: this.buildPersonalityString(externalPet),
+          beneficioEmocional: this.determineEmotionalBenefit(externalPet),
+          saude: this.buildHealthString(externalPet),
+          cuidados: 'Cuidados específicos serão informados no contato.',
+          historia: externalPet.descricao || 'Pet cadastrado recentemente na ThunderPets.',
+          casaIdeal: 'Adequado às necessidades terapêuticas e estilo de vida.',
+          foto: externalPet.foto_url || '/img/THUNDERPETS (4) (1).png',
+          foto_url: externalPet.foto_url,
+          adotado: false,
+          compatibilidade: score.compatibilidade,
+          compatibilidadeScore: score.scores
+        } as Pet;
+      });
+    } catch (error) {
+      console.error('Erro carregando localStorage:', error);
+      return [];
     }
   }
 
+  // Métodos auxiliares (mantidos iguais)
   private calculateCompatibilityScore(externalPet: any): { compatibilidade: any, scores: any } {
-    // Calcular scores baseado na descrição e características
     const descricao = externalPet.descricao?.toLowerCase() || '';
     const caracteristicas = externalPet.caracteristicas_positivas?.toLowerCase() || '';
 
-    // Determinar necessidade energética baseada no nível de energia selecionado
     let energiaType: string[];
     switch (externalPet.energia) {
-      case 'baixo':
-        energiaType = ['calmo-caseiro'];
-        break;
-      case 'medio':
-        energiaType = ['moderado'];
-        break;
-      case 'alto':
-        energiaType = ['ativo-aventurado'];
-        break;
-      default:
-        energiaType = ['moderado'];
+      case 'baixo': energiaType = ['calmo-caseiro']; break;
+      case 'medio': energiaType = ['moderado']; break;
+      case 'alto': energiaType = ['ativo-aventurado']; break;
+      default: energiaType = ['moderado'];
     }
 
-    // Simular scores de compatibilidade (poderiam ser mais sofisticados)
     let depressao = 50, ansiedade = 50, solidao = 50;
-
-    // Ajustar baseado nas características mencionadas
     if (descricao.includes('depress') || caracteristicas.includes('depress')) depressao += 30;
     if (descricao.includes('ansied') || caracteristicas.includes('ansied')) ansiedade += 30;
     if (descricao.includes('solid') || caracteristicas.includes('solid')) solidao += 30;
-
-    // Ajustar baseado no nível de energia
     if (energiaType.includes('ativo-aventurado')) depressao += 20;
     if (energiaType.includes('calmo-caseiro')) ansiedade += 20;
-
     depressao = Math.min(100, depressao);
     ansiedade = Math.min(100, ansiedade);
     solidao = Math.min(100, solidao);
 
     return {
       compatibilidade: {
-        emocao: ['depressao', 'ansiedade', 'solidao'], // Assume compatibilidade geral
+        emocao: ['depressao', 'ansiedade', 'solidao'],
         energia: energiaType,
-        disponibilidade: ['poucas-horas', 'metade-dia', 'todo-dia'] // Assume flexibilidade geral
+        disponibilidade: ['poucas-horas', 'metade-dia', 'todo-dia']
       },
       scores: { depressao, ansiedade, solidao }
     };
   }
 
-  private mapEnergyLevel(energiaForm: string): 'calmo-caseiro' | 'moderado' | 'ativo-aventurado' {
-    switch (energiaForm) {
-      case 'baixo':
-        return 'calmo-caseiro';
-      case 'medio':
-        return 'moderado';
-      case 'alto':
-        return 'ativo-aventurado';
-      default:
-        return 'moderado';
+  private mapEnergyLevel(level: string): 'calmo-caseiro'|'moderado'|'ativo-aventurado' {
+    switch(level){
+      case 'baixo': return 'calmo-caseiro';
+      case 'medio': return 'moderado';
+      case 'alto': return 'ativo-aventurado';
+      default: return 'moderado';
     }
   }
 
   private buildPersonalityString(externalPet: any): string {
     const parts: string[] = [];
-
     if (externalPet.temperamento && externalPet.temperamento.length > 0) {
       parts.push(`Características: ${externalPet.temperamento.join(', ')}`);
     }
-
     if (externalPet.descricao) {
       parts.push(externalPet.descricao);
     }
-
     if (externalPet.caracteristicas_positivas) {
       parts.push(`Pontos positivos: ${externalPet.caracteristicas_positivas}`);
     }
-
     return parts.length > 0 ? parts.join('. ') : 'Personalidade através do contato direto.';
   }
 
   private buildHealthString(externalPet: any): string {
     const healthInfo: string[] = [];
-
     if (externalPet.vacinado) healthInfo.push('Vacinado');
     if (externalPet.vermifugado) healthInfo.push('Vermifugado');
     if (externalPet.castrado) healthInfo.push('Castrado/Sterilizado');
-
     if (externalPet.necessidades_especiais) {
       healthInfo.push(`Necessidades especiais: ${externalPet.necessidades_especiais}`);
     }
-
     return healthInfo.length > 0 ? healthInfo.join(', ') : 'Informações de saúde disponíveis no contato.';
   }
 
   private determineEmotionalBenefit(externalPet: any): string {
-    // Simples inferência baseada na descrição
     const descricao = (externalPet.descricao || '').toLowerCase();
     const caracteristicas = (externalPet.caracteristicas_positivas || '').toLowerCase();
-
     if (descricao.includes('calm') || descricao.includes('seren') || caracteristicas.includes('calm')) {
       return 'Calma & Serenidade';
     } else if (descricao.includes('energ') || descricao.includes('brinc') || caracteristicas.includes('energ')) {
@@ -503,9 +434,9 @@ export class PetsService {
 
   // Sistema de matching terapêutico inteligente - API
   findTherapeuticMatches(userPreferences: {
-    situacao: string; // 'depressao' | 'ansiedade' | 'solidao' | 'mudanca' | 'terapia'
-    energia: string;  // 'calmo-caseiro' | 'moderado' | 'ativo-aventurado'
-    disponibilidade: string[]; // Array de opções selecionadas
+    situacao: string;
+    energia: string;
+    disponibilidade: string[];
   }): Observable<Pet[]> {
     const params = new HttpParams()
       .set('situacao', userPreferences.situacao)
@@ -516,7 +447,7 @@ export class PetsService {
       tap(matches => console.log(`💚 API: ${matches.length} pets compatíveis encontrados`)),
       catchError(error => {
         console.error('❌ Erro no matching via API:', error);
-        return [];
+        return of([]);
       })
     );
   }
@@ -526,7 +457,7 @@ export class PetsService {
       tap(pet => console.log('🐾 API: Pet encontrado:', pet.nome)),
       catchError(error => {
         console.error('❌ Erro buscando pet:', error);
-        return [null];
+        return of(null);
       })
     );
   }
@@ -534,17 +465,16 @@ export class PetsService {
   getAllPets(): Observable<Pet[]> {
     return this.http.get<Pet[]>(`${this.apiUrl}/pets`).pipe(
       tap(pets => {
-        this.petsData.next(pets); // Atualizar BehaviorSubject
+        this.petsData.next(pets);
         console.log('🐕 API: Todos os pets carregados:', pets.length);
       }),
       catchError(error => {
         console.error('❌ Erro carregando todos os pets:', error);
-        return [];
+        return of([]);
       })
     );
   }
 
-  // Adicionar novo pet
   createPet(petData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/pets`, petData).pipe(
       tap(result => console.log('✅ Pet criado na API:', result)),
@@ -555,14 +485,12 @@ export class PetsService {
     );
   }
 
-  // Marcar pet como adotado via API
   adoptPet(id: number): Observable<any> {
     return this.http.patch(`${this.apiUrl}/mediators/adopt/${id}`, {}, {
       headers: { 'x-api-key': 'thunderpets-2024-mediator-secret' }
     }).pipe(
       tap(result => {
         console.log('✅ Pet adotado na API:', result);
-        // Atualizar local
         const pets = this.petsData.value;
         const petIndex = pets.findIndex(p => p.id === id);
         if (petIndex !== -1) {
@@ -578,14 +506,13 @@ export class PetsService {
   }
 
   getDogs(): Pet[] {
-    return PETS_DATABASE.cachorros.filter(pet => !pet.adotado);
+    return this.petsData.value.filter(p => p.especie === 'cachorro' && !p.adotado);
   }
 
   getCats(): Pet[] {
-    return PETS_DATABASE.gatos.filter(pet => !pet.adotado);
+    return this.petsData.value.filter(p => p.especie === 'gato' && !p.adotado);
   }
 
-  // Para futuro - quando implementar doação
   addPet(pet: Omit<Pet, 'id' | 'adotado'>): void {
     const newId = Math.max(...this.petsData.value.map(p => p.id)) + 1;
     const newPet: Pet = { ...pet, id: newId, adotado: false };
@@ -594,14 +521,7 @@ export class PetsService {
     this.saveToLocalStorage(updatedPets);
   }
 
-
-
-  private updatePets(): void {
-    this.petsData.next([...this.petsData.value]);
-  }
-
   private saveToLocalStorage(pets: Pet[]): void {
-    // Futuro: persistir pets customizados no localStorage
     localStorage.setItem('thunderpets_custom_pets', JSON.stringify(pets));
   }
 
@@ -610,7 +530,6 @@ export class PetsService {
     if (stored) {
       try {
         const customPets = JSON.parse(stored);
-        // Merge com dados padrão
         const merged = [...this.petsData.value, ...customPets];
         this.petsData.next(merged);
       } catch (error) {
@@ -619,14 +538,31 @@ export class PetsService {
     }
   }
 
-  // Método para refrescar pets externos (para garantir dados atualizados)
   refreshExternalPets(): void {
     this.loadExternalPets();
     console.log('🔄 Pets externos recarregados');
   }
 
-  // Método para obter total de pets
+  // Método auxiliar para compatibilidade
+  private loadExternalPets(): void {
+    // Método vazio - carregamento agora é feito em loadAllPetsOnce
+  }
+
   getTotalPets(): string {
-    return `Total: ${this.petsData.value.length} pets (${PETS_DATABASE.cachorros.length + PETS_DATABASE.gatos.length} padrão, ${(this.petsData.value.length - PETS_DATABASE.cachorros.length - PETS_DATABASE.gatos.length)} cadastrados)`;
+    return `Total: ${this.petsData.value.length} pets (API + Base + LocalStorage)`;
+  }
+
+  uploadFoto(file: File): Observable<{ url: string }> {
+    const formData = new FormData();
+    formData.append('foto', file);
+
+    return this.http.post<{ url: string }>(
+      `${this.apiUrl}/pets/upload`,
+      formData
+    );
+  }
+
+  getImagensCloudinary(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/pets/images`);
   }
 }

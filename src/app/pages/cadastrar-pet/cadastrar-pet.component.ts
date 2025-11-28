@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { PetsService } from '../../services/pets.service';
 
 export interface PetData {
   nome: string;
@@ -42,9 +43,10 @@ export class CadastrarPetComponent implements OnInit {
   currentStep: number = 1;
   totalSteps: number = 3;
   usuarioAtual: any;
-  selectedImages: string[] = [];
+  selectedImages: string = '';
   isEditMode: boolean = false;
   editingPetId: number | null = null;
+  pet: any = {};
 
   petForm: FormGroup;
   temperamentosDisponiveis: string[] = [
@@ -64,7 +66,7 @@ export class CadastrarPetComponent implements OnInit {
     { value: 'outros', label: 'Outros', icon: '🐾' }
   ];
 
-  constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {
+  constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute, private petService: PetsService) {
     this.petForm = this.createPetForm();
   }
 
@@ -171,7 +173,9 @@ export class CadastrarPetComponent implements OnInit {
 
   isStep3Valid(): boolean {
     const step3Fields = ['descricao', 'localizacao', 'contato'];
-    return step3Fields.every(field => this.petForm.get(field)?.valid);
+    const hasPhoto = this.selectedImages && this.selectedImages.trim() !== '';
+    const allFieldsValid = step3Fields.every(field => this.petForm.get(field)?.valid === true);
+    return Boolean(allFieldsValid && hasPhoto);
   }
 
   // Toggle temperamento
@@ -291,35 +295,21 @@ export class CadastrarPetComponent implements OnInit {
   }
 
   async onFileSelected(event: any): Promise<void> {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      const promises: Promise<string>[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (file.type.startsWith('image/') && (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg')) {
-          promises.push(new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              const dataUrl = e.target?.result as string;
-              resolve(dataUrl);
-            };
-            reader.readAsDataURL(file);
-          }));
-        }
-      }
-      const dataUrls = await Promise.all(promises);
-      this.selectedImages.push(...dataUrls);
-      const currentFotos = this.petForm.get('fotos')?.value || [];
-      currentFotos.push(...dataUrls);
-      this.petForm.get('fotos')?.setValue(currentFotos);
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('image/') && (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        this.selectedImages = dataUrl;
+        this.petForm.get('fotos')?.setValue([dataUrl]);
+      };
+      reader.readAsDataURL(file);
     }
   }
 
-  removeImage(index: number): void {
-    this.selectedImages.splice(index, 1);
-    const currentFotos = this.petForm.get('fotos')?.value || [];
-    currentFotos.splice(index, 1);
-    this.petForm.get('fotos')?.setValue(currentFotos);
+  removeImage(): void {
+    this.selectedImages = '';
+    this.petForm.get('fotos')?.setValue([]);
   }
 
   // Carregar dados do pet para edição
@@ -355,7 +345,7 @@ export class CadastrarPetComponent implements OnInit {
 
         // Se há fotos existentes, mostrar como selectedImages
         if (pet.fotos && pet.fotos.length > 0) {
-          this.selectedImages = [...pet.fotos];
+          this.selectedImages = pet.fotos[0]; // Apenas a primeira imagem
         }
       } else {
         alert('Pet não encontrado ou você não tem permissão para editá-lo.');

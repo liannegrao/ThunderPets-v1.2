@@ -117,30 +117,65 @@
       <!-- Results Section -->
       <div *ngIf="showResults" id="matching-results" style="margin-top: 2rem;">
         <h3 style="margin-bottom: 1rem; color: #14b8a6;">💝 Terapeutas Emocionais Compatíveis!</h3>
-        <div id="results-container">
-          <div *ngFor="let pet of matchedPets" class="pet-result-card" style="border: 2px solid #e5e7eb; padding: 1rem; border-radius: 12px; background: white; margin-bottom: 1rem; display: flex; gap: 1rem;">
-            <img [src]="pet.foto" [alt]="'Foto de ' + pet.nome" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
-            <div class="pet-result-content" style="flex: 1;">
-              <h4 style="margin: 0 0 0.5rem 0; color: #1f2937;">{{ pet.nome }}</h4>
-              <p style="margin: 0 0 0.25rem 0; font-weight: 600; color: #059669;">{{ pet.beneficioEmocional || 'Companheiro Terapêutico' }}</p>
-              <p style="margin: 0 0 0.25rem 0; font-size: 0.9rem; color: #6b7280;">{{ pet.raca }} • {{ pet.idade }} meses • {{ pet.porte }}</p>
-              <p style="margin: 0 0 1rem 0; font-size: 0.9rem; color: #374151; line-height: 1.4;">
-                {{ pet.personalidade }}
-              </p>
-              <button class="button button-secondary" (click)="openPetDetails(pet)" style="background: #14b8a6; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer;">
-                ❤️ Conhecer {{ pet.nome }}
-              </button>
+
+        <!-- Lista de Pets Matched -->
+        <div class="pets-matched-grid">
+          <div class="pet-match-card" *ngFor="let pet of matchedPets">
+            <div class="pet-match-image">
+              <!-- Imagem real com fallback -->
+              <img
+                [src]="pet.foto_url || '/img/THUNDERPETS (4) (1).png'"
+                [alt]="'Foto de ' + pet.nome"
+                class="pet-img"
+              />
+              <div class="pet-status-badge" [ngClass]="getTherapyBadge(pet)">
+                {{ getTherapyLabel(pet) }}
+              </div>
+            </div>
+
+            <div class="pet-match-content">
+              <div class="pet-match-header">
+                <h3>{{ pet.nome }}</h3>
+                <div class="pet-species">{{ pet.especie | titlecase }} • {{ pet.raca }}</div>
+              </div>
+
+              <div class="pet-benefits">
+                <span class="benefit-chip">{{ pet.beneficioEmocional }}</span>
+              </div>
+
+              <div class="compatibility-scores">
+                <div class="score-item" *ngFor="let score of getTopScores(pet)">
+                  <span class="score-label">{{ score.label }}</span>
+                  <div class="score-bar">
+                    <div class="score-fill" [style.width.%]="score.value"></div>
+                  </div>
+                  <span class="score-value">{{ score.value }}%</span>
+                </div>
+              </div>
+
+              <p class="pet-description" [innerHTML]="pet.personalidade | slice:0:120"></p>
+
+              <div class="pet-actions">
+                <button class="btn-secondary" (click)="openPetDetails(pet)">
+                  📋 Ver Detalhes
+                </button>
+                <button class="btn-primary" (click)="requestAdoption(pet)">
+                  ❤️ Solicitar Adoção
+                </button>
+              </div>
             </div>
           </div>
-          <div *ngIf="matchedPets.length === 0" style="text-align: center; padding: 3rem; background: #fef3c7; border-radius: 12px; border: 2px solid #f59e0b; margin-top: 2rem;">
-            <p style="color: #92400e; font-weight: bold; font-size: 1.1rem; margin-bottom: 0.5rem;">
-              😔 Nenhum pet compatível encontrado
-            </p>
-            <p style="color: #78350f; margin: 0;">
-              Tente ajustar suas preferências ou entre em contato conosco para ajuda personalizada.
-            </p>
-          </div>
         </div>
+
+        <div *ngIf="matchedPets.length === 0" style="text-align: center; padding: 3rem; background: #fef3c7; border-radius: 12px; border: 2px solid #f59e0b; margin-top: 2rem;">
+          <p style="color: #92400e; font-weight: bold; font-size: 1.1rem; margin-bottom: 0.5rem;">
+            😔 Nenhum pet compatível encontrado
+          </p>
+          <p style="color: #78350f; margin: 0;">
+            Tente ajustar suas preferências ou entre em contato conosco para ajuda personalizada.
+          </p>
+        </div>
+
         <div *ngIf="hasMoreResults" style="text-align: center; margin-top: 1.5rem;">
           <button
             id="showMoreResults"
@@ -163,7 +198,7 @@
     </div>
     <div class="pet-grid">
       <div *ngFor="let pet of showcasedPets" class="pet-card">
-        <img [src]="pet.foto" [alt]="'Foto de ' + pet.nome">
+        <img [src]="getLocalImage(pet)" [alt]="'Foto de ' + pet.nome" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
         <div class="pet-card-content">
           <h3>{{ pet.nome }}</h3>
           <p><span style="font-weight: 600;">Benefício Emocional:</span> {{ pet.beneficioEmocional || 'Companheiro Terapêutico' }}<br><span style="font-weight: 600;">Perfil:</span> {{ pet.porte }} • {{ pet.idade }} meses</p>
@@ -239,7 +274,7 @@
     <div class="pet-modal-body">
       <div class="pet-modal-main">
         <div class="pet-modal-image">
-          <img [src]="selectedPet.foto" [alt]="'Foto de ' + selectedPet.nome" class="pet-large-image">
+          <div style="width: 100%; height: 300px; background: #f3f4f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #6b7280; font-weight: 600; font-size: 1.2rem;">Foto de {{ selectedPet.nome }}</div>
         </div>
 
         <div class="pet-modal-info">

@@ -15,6 +15,7 @@ interface PetComDoador extends Pet {
   doador?: Usuario;
   dataCadastro?: Date;
   status: 'pendente' | 'aprovado' | 'adotado';
+  foto_url?: string; // Adicionar foto_url
 }
 
 @Component({
@@ -111,6 +112,7 @@ export class PainelMediadorComponent implements OnInit {
           energia: 'moderado', // Valor padrão
           adotado: pet.status === 'adotado',
           foto: pet.foto || '/img/THUNDERPETS (4) (1).png',
+          foto_url: pet.foto_url, // URL do Cloudinary se disponível
           beneficioEmocional: pet.caracteristicas_positivas || 'Companheiro terapêutico',
           personalidade: pet.descricao,
           saude: 'Boa saúde', // Valor padrão

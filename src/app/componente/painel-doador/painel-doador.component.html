@@ -72,7 +72,7 @@
       <div class="pets-grid" *ngIf="meusPets.length > 0">
         <div class="pet-card" *ngFor="let pet of meusPets">
           <div class="pet-header">
-            <img [src]="pet.foto" [alt]="pet.nome" class="pet-image">
+            <img [src]="pet.foto_url || '/img/THUNDERPETS (4) (1).png'" [alt]="pet.nome" class="pet-image">
             <div class="pet-status-badge" [ngClass]="getStatusBadge(pet.status).class">
               {{ getStatusBadge(pet.status).text }}
             </div>

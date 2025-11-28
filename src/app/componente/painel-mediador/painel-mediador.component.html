@@ -135,7 +135,7 @@
           <div class="pets-grid">
             <div *ngFor="let pet of getPetsPorStatus('pendente')" class="pet-card-mediador">
               <div class="pet-header">
-                <img [src]="pet.foto" [alt]="pet.nome" class="pet-foto">
+                <img [src]="pet.foto_url || '/img/THUNDERPETS (4) (1).png'" [alt]="pet.nome" class="pet-foto">
                 <div class="pet-info">
                   <h4>{{ pet.nome }}</h4>
                   <p>{{ pet.raca }} • {{ pet.idade }} meses • {{ pet.porte }}</p>
@@ -162,7 +162,7 @@
           <div class="pets-grid">
             <div *ngFor="let pet of getPetsPorStatus('aprovado')" class="pet-card-mediador">
               <div class="pet-header">
-                <img [src]="pet.foto" [alt]="pet.nome" class="pet-foto">
+                <img [src]="pet.foto_url || '/img/THUNDERPETS (4) (1).png'" [alt]="pet.nome" class="pet-foto">
                 <div class="pet-info">
                   <h4>{{ pet.nome }}</h4>
                   <p>{{ pet.raca }} • {{ pet.idade }} meses • {{ pet.porte }}</p>
@@ -196,7 +196,7 @@
           <div class="pets-grid">
             <div *ngFor="let pet of getPetsPorStatus('adotado')" class="pet-card-mediador">
               <div class="pet-header">
-                <img [src]="pet.foto" [alt]="pet.nome" class="pet-foto">
+                <img [src]="pet.foto_url || '/img/THUNDERPETS (4) (1).png'" [alt]="pet.nome" class="pet-foto">
                 <div class="pet-info">
                   <h4>{{ pet.nome }}</h4>
                   <p>{{ pet.raca }} • {{ pet.idade }} meses • {{ pet.porte }}</p>
