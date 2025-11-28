@@ -31,22 +31,95 @@ async function syncPetsWithCloudinaryImages() {
       console.log(`⚠️  Avisos: Esperados 60 pets, encontrados ${pets.length}`);
     }
 
-    // Atualizar cada pet com uma imagem do Cloudinary (distribuição uniforme)
-    let imageIndex = 0;
-    const imagesPerPet = Math.ceil(imagensCloudinary.length / pets.length);
-    console.log(`📊 ${imagensCloudinary.length} imagens para ${pets.length} pets (${imagesPerPet} imagens por pet em média)`);
+    // 🔍 CLASSIFICAR IMAGENS POR TIPO (Cachorro vs Gato)
+    const imagensCachorros = [];
+    const imagensGatos = [];
+    const imagensNeutras = [];
 
-    for (const pet of pets) {
-      const imagem = imagensCloudinary[imageIndex % imagensCloudinary.length];
+    // Palavras-chave para identificar imagens
+    const palavrasCachorro = ['dog', 'cachorro', 'cao', 'puppy', 'pet', 'animal', 'hound', 'retriever', 'labrador', 'golden', 'poodle', 'bulldog', 'beagle', 'husky', 'pitbull', 'pug', 'shih', 'yorkshire', 'boxer', 'rottweiler', 'dachshund', 'schnauzer'];
+    const palavrasGato = ['cat', 'gato', 'kitten', 'feline', 'persian', 'siamese', 'angora', 'ragdoll', 'sphynx', 'bengal', 'manx', 'russian', 'scottish', 'fold', 'burmese', 'tonkinese', 'korat', 'ashera'];
 
-      console.log(`🔄 ${pet.nome} (ID: ${pet.id}) → ${imagem.filename}`);
+    for (const imagem of imagensCloudinary) {
+      const filename = imagem.filename.toLowerCase();
+      const publicId = imagem.public_id.toLowerCase();
+
+      // Verificar se contém palavras de cachorro
+      const isCachorro = palavrasCachorro.some(palavra =>
+        filename.includes(palavra) || publicId.includes(palavra)
+      );
+
+      // Verificar se contém palavras de gato
+      const isGato = palavrasGato.some(palavra =>
+        filename.includes(palavra) || publicId.includes(palavra)
+      );
+
+      if (isCachorro && !isGato) {
+        imagensCachorros.push(imagem);
+      } else if (isGato && !isCachorro) {
+        imagensGatos.push(imagem);
+      } else {
+        imagensNeutras.push(imagem);
+      }
+    }
+
+    console.log(`🐕 ${imagensCachorros.length} imagens de cachorros encontradas`);
+    console.log(`🐱 ${imagensGatos.length} imagens de gatos encontradas`);
+    console.log(`🎨 ${imagensNeutras.length} imagens neutras encontradas`);
+
+    // 🔄 ATRIBUIR IMAGENS POR ESPÉCIE
+    const cachorros = pets.filter(pet => pet.especie === 'cachorro');
+    const gatos = pets.filter(pet => pet.especie === 'gato');
+
+    console.log(`🐕 ${cachorros.length} pets cachorros para sincronizar`);
+    console.log(`🐱 ${gatos.length} pets gatos para sincronizar`);
+
+    // Atribuir imagens para cachorros
+    let indexCachorro = 0;
+    for (const pet of cachorros) {
+      let imagem;
+      if (imagensCachorros.length > 0) {
+        imagem = imagensCachorros[indexCachorro % imagensCachorros.length];
+        indexCachorro++;
+      } else if (imagensNeutras.length > 0) {
+        imagem = imagensNeutras[indexCachorro % imagensNeutras.length];
+        indexCachorro++;
+      } else {
+        // Fallback para qualquer imagem
+        imagem = imagensCloudinary[indexCachorro % imagensCloudinary.length];
+        indexCachorro++;
+      }
+
+      console.log(`🐕 ${pet.nome} (ID: ${pet.id}) → ${imagem.filename}`);
 
       await global.dbManager.run(
         'UPDATE pets SET foto_url = ? WHERE id = ?',
         [imagem.url, pet.id]
       );
+    }
 
-      imageIndex++;
+    // Atribuir imagens para gatos
+    let indexGato = 0;
+    for (const pet of gatos) {
+      let imagem;
+      if (imagensGatos.length > 0) {
+        imagem = imagensGatos[indexGato % imagensGatos.length];
+        indexGato++;
+      } else if (imagensNeutras.length > 0) {
+        imagem = imagensNeutras[indexGato % imagensNeutras.length];
+        indexGato++;
+      } else {
+        // Fallback para qualquer imagem
+        imagem = imagensCloudinary[indexGato % imagensCloudinary.length];
+        indexGato++;
+      }
+
+      console.log(`🐱 ${pet.nome} (ID: ${pet.id}) → ${imagem.filename}`);
+
+      await global.dbManager.run(
+        'UPDATE pets SET foto_url = ? WHERE id = ?',
+        [imagem.url, pet.id]
+      );
     }
 
     console.log('✅ Sincronização concluída!');

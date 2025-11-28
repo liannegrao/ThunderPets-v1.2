@@ -76,4 +76,65 @@ class DatabaseManager {
     }
 }
 
-module.exports = { DatabaseManager };
+// =============================================================
+// 🚀 SEED AUTOMÁTICO: Criar 52 pets com imagens do Cloudinary
+// =============================================================
+async function seedPets(db) {
+    console.log("📦 Criando 52 pets automaticamente...");
+
+    const pets = [];
+
+    // URLs reais você pode trocar depois
+    const cloudinaryImages = [
+        'https://res.cloudinary.com/demo/image/upload/v1699999999/thor.jpg',
+        'https://res.cloudinary.com/demo/image/upload/v1699999999/caramelo.jpg',
+        'https://res.cloudinary.com/demo/image/upload/v1699999999/luna.jpg'
+    ];
+
+    const genericDog = 'https://res.cloudinary.com/demo/image/upload/v1699999999/cachorro.jpg';
+    const genericCat = 'https://res.cloudinary.com/demo/image/upload/v1699999999/gato.jpg';
+
+    for (let i = 1; i <= 52; i++) {
+        let foto_url;
+
+        if (i === 1) foto_url = cloudinaryImages[0]; // Thor
+        else if (i === 2) foto_url = cloudinaryImages[1]; // Caramelo
+        else if (i === 3) foto_url = cloudinaryImages[2]; // Luna
+        else foto_url = i % 2 === 0 ? genericDog : genericCat;
+
+        pets.push({
+            nome: `Pet ${i}`,
+            especie: i % 2 === 0 ? 'Cachorro' : 'Gato',
+            raca: i % 2 === 0 ? 'Vira-lata' : 'SRD',
+            idade_meses: Math.floor(Math.random() * 180) + 1,
+            porte: ['pequeno', 'medio', 'grande'][Math.floor(Math.random() * 3)],
+            energia: ['calmo-caseiro', 'moderado', 'ativo-aventurado'][Math.floor(Math.random() * 3)],
+            personalidade: ['amigavel', 'brincalhao', 'tranquilo', 'ativo'][Math.floor(Math.random() * 4)],
+            descricao: `Descrição automática do Pet ${i}`,
+            foto_url
+        });
+    }
+
+    for (const pet of pets) {
+        await db.run(
+            `INSERT INTO pets
+                (nome, especie, raca, idade_meses, porte, energia, personalidade, descricao, foto_url)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                pet.nome,
+                pet.especie,
+                pet.raca,
+                pet.idade_meses,
+                pet.porte,
+                pet.energia,
+                pet.personalidade,
+                pet.descricao,
+                pet.foto_url
+            ]
+        );
+    }
+
+    console.log("✅ Seed finalizado com sucesso!");
+}
+
+module.exports = { DatabaseManager, seedPets };

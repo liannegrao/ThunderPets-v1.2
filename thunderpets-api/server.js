@@ -63,11 +63,11 @@ async function startServer() {
         const dbPath = path.join(__dirname, 'thunderpets.db');
 
         // =====================================================
-        // 🧹 1. Apagar o banco sempre que iniciar o server
+        // 🧹 1. Apagar o banco sempre que iniciar o server (DESABILITADO TEMPORARIAMENTE)
         // =====================================================
         if (fs.existsSync(dbPath)) {
-            fs.unlinkSync(dbPath);
-            console.log("🗑️ Banco antigo deletado.");
+            // fs.unlinkSync(dbPath);
+            console.log("💾 Banco existente mantido (imagens Cloudinary já sincronizadas).");
         } else {
             console.log("⚠️ Nenhum banco encontrado (ok, será criado).");
         }
@@ -79,24 +79,9 @@ async function startServer() {
         await dbManager.initDatabase();
         global.dbManager = dbManager;
 
-        // =====================================================
-        // 🐶🐱 3. Criar automaticamente 52 pets
-        // =====================================================
-        console.log("📦 Criando 52 pets automaticamente...");
 
-        for (let i = 1; i <= 52; i++) {
-            const nome = `Pet ${i}`;
-            const especie = i % 2 === 0 ? "Cachorro" : "Gato";
-            const idade = Math.floor(Math.random() * 10) + 1;
-            const descricao = `Descrição automática do ${nome}`;
 
-            await dbManager.run(`
-                INSERT INTO pets (nome, especie, idade, descricao, foto_url)
-                VALUES (?, ?, ?, ?, ?)
-            `, [nome, especie, idade, descricao, null]);
-        }
 
-        console.log("🎉 Pronto! 52 pets criados no banco.");
 
         // =====================================================
         // 🚀 4. Iniciar API normalmente
