@@ -57,35 +57,53 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start server
 async function startServer() {
     try {
+        const fs = require('fs');
+        const dbPath = path.join(__dirname, 'thunderpets.db');
+
+        // =====================================================
+        // 🧹 1. Apagar o banco sempre que iniciar o server
+        // =====================================================
+        if (fs.existsSync(dbPath)) {
+            fs.unlinkSync(dbPath);
+            console.log("🗑️ Banco antigo deletado.");
+        } else {
+            console.log("⚠️ Nenhum banco encontrado (ok, será criado).");
+        }
+
+        // =====================================================
+        // 🛠 2. Criar banco novo
+        // =====================================================
         const dbManager = new DatabaseManager();
         await dbManager.initDatabase();
         global.dbManager = dbManager;
 
-        if (!process.env.CLOUDINARY_URL) {
-            console.warn('⚠️ CLOUDINARY_URL não encontrada. Sincronização de imagens desabilitada!');
-        } else {
-            console.log('🔄 Sincronizando pets com imagens do Cloudinary...');
-            const imagens = await listarImagensThunderPets();
-            if (!imagens.length) {
-                console.log('⚠️ Nenhuma imagem encontrada no Cloudinary.');
-            } else {
-                // Pega no máximo 105 pets do banco
-                const pets = (await dbManager.all('SELECT id, nome FROM pets ORDER BY id')).slice(0, 105);
-                let index = 0;
-                for (const pet of pets) {
-                    const img = imagens[index % imagens.length].url;
-                    await dbManager.run('UPDATE pets SET foto_url = ? WHERE id = ?', [img, pet.id]);
-                    console.log(`🔄 Pet "${pet.nome}" atualizado com imagem: ${img.split('/').pop()}`);
-                    index++;
-                }
-                console.log(`✅ ${pets.length} pets atualizados com imagens do Cloudinary!`);
-            }
+        // =====================================================
+        // 🐶🐱 3. Criar automaticamente 52 pets
+        // =====================================================
+        console.log("📦 Criando 52 pets automaticamente...");
+
+        for (let i = 1; i <= 52; i++) {
+            const nome = `Pet ${i}`;
+            const especie = i % 2 === 0 ? "Cachorro" : "Gato";
+            const idade = Math.floor(Math.random() * 10) + 1;
+            const descricao = `Descrição automática do ${nome}`;
+
+            await dbManager.run(`
+                INSERT INTO pets (nome, especie, idade, descricao, foto_url)
+                VALUES (?, ?, ?, ?, ?)
+            `, [nome, especie, idade, descricao, null]);
         }
 
-        app.listen(PORT, () => console.log(`🚀 ThunderPets API rodando na porta ${PORT}`));
+        console.log("🎉 Pronto! 52 pets criados no banco.");
+
+        // =====================================================
+        // 🚀 4. Iniciar API normalmente
+        // =====================================================
+        app.listen(PORT, () =>
+            console.log(`🚀 ThunderPets API rodando na porta ${PORT}`)
+        );
 
     } catch (error) {
         console.error('❌ Falha ao iniciar servidor:', error);

@@ -209,7 +209,107 @@
              [alt]="'Foto de ' + selectedPet.nome"
              class="pet-image-large">
       </div>
-      <!-- Resto do modal continua igual -->
+
+      <!-- Informações Detalhadas do Pet -->
+      <div class="pet-details-content">
+        <!-- Dados Básicos -->
+        <div class="detail-section">
+          <h3>🐾 Dados Básicos</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">Nome:</span>
+              <span class="detail-value">{{ selectedPet.nome }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Espécie:</span>
+              <span class="detail-value">{{ selectedPet.especie | titlecase }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Raça:</span>
+              <span class="detail-value">{{ selectedPet.raca }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Idade:</span>
+              <span class="detail-value">{{ getFormattedAge(selectedPet.idade) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Porte:</span>
+              <span class="detail-value">{{ selectedPet.porte | titlecase }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Nível de Energia:</span>
+              <span class="detail-value">{{ selectedPet.energia | titlecase }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personalidade e Benefício Emocional -->
+        <div class="detail-section">
+          <h3>💝 Personalidade e Benefício Emocional</h3>
+          <div class="detail-item">
+            <span class="detail-label">Personalidade:</span>
+            <span class="detail-value">{{ selectedPet.personalidade }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Benefício Emocional:</span>
+            <span class="detail-value">{{ selectedPet.beneficioEmocional || 'Companheiro Fiel' }}</span>
+          </div>
+        </div>
+
+        <!-- Saúde e Cuidados -->
+        <div class="detail-section">
+          <h3>🏥 Saúde e Cuidados</h3>
+          <div class="detail-item">
+            <span class="detail-label">Saúde:</span>
+            <span class="detail-value">{{ selectedPet.saude }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Cuidados Específicos:</span>
+            <span class="detail-value">{{ selectedPet.cuidados }}</span>
+          </div>
+        </div>
+
+        <!-- História e Casa Ideal -->
+        <div class="detail-section">
+          <h3>📖 História e Ambiente Ideal</h3>
+          <div class="detail-item">
+            <span class="detail-label">História:</span>
+            <span class="detail-value">{{ selectedPet.historia }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Casa Ideal:</span>
+            <span class="detail-value">{{ selectedPet.casaIdeal }}</span>
+          </div>
+        </div>
+
+        <!-- Compatibilidade Terapêutica -->
+        <div class="detail-section">
+          <h3>🎯 Compatibilidade Terapêutica</h3>
+          <div class="compatibility-scores">
+            <div class="score-item">
+              <span class="score-label">Depressão:</span>
+              <div class="score-bar">
+                <div class="score-fill" [style.width.%]="selectedPet.compatibilidadeScore.depressao || 50"></div>
+              </div>
+              <span class="score-value">{{ selectedPet.compatibilidadeScore.depressao || 50 }}%</span>
+            </div>
+            <div class="score-item">
+              <span class="score-label">Ansiedade:</span>
+              <div class="score-bar">
+                <div class="score-fill" [style.width.%]="selectedPet.compatibilidadeScore.ansiedade || 50"></div>
+              </div>
+              <span class="score-value">{{ selectedPet.compatibilidadeScore.ansiedade || 50 }}%</span>
+            </div>
+            <div class="score-item">
+              <span class="score-label">Solidão:</span>
+              <div class="score-bar">
+                <div class="score-fill" [style.width.%]="selectedPet.compatibilidadeScore.solidao || 50"></div>
+              </div>
+              <span class="score-value">{{ selectedPet.compatibilidadeScore.solidao || 50 }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
