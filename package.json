@@ -3,7 +3,7 @@
   "private": true,
   "workspaces": ["thunderpets-api"],
   "scripts": {
-    "start": "node thunderpets-api/server.js",
+    "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
