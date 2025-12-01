@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PetsService, Pet } from '../../services/pets.service';
+import { AdocaoService, SolicitacaoAdocao } from '../../services/adocao.service';
 import { SlicePipe, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -19,6 +20,51 @@ interface DisponibilidadeOption {
   styleUrl: './painel-adotante.component.css'
 })
 export class PainelAdotanteComponent implements OnInit {
+
+  calcularIdade(idade: string | number): string {
+    if (idade === null || idade === undefined) {
+      return 'Idade não informada';
+    }
+
+    // Se a idade for um número ou uma string numérica, assumimos que são meses.
+    if (typeof idade === 'number' || !isNaN(Number(idade))) {
+      const idadeEmMeses = Number(idade);
+      const anos = Math.floor(idadeEmMeses / 12);
+      const meses = idadeEmMeses % 12;
+
+      if (anos > 0 && meses > 0) {
+        return `${anos} ano${anos > 1 ? 's' : ''} e ${meses} mes${meses > 1 ? 'es' : ''}`;
+      }
+      if (anos > 0) {
+        return `${anos} ano${anos > 1 ? 's' : ''}`;
+      }
+      if (meses > 0) {
+        return `${meses} mes${meses > 1 ? 'es' : ''}`;
+      }
+      return 'Recém-nascido';
+    }
+
+    // Se for uma string de data (fallback)
+    const nascimento = new Date(idade);
+    if (isNaN(nascimento.getTime())) {
+      return 'Idade não informada';
+    }
+
+    const hoje = new Date();
+    let anos = hoje.getFullYear() - nascimento.getFullYear();
+    let meses = hoje.getMonth() - nascimento.getMonth();
+
+    if (meses < 0 || (meses === 0 && hoje.getDate() < nascimento.getDate())) {
+      anos--;
+      meses += 12;
+    }
+
+    if (anos > 0) {
+      return `${anos} ano${anos > 1 ? 's' : ''}`;
+    } else {
+      return `${meses} mes${meses > 1 ? 'es' : ''}`;
+    }
+  }
 
   matchingForm!: FormGroup;
   isMatching = false;
@@ -243,12 +289,31 @@ const tipoPainel = currentUser.role === 'mediador' ? 'Painel de Mediador' : 'Pai
 
 // Mensagem correta
 const confirmacao = confirm(
-  `${pet.nome} foi adicionado ao seu ${tipoPainel}! 🐾\n\nVocê pode visualizar todas as solicitações no seu painel personalizado.`
-);
+        `Sua escolha do pet ${pet.nome} foi para seu painel. Depois o mediador vai ver, lá em Solicitações de Adoção Pendentes, o seu nome (${currentUser.nome}).`
+      );
 
 if (confirmacao) {
-  this.router.navigate([`/${painel}`]);
-}
+      // Salvar a solicitação no localStorage
+      const adoptionRequest: SolicitacaoAdocao = {
+        id: Date.now(),
+        pet: {
+          ...pet,
+          foto: pet.foto || '/img/THUNDERPETS (4) (1).png',
+          foto_url: pet.foto_url || ''
+        },
+        solicitante: currentUser,
+        data: new Date(),
+        status: 'pendente',
+      };
+
+      // Obter solicitações existentes e adicionar a nova
+      const existingRequests = JSON.parse(localStorage.getItem('adocaoSolicitations') || '[]');
+      existingRequests.push(adoptionRequest);
+      localStorage.setItem('adocaoSolicitations', JSON.stringify(existingRequests));
+
+      // Redirecionar para o painel
+      this.router.navigate([`/${painel}`]);
+    }
 }
 
   confirmAdoption() {
@@ -360,7 +425,16 @@ if (confirmacao) {
         console.error('Erro ao carregar pets doadores:', error);
       }
 
-      this.petsDisponiveis = todosPets.filter(pet => !pet.adotado);
+      this.petsDisponiveis = todosPets.filter(pet => !pet.adotado).map(pet => {
+        if (pet.nome === 'Sonecas') {
+          pet.foto = '/img/cut cat serhio 02-1813x1811-720x719.jpg';
+        }
+        if (pet.nome === 'Purês') {
+          pet.foto = '/img/premium_photo-1673967831980-1d377baaded2.jpg';
+          pet.foto_url = ''; // Limpar a foto_url para evitar duplicatas
+        }
+        return pet;
+      });
       this.totalPetsDisponiveis = this.petsDisponiveis.length; // Atualizar propriedade para estatísticas
       this.isLoadingPets = false;
       this.aplicarFiltros();
@@ -375,7 +449,11 @@ if (confirmacao) {
     let filtrados = [...this.petsDisponiveis];
 
     if (this.filtroEspecie) {
-      filtrados = filtrados.filter(pet => pet.especie === this.filtroEspecie);
+      if (this.filtroEspecie === 'outros') {
+        filtrados = filtrados.filter(pet => pet.especie !== 'cachorro' && pet.especie !== 'gato');
+      } else {
+        filtrados = filtrados.filter(pet => pet.especie === this.filtroEspecie);
+      }
     }
 
     if (this.filtroPorte) {
@@ -383,7 +461,13 @@ if (confirmacao) {
     }
 
     if (this.filtroEnergia) {
-      filtrados = filtrados.filter(pet => pet.energia === this.filtroEnergia);
+      const energiaMap: Record<string, string[]> = {
+        baixo: ['calmo-caseiro', 'baixo', 'calmo'],
+        medio: ['moderado', 'medio'],
+        alto: ['alto', 'hiperativo']
+      };
+      const valoresAceitos = energiaMap[this.filtroEnergia] || [this.filtroEnergia];
+      filtrados = filtrados.filter(pet => valoresAceitos.includes(String(pet.energia)));
     }
 
     // Ordenar por data de cadastro (mais recentes primeiro)

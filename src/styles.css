@@ -131,7 +131,7 @@ button {
 body {
     font-family: 'Inter', sans-serif;
     font-size: var(--text-base);
-    line-height: -0.35;
+    line-height: 1.6;
     font-weight: var(--font-normal);
     color: var(--color-gray-800);
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -439,10 +439,10 @@ header {
 }
 
 .pet-card img {
-    width: 30px;
-    height: 200px;
+    width: 100%;
+    height: auto;
+    display: block;
     object-fit: cover;
-   object-position: 50% 30%;
 }
 
 .pet-card-content {

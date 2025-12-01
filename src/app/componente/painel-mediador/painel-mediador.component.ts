@@ -1,7 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AuthService, Usuario } from '../../services/auth.service';
 import { PetsService, Pet } from '../../services/pets.service';
+import { DepoimentoService, Depoimento } from '../../services/depoimento.service';
+import { AdocaoService, SolicitacaoAdocao } from '../../services/adocao.service';
 import { Router } from '@angular/router';
 
 interface Estatistica {
@@ -20,7 +23,7 @@ interface PetComDoador extends Pet {
 
 @Component({
   selector: 'app-painel-mediador',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './painel-mediador.component.html',
   styleUrl: './painel-mediador.component.css'
 })
@@ -28,12 +31,16 @@ export class PainelMediadorComponent implements OnInit {
 
   private authService = inject(AuthService);
   private petsService = inject(PetsService);
+  private depoimentoService = inject(DepoimentoService);
+  private adocaoService = inject(AdocaoService);
   private router = inject(Router);
 
   currentUser?: Usuario;
   pets: PetComDoador[] = [];
   usuarios: Usuario[] = [];
-  activeTab: string = 'dashboard';
+  depoimentos: Depoimento[] = [];
+  solicitacoesAdocao: SolicitacaoAdocao[] = [];
+  activeTab: 'dashboard' | 'pets' | 'usuarios' | 'depoimentos' | 'relatorios' | 'solicitacoes-adocao' = 'dashboard';
 
   estatisticas: Estatistica[] = [
     {
@@ -74,7 +81,18 @@ export class PainelMediadorComponent implements OnInit {
     this.loadCurrentUser();
     this.loadPets();
     this.loadUsuarios();
+    this.loadDepoimentos();
     this.atualizarEstatisticas();
+  }
+
+  private loadDepoimentos() {
+    this.depoimentoService.depoimentos$.subscribe(depoimentos => {
+      this.depoimentos = depoimentos;
+    });
+
+    // Carregar solicitações de adoção do localStorage
+    const solicitacoes = JSON.parse(localStorage.getItem('adocaoSolicitations') || '[]');
+    this.solicitacoesAdocao = solicitacoes.filter((s: SolicitacaoAdocao) => s.status === 'pendente');
   }
 
   private loadCurrentUser() {
@@ -141,8 +159,13 @@ export class PainelMediadorComponent implements OnInit {
   }
 
   private loadUsuarios() {
-    // Simular usuários - em produção viria de uma API
-    this.usuarios = this.usuariosSimulados;
+    try {
+      const cadastrados = this.authService.getAllUsers();
+      // Se não houver nenhum cadastrado, usar simulados como fallback
+      this.usuarios = cadastrados && cadastrados.length ? cadastrados : this.usuariosSimulados;
+    } catch (e) {
+      this.usuarios = this.usuariosSimulados;
+    }
   }
 
   private atualizarEstatisticas() {
@@ -175,6 +198,7 @@ export class PainelMediadorComponent implements OnInit {
       case 'mediador': return 'Mediador';
       case 'voluntario': return 'Voluntário';
       case 'doador': return 'Doador';
+      case 'comum': return 'Usuário Comum';
       default: return 'Usuário';
     }
   }
@@ -233,13 +257,164 @@ export class PainelMediadorComponent implements OnInit {
     console.log('Pet marcado como adotado:', pet);
   }
 
-  setActiveTab(tab: string) {
+  // ===== EDIÇÃO DE PETS (apenas mediadores) =====
+  isEditing: boolean = false;
+  editingPet: PetComDoador | null = null;
+  editedData: Partial<PetComDoador> = {};
+
+  openEditPet(pet: PetComDoador) {
+    if (this.currentUser?.role !== 'mediador') {
+      alert('❌ Apenas mediadores podem editar informações dos pets.');
+      return;
+    }
+    this.isEditing = true;
+    this.editingPet = { ...pet };
+    this.editedData = {
+      nome: pet.nome,
+      raca: pet.raca,
+      idade: pet.idade,
+      porte: pet.porte,
+      energia: pet.energia,
+      personalidade: pet.personalidade,
+      beneficioEmocional: pet.beneficioEmocional
+    } as Partial<PetComDoador>;
+  }
+
+  cancelEditPet() {
+    this.isEditing = false;
+    this.editingPet = null;
+    this.editedData = {};
+  }
+
+  saveEditPet() {
+    if (!this.editingPet) return;
+
+    const id = this.editingPet.id;
+    const payload: Partial<Pet> = {
+      nome: this.editedData.nome,
+      raca: this.editedData.raca,
+      idade: this.editedData.idade,
+      porte: this.editedData.porte as any,
+      energia: (this.editedData.energia as any) || 'moderado',
+      personalidade: this.editedData.personalidade,
+      beneficioEmocional: this.editedData.beneficioEmocional
+    };
+
+    const isApiPet = id < 100;
+
+    if (isApiPet) {
+      this.petsService.updatePet(id, payload).subscribe({
+        next: () => {
+          // Atualizar lista local
+          this.pets = this.pets.map(p => p.id === id ? { ...p, ...payload } as PetComDoador : p);
+          this.isEditing = false;
+          this.editingPet = null;
+          alert('✅ Pet atualizado com sucesso!');
+        },
+        error: () => alert('❌ Erro ao salvar alterações na API.')
+      });
+    } else {
+      // Atualizar no localStorage dos doadores
+      try {
+        const petsCadastrados = JSON.parse(localStorage.getItem('petsCadastrados') || '[]');
+        const idx = petsCadastrados.findIndex((p: any) => p.id === id);
+        if (idx !== -1) {
+          const updated = { ...petsCadastrados[idx], ...payload };
+          petsCadastrados[idx] = updated;
+          localStorage.setItem('petsCadastrados', JSON.stringify(petsCadastrados));
+        }
+        // Refletir localmente
+        this.pets = this.pets.map(p => p.id === id ? { ...p, ...payload } as PetComDoador : p);
+        // Notificar outros painéis
+        if ('emitChange' in this.petsService) {
+          // @ts-ignore
+          this.petsService.emitChange();
+        }
+        this.isEditing = false;
+        this.editingPet = null;
+        alert('✅ Pet atualizado com sucesso!');
+      } catch (e) {
+        alert('❌ Erro ao atualizar o pet local.');
+      }
+    }
+  }
+
+  setActiveTab(tab: 'dashboard' | 'pets' | 'usuarios' | 'depoimentos' | 'relatorios' | 'solicitacoes-adocao') {
     this.activeTab = tab;
   }
 
   logout() {
     this.authService.logout();
     this.router.navigate(['/']);
+  }
+
+  // ===== DEPOIMENTOS =====
+  isEditingDepoimento = false;
+  editingDepoimento: Depoimento | null = null;
+  editingDepoimentoData: Partial<Depoimento> = {};
+
+  abrirModalEdicao(depoimento: Depoimento) {
+    this.editingDepoimento = { ...depoimento };
+    this.editingDepoimentoData = { depoimento: depoimento.depoimento };
+    this.isEditingDepoimento = true;
+  }
+
+  cancelarEdicaoDepoimento() {
+    this.isEditingDepoimento = false;
+    this.editingDepoimento = null;
+    this.editingDepoimentoData = {};
+  }
+
+  salvarEdicaoDepoimento() {
+    if (!this.editingDepoimento || this.editingDepoimentoData.depoimento === undefined) return;
+
+    // Por enquanto, apenas atualiza localmente.
+    // A lógica de serviço será implementada a seguir.
+    this.depoimentoService.atualizarDepoimento({
+      ...this.editingDepoimento,
+      depoimento: this.editingDepoimentoData.depoimento
+    });
+
+    this.cancelarEdicaoDepoimento();
+  }
+
+  getDepoimentosPendentes(): Depoimento[] {
+    return this.depoimentos.filter(d => !d.aprovado);
+  }
+
+  getDepoimentosAprovados(): Depoimento[] {
+    return this.depoimentos.filter(d => d.aprovado);
+  }
+
+  aprovarDepoimento(depoimento: Depoimento) {
+    this.depoimentoService.aprovarDepoimento(depoimento);
+  }
+
+  rejeitarDepoimento(depoimento: Depoimento) {
+    if (confirm('Tem certeza que deseja rejeitar este depoimento? A ação não pode ser desfeita.')) {
+      this.depoimentoService.rejeitarDepoimento(depoimento);
+    }
+  }
+
+  // ===== SOLICITAÇÕES DE ADOÇÃO =====
+  aprovarSolicitacao(solicitacao: SolicitacaoAdocao) {
+    solicitacao.status = 'aprovada';
+    this.atualizarSolicitacoes(solicitacao);
+  }
+
+  rejeitarSolicitacao(solicitacao: SolicitacaoAdocao) {
+    solicitacao.status = 'rejeitada';
+    this.atualizarSolicitacoes(solicitacao);
+  }
+
+  private atualizarSolicitacoes(solicitacaoAtualizada: SolicitacaoAdocao) {
+    const solicitacoes = JSON.parse(localStorage.getItem('adocaoSolicitations') || '[]');
+    const index = solicitacoes.findIndex((s: SolicitacaoAdocao) => s.id === solicitacaoAtualizada.id);
+    if (index !== -1) {
+      solicitacoes[index] = solicitacaoAtualizada;
+      localStorage.setItem('adocaoSolicitations', JSON.stringify(solicitacoes));
+      this.solicitacoesAdocao = solicitacoes.filter((s: SolicitacaoAdocao) => s.status === 'pendente');
+    }
   }
 
   // Métodos para obter totais para cada seção
@@ -292,6 +467,14 @@ export class PainelMediadorComponent implements OnInit {
     } catch (error) {
       console.error('Erro ao limpar pets adotados:', error);
       alert('❌ Erro ao limpar pets adotados. Tente novamente.');
+    }
+  }
+
+  excluirUsuario(email: string) {
+    if (confirm(`Tem certeza que deseja excluir o usuário com o e-mail ${email}? Esta ação não pode ser desfeita.`)) {
+      this.authService.excluirUsuario(email);
+      this.loadUsuarios(); // Recarrega a lista de usuários
+      alert('Usuário excluído com sucesso!');
     }
   }
 }

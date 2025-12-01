@@ -1,0 +1,27 @@
+<div class="form-container">
+  <div class="form-header">
+    <button class="back-button" (click)="voltarAoInicio()">⬅️ Voltar ao Início</button>
+    <h1>Deixe seu Comentário</h1>
+    <p>Compartilhe como a ThunderPets ajudou você a encontrar um amigo e a transformar sua vida.</p>
+  </div>
+
+  <form [formGroup]="comentarioForm" (ngSubmit)="onSubmit()" class="comment-form">
+    <div class="form-group">
+      <label for="nome">Seu Nome</label>
+      <input id="nome" type="text" formControlName="nome" placeholder="Digite seu nome completo">
+    </div>
+
+    <div class="form-group">
+      <label for="depoimento">Seu Depoimento</label>
+      <textarea id="depoimento" formControlName="depoimento" rows="6" placeholder="Escreva aqui sua história de superação e como seu pet ajudou..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="foto">Sua Foto (Opcional)</label>
+      <input id="foto" type="file" (change)="onFileSelected($event)">
+      <span *ngIf="selectedFileName" class="file-name">Arquivo: {{ selectedFileName }}</span>
+    </div>
+
+    <button type="submit" class="submit-button" [disabled]="comentarioForm.invalid">Enviar Depoimento</button>
+  </form>
+</div>

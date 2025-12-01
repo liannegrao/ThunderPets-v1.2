@@ -51,7 +51,8 @@ export class LoginComponent implements OnInit {
       nome: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      tipo: ['Usuário Comum', Validators.required]
+      tipo: ['Usuário Comum', Validators.required],
+      lgpd: [false, Validators.requiredTrue]
     });
   }
 
@@ -96,7 +97,12 @@ export class LoginComponent implements OnInit {
         this.showMessage('🔒 Login realizado com sucesso!', 'success');
         setTimeout(() => {
           this.closeModal();
-          this.router.navigate(['/']);
+          const user = this.authService.currentUser;
+          if (user?.role === 'mediador') {
+            this.router.navigate(['/painel-mediador']);
+          } else {
+            this.router.navigate(['/meu-painel']);
+          }
         }, 1500);
       } else {
         this.showMessage(result.error || 'Erro no login', 'error');
@@ -114,15 +120,23 @@ export class LoginComponent implements OnInit {
     this.isSubmitted = true;
     this.hideMessages();
 
-    if (this.cadastroForm.invalid) return;
+    if (this.cadastroForm.invalid) {
+      console.log('Formulário de cadastro inválido:', this.cadastroFormErrors);
+      return;
+    }
 
     this.isLoading = true;
 
     try {
-      const { nome, email, password, tipo } = this.cadastroForm.value;
+      const { nome, email, password, tipo, lgpd } = this.cadastroForm.value;
 
-      // Convert tipo to role format expected by AuthService
-      const role = tipo === 'Administrador' ? 'mediador' : 'doador'; // Usuários comuns são "doador"
+      if (!lgpd) {
+        this.showMessage('Você deve concordar com a Política de Privacidade.', 'error');
+        this.isLoading = false;
+        return;
+      }
+
+      const role = tipo === 'Administrador' ? 'mediador' : 'doador';
 
       const result = await this.authService.register({
         nome,
@@ -151,10 +165,8 @@ export class LoginComponent implements OnInit {
               const userRole = role; // O role que acabamos de determinar
               if (userRole === 'mediador') {
                 this.router.navigate(['/painel-mediador']);
-              } else if (userRole === 'doador') {
-                this.router.navigate(['/painel-doador']); // Usuários doadores vão para seu painel
               } else {
-                this.router.navigate(['/painel-adotante']); // Outros casos
+                this.router.navigate(['/meu-painel']); // Redireciona para o painel unificado
               }
             } else {
               console.error('❌ Falhou login automático');
@@ -190,7 +202,8 @@ export class LoginComponent implements OnInit {
     return {
       nome: this.cadastroForm.get('nome')?.errors,
       email: this.cadastroForm.get('email')?.errors,
-      password: this.cadastroForm.get('password')?.errors
+      password: this.cadastroForm.get('password')?.errors,
+      lgpd: this.cadastroForm.get('lgpd')?.errors
     };
   }
 

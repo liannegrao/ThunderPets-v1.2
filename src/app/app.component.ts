@@ -30,8 +30,7 @@ export class AppComponent implements OnInit, OnDestroy {
       )
       .subscribe((event: NavigationEnd) => {
         // Hide header/footer on auth route and doar route
-        this.isAuthRoute = (event.urlAfterRedirects === '/auth' || event.urlAfterRedirects.startsWith('/auth')) ||
-                          (event.urlAfterRedirects === '/doar' || event.urlAfterRedirects.startsWith('/doar'));
+        this.isAuthRoute = event.urlAfterRedirects.startsWith('/auth');
         console.log('Current route:', event.urlAfterRedirects, 'isAuthRoute:', this.isAuthRoute);
       });
   }

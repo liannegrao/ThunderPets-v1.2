@@ -89,23 +89,47 @@ router.post('/', upload.single('foto'), async (req, res) => {
     }
 });
 
-// Atualizar pet
-router.put('/:id', async (req, res) => {
+// Middleware de simulação de autorização (substituir com autenticação real)
+const isMediator = (req, res, next) => {
+    // Simulação: verificar um header `x-user-role`
+    // Em um app real, isso viria de um token JWT decodificado
+    if (req.headers['x-user-role'] === 'mediador') {
+        next(); // Usuário é mediador, pode continuar
+    } else {
+        res.status(403).json({ error: 'Acesso negado. Apenas mediadores podem editar.' });
+    }
+};
+
+// Atualizar pet (apenas para mediadores)
+router.put('/:id', isMediator, async (req, res) => {
     try {
+        const { id } = req.params;
         const updates = req.body;
-        const fields = Object.keys(updates).filter(key => updates[key] !== undefined);
+
+        // Lista de campos permitidos para atualização
+        const allowedFields = ['nome', 'especie', 'raca', 'idade_meses', 'porte', 'energia', 'personalidade', 'beneficio_emocional', 'saude', 'cuidados', 'historia', 'cas-ideal', 'foto_url', 'adotado', 'aprovado'];
+
+        const fields = Object.keys(updates).filter(key => allowedFields.includes(key) && updates[key] !== undefined);
         const values = fields.map(key => updates[key]);
 
-        if (fields.length === 0) return res.status(400).json({ error: 'Nenhuma atualização fornecida' });
+        if (fields.length === 0) {
+            return res.status(400).json({ error: 'Nenhum campo válido para atualização fornecido' });
+        }
 
         const setClause = fields.map(field => `${field} = ?`).join(', ');
-        values.push(req.params.id);
+        const sql = `UPDATE pets SET ${setClause} WHERE id = ?`;
 
-        await global.dbManager.run(`UPDATE pets SET ${setClause} WHERE id = ?`, values);
-        res.json({ message: 'Pet atualizado!' });
+        const result = await global.dbManager.run(sql, [...values, id]);
+
+        if (result.changes === 0) {
+            return res.status(404).json({ error: 'Pet não encontrado ou nenhum dado alterado' });
+        }
+
+        res.json({ message: `Pet ${id} atualizado com sucesso!` });
 
     } catch (error) {
-        res.status(500).json({ error: 'Erro ao atualizar pet' });
+        console.error('Erro ao atualizar pet:', error);
+        res.status(500).json({ error: 'Erro interno ao atualizar o pet' });
     }
 });
 

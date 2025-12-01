@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export interface Usuario {
   email: string;
   nome: string;
-  role: 'mediador' | 'voluntario' | 'doador';
+  role: 'mediador' | 'voluntario' | 'doador' | 'adotante' | 'comum';
   createdAt: string;
 }
 
@@ -113,6 +113,12 @@ export class AuthService {
     return stored ? JSON.parse(stored) : [];
   }
 
+  // Expor lista de usuários cadastrados para o painel do mediador
+  public getAllUsers(): Usuario[] {
+    const usersWithPasswords = this.getUsers();
+    return usersWithPasswords.map(({ password, ...rest }) => rest);
+  }
+
   private setCurrentUser(user: Usuario, persistent: boolean): void {
     // Remove password before storing
     const { password, ...userWithoutPassword } = user as Usuario & { password?: string };
@@ -146,5 +152,12 @@ export class AuthService {
   // Simple password hash (in production use bcrypt or similar)
   private hashPassword(password: string): string {
     return btoa(password); // Base64 encode - NOT secure, just for demo
+  }
+
+  // Excluir usuário
+  excluirUsuario(email: string): void {
+    let users = this.getUsers();
+    users = users.filter(u => u.email.toLowerCase() !== email.toLowerCase());
+    localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
   }
 }

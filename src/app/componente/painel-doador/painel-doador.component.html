@@ -52,6 +52,27 @@
       </button>
     </section>
 
+    <!-- ===== SUAS SOLICITAÇÕES ===== -->
+    <section class="solicitacoes-section">
+      <div class="solicitacoes-card">
+        <h2>📋 Suas Solicitações</h2>
+        <div class="solicitacoes-stats">
+          <div class="stat-item">
+            <span class="stat-number">{{ getSolicitacoesStats().pendentes }}</span>
+            <span class="stat-label">Aguardando Aprovação</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ getSolicitacoesStats().aprovadas }}</span>
+            <span class="stat-label">Aprovadas</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ getSolicitacoesStats().rejeitadas }}</span>
+            <span class="stat-label">Não Aprovadas</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- LISTA DE PETS -->
     <section class="pets-section">
       <div class="section-header">
@@ -96,6 +117,40 @@
               ✏️ Editar
             </button>
             <!-- Botão removido: só mediadores podem marcar como adotado -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== STATUS DAS SOLICITAÇÕES DE ADOÇÃO ===== -->
+    <section class="solicitacoes-section">
+      <div class="section-header">
+        <h2>Status das Solicitações de Adoção</h2>
+      </div>
+
+      <!-- Estado vazio -->
+      <div class="empty-state" *ngIf="solicitacoes.length === 0">
+        <div class="empty-icon">📪</div>
+        <h3>Nenhuma solicitação de adoção ainda</h3>
+        <p>Quando um usuário solicitar a adoção de um de seus pets, o status aparecerá aqui.</p>
+      </div>
+
+      <!-- Lista de solicitações -->
+      <div class="solicitacoes-grid" *ngIf="solicitacoes.length > 0">
+        <div class="solicitacao-card" *ngFor="let solicitacao of solicitacoes">
+          <div class="solicitacao-pet-info">
+            <img [src]="solicitacao.pet.foto || solicitacao.pet.foto_url || '/img/THUNDERPETS (4) (1).png'" [alt]="solicitacao.pet.nome" class="pet-image-small">
+            <h4>{{ solicitacao.pet.nome }}</h4>
+          </div>
+          <div class="solicitacao-adotante-info">
+            <span>Solicitante:</span>
+            <p>{{ solicitacao.solicitante.nome }}</p>
+          </div>
+          <div class="solicitacao-status">
+            <span>Status:</span>
+            <div class="status-badge" [ngClass]="getStatusBadge(solicitacao.status).class">
+              {{ getStatusBadge(solicitacao.status).text }}
+            </div>
           </div>
         </div>
       </div>

@@ -39,39 +39,24 @@ node -e "require('dotenv').config(); console.log('✅ Cloudinary:', process.env.
 
 ## 🏃‍♂️ Como Executar
 
-### 🔥 Comando Rápido (Recomendado)
-```bash
-npm run dev
-```
-Este comando faz tudo automaticamente em ~30 segundos!
+## 🔧 Aplicar Correções
 
-### Ou passo a passo:
+Agora, para aplicar as correções, siga estes passos:
 
-#### 1. Iniciar API
-```bash
-npm run api
-```
+1. Pare a API : Se o servidor da API estiver em execução, pare-o no terminal.
+2. Delete o banco de dados antigo : Vá até a pasta thunderpets-api e apague o arquivo thunderpets.db .
+3. Inicie a API novamente : No terminal, dentro da pasta thunderpets-api , execute npm start . Isso criará um novo banco de dados com os 97 pets.
+4. Execute o script de sincronização : Em outro terminal, também na pasta thunderpets-api , execute o comando node update-pets-images.js .
+O script agora irá atribuir uma imagem única para cada pet, priorizando a correspondência por espécie (cão/gato) e evitando as duplicatas.
 
-#### 2. Sincronizar imagens Cloudinary (em outro terminal)
-```bash
-npm run sync
-```
+Depois de executar o script, verifique sua aplicação e você verá que cada pet tem uma imagem diferente e correta.
 
-#### 3. Limpar duplicatas
-```bash
-npm run clean
-```
 
-#### 4. Reiniciar API
-```bash
-npm run api
-```
 
 #### 5. Iniciar Angular (em outro terminal)
 ```bash
 npm start
 ```
-
 ## 🌐 Acessar a Aplicação
 
 Após executar `npm run dev`, acesse:
@@ -135,7 +120,7 @@ ThunderPets é uma plataforma inovadora que conecta pessoas com necessidades ter
 
 ### Funcionalidades
 
-- ✅ **52 pets cadastrados** com perfis terapêuticos
+- ✅ **97 pets cadastrados** com perfis terapêuticos
 - ✅ **Imagens otimizadas** via Cloudinary
 - ✅ **Sistema de matching** por necessidades emocionais
 - ✅ **Painéis especializados** (Adotante, Doador, Mediador)

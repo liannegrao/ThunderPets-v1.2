@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, HostListener, NgZone } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AuthService, Usuario } from '../../services/auth.service';
@@ -8,7 +8,7 @@ import { LoginComponent } from '../../componente/login/login.component';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, CommonModule, LoginComponent],
+  imports: [RouterLink, CommonModule, LoginComponent, NgOptimizedImage],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })

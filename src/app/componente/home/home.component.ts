@@ -1,9 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { PetsService, Pet } from '../../services/pets.service';
+import { DepoimentoService } from '../../services/depoimento.service';
+import { AdocaoService } from '../../services/adocao.service';
 
 interface Testimonial {
   text: string;
@@ -18,10 +20,17 @@ interface DisponibilidadeOption {
   emoji: string;
 }
 
+interface UnifiedDepoimento {
+  text: string;
+  img: string;
+  name: string;
+  info: string;
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgOptimizedImage],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -59,23 +68,37 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   // Matched pets will be loaded from service
 
+  showcasedPets: Pet[] = [];
+  depoimentos: UnifiedDepoimento[] = [];
+
   testimonials: Testimonial[] = [
     {
-      text: 'Adotar o Max mudou minha vida. Ele me ajudou a superar momentos difíceis.',
-      img: '/img/mulher-feliz-com-seu-cachorro-fofo_23-2148345885.avif',
-      name: 'Ana Silva',
-      info: 'Adotante há 2 anos'
+      text: 'A equipe do ThunderPets foi incrível! Encontrei meu melhor amigo, o Bob, e não poderia estar mais feliz. O processo de adoção foi super tranquilo e eles me deram todo o suporte necessário.',
+      img: 'img/UPF-091817-NT-Cats-medium.jpg',
+      name: 'Carlos Souza',
+      info: 'Feliz tutor do Bob'
     },
-    // Add more testimonials
+    {
+      text: 'Adotar a Luna foi a melhor decisão que já tomei. Ela trouxe muita alegria para minha casa. Agradeço ao ThunderPets por conectar nossas vidas e por todo o cuidado que tiveram.',
+      img: 'img/why_life_is_better_with_dog_hero.jpg',
+      name: 'Leonardo Silva',
+      info: 'Feliz tutor da Luna'
+    },
+    {
+      text: 'Obrigado, ThunderPets, por me ajudarem a encontrar o Thor! Ele é um cãozinho maravilhoso e cheio de energia. Recomendo a todos que queiram adotar um pet de forma responsável.',
+      img: 'img/3DB8AACF00000578-0-image-a-73_1488153144705.jpg',
+      name: 'Ana Pereira',
+      info: 'Feliz tutora do Thor'
+    }
   ];
-
-  showcasedPets: Pet[] = [];
 
   constructor(
     private fb: FormBuilder,
     private petsService: PetsService,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private depoimentoService: DepoimentoService,
+    private adocaoService: AdocaoService
   ) {}
 
   ngOnInit() {
@@ -103,6 +126,21 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     // Start carousel
     this.startCarousel();
+
+    this.depoimentoService.depoimentos$.subscribe(depoimentos => {
+      const depoimentosAprovados = depoimentos
+        .filter(d => d.aprovado)
+        .map(d => ({
+          text: d.depoimento,
+          name: d.nome,
+          img: d.fotoUrl || 'assets/img/user-placeholder.png',
+          info: 'Usuário verificado'
+        }));
+
+      const depoimentosEstaticos = this.testimonials.map(t => ({ ...t }));
+
+      this.depoimentos = [...depoimentosEstaticos, ...depoimentosAprovados];
+    });
   }
 
   ngOnDestroy() {
@@ -141,11 +179,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.showResults = false;
     this.currentOffset = 0; // Reset offset para nova busca
 
-    // Coletar dados do formulário
     const formValue = this.matchingForm.value;
-    const disponibilidadeSelecionada = Object.keys(formValue)
-      .filter(key => key !== 'situacao' && key !== 'energia' && formValue[key])
-      .map(key => key);
+    const disponibilidadeSelecionada = this.disponibilidadeOptions
+      .filter(opt => formValue[opt.value])
+      .map(opt => opt.value);
 
     const userPreferences = {
       situacao: formValue.situacao,
@@ -155,7 +192,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     console.log('🎯 Buscando matches via API:', userPreferences);
 
-    // Usar API para matching
     this.petsService.findTherapeuticMatches(userPreferences).subscribe({
       next: (matches: Pet[]) => {
         this.isMatching = false;
@@ -168,11 +204,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       error: (error: any) => {
         console.error('❌ Erro no matching via API:', error);
         this.isMatching = false;
-        // Fallback: usar dados locais
-        this.matchedPets = this.showcasedPets.slice(0, 3);
-        this.hasMoreResults = false;
-        this.showResults = true;
-        console.log('⚠️ Fallback: usando dados locais');
+        this.petsService.pets$.subscribe(allPets => {
+          this.matchedPets = allPets.filter((pet: Pet) => !pet.adotado).slice(0, 3);
+          this.hasMoreResults = allPets.length > 3;
+          this.showResults = true;
+          console.log('⚠️ Fallback: usando dados locais');
+        }).unsubscribe();
       }
     });
   }
@@ -215,12 +252,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     console.log('✅ Usuário validado no home:', currentUser.nome, 'Role:', currentUser.role);
 
-    // Para TODOS os usuários logados: mostrar mensagem simples e redirecionar
-    const confirmacao = confirm(`${pet.nome} foi adicionado ao seu painel de adotante! 🍇\n\nVocê pode visualizar todas as suas solicitações de adoção no seu painel personalizado.`);
+    this.adocaoService.novaSolicitacao(pet, currentUser);
 
-    if (confirmacao) {
-      // Redirecionar para painel adotante
-      this.router.navigate(['/painel-adotante']);
+    // Mensagem de sucesso para o usuário
+    alert(`✅ Solicitação de adoção para ${pet.nome} enviada com sucesso!\n\nNossa equipe de mediação irá avaliar seu pedido e entrará em contato em breve. Fique de olho no seu painel!`);
+
+    // Opcional: fechar o modal se estiver aberto
+    if (this.showPetModal) {
+      this.closePetModal();
     }
   }
 
@@ -232,7 +271,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           // Filtrar pets que ainda não foram mostrados (evitar duplicatas)
-          const newPets = response.pets.filter(pet =>
+          const newPets = response.pets.filter((pet: Pet) =>
             !this.matchedPets.some(shown => shown.id === pet.id)
           );
 
@@ -248,11 +287,11 @@ export class HomeComponent implements OnInit, OnDestroy {
           console.log(`📈 Carregados ${newPets.length} novos pets via API. Total: ${this.matchedPets.length}`);
           console.log(`📄 Offset atual: ${this.currentOffset}, Has more: ${this.hasMoreResults}`);
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('❌ Erro ao carregar mais pets:', error);
           // Fallback: tentar usar dados locais do serviço
           this.petsService.pets$.subscribe(allPets => {
-            const newPets = allPets.filter(pet =>
+            const newPets = allPets.filter((pet: Pet) =>
               !this.matchedPets.some(shown => shown.id === pet.id)
             ).slice(0, 3);
 
@@ -265,31 +304,93 @@ export class HomeComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Método auxiliar para obter top scores de compatibilidade
   getTopScores(pet: Pet): { label: string, value: number }[] {
-    // Proteção contra compatibilidadeScore undefined ou propriedades individuais undefined
-    const scoreDepressao = pet?.compatibilidadeScore?.depressao || 50;
-    const scoreAnsiedade = pet?.compatibilidadeScore?.ansiedade || 50;
-    const scoreSolidao = pet?.compatibilidadeScore?.solidao || 50;
+    const formValue = this.matchingForm.value;
+    const situacaoPrincipal = formValue.situacao;
+    const energiaPrincipal = formValue.energia;
 
-    const scores = [
-      { label: 'Depressão', value: scoreDepressao },
-      { label: 'Ansiedade', value: scoreAnsiedade },
-      { label: 'Solidão', value: scoreSolidao }
-    ];
-    return scores.sort((a, b) => b.value - a.value).slice(0, 3);
+    const scores: { [key: string]: number } = {
+      'Depressão': 40,
+      'Ansiedade': 40,
+      'Solidão': 40,
+    };
+
+    // Aumenta o score da situação principal selecionada
+    if (situacaoPrincipal) {
+      const situacaoLabel = this.getSituacaoLabel(situacaoPrincipal);
+      if (scores.hasOwnProperty(situacaoLabel)) {
+        scores[situacaoLabel] = Math.min(95, scores[situacaoLabel] + 50); // Aumenta 50, máximo 95
+      }
+    }
+
+    // Ajusta scores com base na energia do pet
+    if (pet.energia === 'calmo-caseiro') {
+      scores['Ansiedade'] = Math.min(95, (scores['Ansiedade'] || 40) + 30);
+    } else if (pet.energia === 'ativo-aventurado') {
+      scores['Depressão'] = Math.min(95, (scores['Depressão'] || 40) + 30);
+    } else {
+      scores['Solidão'] = Math.min(95, (scores['Solidão'] || 40) + 20);
+    }
+
+    // Converte para o formato de array e ordena
+    return Object.entries(scores)
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 3);
+  }
+
+  private getSituacaoLabel(situacaoValue: string): string {
+    switch (situacaoValue) {
+      case 'depressao': return 'Depressão';
+      case 'ansiedade': return 'Ansiedade';
+      case 'solidao': return 'Solidão';
+      default: return '';
+    }
   }
 
   // Método auxiliar para calcular idade formatada
-  getFormattedAge(idadeMeses: number): string {
-    const anos = Math.floor(idadeMeses / 12);
-    const meses = idadeMeses % 12;
-    if (anos === 0) {
-      return `${meses} meses`;
-    } else if (meses === 0) {
-      return `${anos} ${anos === 1 ? 'ano' : 'anos'}`;
+  calcularIdade(idade: string | number): string {
+    if (idade === null || idade === undefined) {
+      return 'Idade não informada';
+    }
+
+    // Se a idade for um número ou uma string numérica, assumimos que são meses.
+    if (typeof idade === 'number' || !isNaN(Number(idade))) {
+      const idadeEmMeses = Number(idade);
+      const anos = Math.floor(idadeEmMeses / 12);
+      const meses = idadeEmMeses % 12;
+
+      if (anos > 0 && meses > 0) {
+        return `${anos} ano${anos > 1 ? 's' : ''} e ${meses} mes${meses > 1 ? 'es' : ''}`;
+      }
+      if (anos > 0) {
+        return `${anos} ano${anos > 1 ? 's' : ''}`;
+      }
+      if (meses > 0) {
+        return `${meses} mes${meses > 1 ? 'es' : ''}`;
+      }
+      return 'Recém-nascido';
+    }
+
+    // Se for uma string de data (fallback)
+    const nascimento = new Date(idade);
+    if (isNaN(nascimento.getTime())) {
+      return 'Idade não informada';
+    }
+
+    const hoje = new Date();
+    let anos = hoje.getFullYear() - nascimento.getFullYear();
+    let meses = hoje.getMonth() - nascimento.getMonth();
+
+    if (meses < 0 || (meses === 0 && hoje.getDate() < nascimento.getDate())) {
+      anos--;
+      meses += 12;
+    }
+
+    if (anos > 0) {
+      return `${anos} ano${anos > 1 ? 's' : ''}`;
     } else {
-      return `${anos} ${anos === 1 ? 'ano' : 'anos'} e ${meses} meses`;
+      return `${meses} mes${meses > 1 ? 'es' : ''}`;
     }
   }
 
@@ -375,12 +476,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     console.log('✅ Usuário validado no home:', currentUser.nome, 'Role:', currentUser.role);
 
-    // Para TODOS os usuários logados: mostrar mensagem simples e redirecionar
-    const confirmacao = confirm(`${pet.nome} foi adicionado ao seu painel de adotante! 🍇\n\nVocê pode visualizar todas as suas solicitações de adoção no seu painel personalizado.`);
+    this.adocaoService.novaSolicitacao(pet, currentUser);
 
-    if (confirmacao) {
-      // Redirecionar para painel adotante
-      this.router.navigate(['/painel-adotante']);
-    }
+    // Mensagem de sucesso para o usuário
+    alert(`✅ Solicitação de adoção para ${pet.nome} enviada com sucesso!\n\nNossa equipe de mediação irá avaliar seu pedido e entrará em contato em breve. Fique de olho no seu painel!`);
   }
 }

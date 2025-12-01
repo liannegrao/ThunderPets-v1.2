@@ -41,6 +41,20 @@
       </button>
       <button
         class="nav-tab"
+        [class.active]="activeTab === 'depoimentos'"
+        (click)="setActiveTab('depoimentos')"
+      >
+        💬 Depoimentos
+      </button>
+      <button
+        class="nav-tab"
+        [class.active]="activeTab === 'solicitacoes-adocao'"
+        (click)="setActiveTab('solicitacoes-adocao')"
+      >
+        📝 Solicitações
+      </button>
+      <button
+        class="nav-tab"
         [class.active]="activeTab === 'relatorios'"
         (click)="setActiveTab('relatorios')"
       >
@@ -132,28 +146,29 @@
         <!-- Pending Pets -->
         <div *ngIf="getPendingPetsCount() > 0" class="pets-list">
           <h3>🔔 Pets Aguardando Aprovação</h3>
-          <div class="pets-grid">
-            <div *ngFor="let pet of getPetsPorStatus('pendente')" class="pet-card-mediador">
-              <div class="pet-header">
-                <img [src]="pet.foto_url || '/img/THUNDERPETS (4) (1).png'" [alt]="pet.nome" class="pet-foto">
-                <div class="pet-info">
-                  <h4>{{ pet.nome }}</h4>
-                  <p>{{ pet.raca }} • {{ pet.idade }} meses • {{ pet.porte }}</p>
-                  <p class="pet-doador" *ngIf="pet.doador">👤 {{ pet.doador.nome }}</p>
-                </div>
-                <div class="pet-status" [style.background-color]="getStatusColor(pet.status)">
-                  {{ getStatusLabel(pet.status) }}
-                </div>
+        <div class="pets-grid">
+          <div *ngFor="let pet of getPetsPorStatus('pendente')" class="pet-card-mediador">
+            <div class="pet-header">
+              <img [src]="pet.foto_url || '/img/THUNDERPETS (4) (1).png'" [alt]="pet.nome" class="pet-foto">
+              <div class="pet-info">
+                <h4>{{ pet.nome }}</h4>
+                <p>{{ pet.raca }} • {{ pet.idade }} meses • {{ pet.porte }}</p>
+                <p class="pet-doador" *ngIf="pet.doador">👤 {{ pet.doador.nome }}</p>
               </div>
-              <div class="pet-description">
-                <p>{{ pet.personalidade }}</p>
-              </div>
-              <div class="pet-actions">
-                <button class="btn-approve" (click)="aprovarPet(pet)">✅ Aprovar</button>
-                <button class="btn-reject" (click)="rejeitarPet(pet)">❌ Rejeitar</button>
+              <div class="pet-status" [style.background-color]="getStatusColor(pet.status)">
+                {{ getStatusLabel(pet.status) }}
               </div>
             </div>
+            <div class="pet-description">
+              <p>{{ pet.personalidade }}</p>
+            </div>
+            <div class="pet-actions">
+              <button class="btn-approve" (click)="aprovarPet(pet)">✅ Aprovar</button>
+              <button class="btn-reject" (click)="rejeitarPet(pet)">❌ Rejeitar</button>
+              <button *ngIf="currentUser?.role === 'mediador'" class="btn-edit" (click)="openEditPet(pet)" title="Editar (Mediador)">✏️ Editar</button>
+            </div>
           </div>
+        </div>
         </div>
 
         <!-- Available Pets -->
@@ -177,6 +192,7 @@
               </div>
               <div class="pet-actions">
                 <button class="btn-adopt" (click)="marcarComoAdotado(pet)">❤️ Marcar como Adotado</button>
+                <button *ngIf="currentUser?.role === 'mediador'" class="btn-edit" (click)="openEditPet(pet)" title="Editar (Mediador)">✏️ Editar</button>
               </div>
             </div>
           </div>
@@ -228,12 +244,8 @@
           <p>{{ getUsuariosPorRole('mediador').length }} usuários</p>
         </div>
         <div class="summary-item">
-          <h3>🤝 Voluntários</h3>
-          <p>{{ getUsuariosPorRole('voluntario').length }} usuários</p>
-        </div>
-        <div class="summary-item">
-          <h3>🐾 Doadores</h3>
-          <p>{{ getUsuariosPorRole('doador').length }} usuários</p>
+          <h3>🐾 Doadores e Adotantes</h3>
+          <p>{{ getUsuariosPorRole('doador').length + getUsuariosPorRole('comum').length }} usuários</p>
         </div>
       </div>
 
@@ -250,38 +262,79 @@
                 <p>{{ user.email }}</p>
                 <p class="user-role">{{ getRoleLabel(user.role) }}</p>
               </div>
+              <button class="btn-delete-user" (click)="excluirUsuario(user.email)">🗑️</button>
             </div>
           </div>
         </div>
 
-        <!-- Voluntários -->
-        <div class="users-list">
-          <h3>🤝 Voluntários</h3>
-          <div class="users-grid">
-            <div *ngFor="let user of getUsuariosPorRole('voluntario')" class="user-card">
-              <div class="user-avatar">🤝</div>
-              <div class="user-info">
-                <h4>{{ user.nome }}</h4>
-                <p>{{ user.email }}</p>
-                <p class="user-role">{{ getRoleLabel(user.role) }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         <!-- Doadores -->
         <div class="users-list">
-          <h3>🐾 Doadores</h3>
+          <h3>🐾 Doadores e Adotantes</h3>
           <div class="users-grid">
-            <div *ngFor="let user of getUsuariosPorRole('doador')" class="user-card">
+            <div *ngFor="let user of getUsuariosPorRole('doador').concat(getUsuariosPorRole('adotante')).concat(getUsuariosPorRole('comum'))" class="user-card">
               <div class="user-avatar">🐾</div>
               <div class="user-info">
                 <h4>{{ user.nome }}</h4>
                 <p>{{ user.email }}</p>
                 <p class="user-role">{{ getRoleLabel(user.role) }}</p>
               </div>
+              <button class="btn-delete-user" (click)="excluirUsuario(user.email)">🗑️</button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Depoimentos Tab -->
+    <div *ngIf="activeTab === 'depoimentos'" class="tab-content">
+      <div class="depoimentos-section">
+        <!-- Depoimentos Pendentes -->
+        <div class="depoimentos-list">
+          <h3>🔔 Depoimentos Pendentes de Aprovação ({{ getDepoimentosPendentes().length }})</h3>
+          <div *ngIf="getDepoimentosPendentes().length > 0; else noPendentes" class="depoimentos-grid">
+            <div *ngFor="let depoimento of getDepoimentosPendentes()" class="depoimento-card">
+              <p class="depoimento-texto">"{{ depoimento.depoimento }}"</p>
+              <p class="depoimento-autor">- {{ depoimento.nome }}</p>
+              <div class="depoimento-actions">
+                <button class="btn-approve" (click)="aprovarDepoimento(depoimento)">✅ Aprovar</button>
+                <button class="btn-reject" (click)="rejeitarDepoimento(depoimento)">❌ Rejeitar</button>
+                <button class="btn-edit" (click)="abrirModalEdicao(depoimento)">✏️ Editar</button>
+              </div>
+              <div *ngIf="depoimento.fotoUrl" class="depoimento-imagem">
+                <img [src]="depoimento.fotoUrl" alt="Foto do depoimento">
+              </div>
+            </div>
+          </div>
+          <ng-template #noPendentes>
+            <div class="empty-section">
+              <p>Nenhum depoimento pendente no momento.</p>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Depoimentos Aprovados -->
+        <div class="depoimentos-list">
+          <h3>✅ Depoimentos Aprovados ({{ getDepoimentosAprovados().length }})</h3>
+          <div *ngIf="getDepoimentosAprovados().length > 0; else noAprovados" class="depoimentos-grid">
+            <div *ngFor="let depoimento of getDepoimentosAprovados()" class="depoimento-card approved">
+              <p class="depoimento-texto">"{{ depoimento.depoimento }}"</p>
+              <p class="depoimento-autor">- {{ depoimento.nome }}</p>
+              <div class="depoimento-actions">
+                <button class="btn-edit" (click)="abrirModalEdicao(depoimento)">✏️ Editar</button>
+                <button class="btn-reject" (click)="rejeitarDepoimento(depoimento)">❌ Reverter</button>
+              </div>
+              <div *ngIf="depoimento.fotoUrl" class="depoimento-imagem">
+                <img [src]="depoimento.fotoUrl" alt="Foto do depoimento">
+              </div>
+            </div>
+          </div>
+          <ng-template #noAprovados>
+            <div class="empty-section">
+              <p>Nenhum depoimento aprovado ainda.</p>
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>
@@ -310,5 +363,103 @@
       </div>
     </div>
 
+    <!-- Solicitações de Adoção Tab -->
+    <div *ngIf="activeTab === 'solicitacoes-adocao'" class="tab-content">
+      <h2 class="section-title">🐾 Solicitações de Adoção Pendentes</h2>
+      <div class="depoimento-grid">
+        <div *ngFor="let solicitacao of solicitacoesAdocao" class="solicitacao-card">
+          <div class="pet-info">
+            <img [src]="solicitacao.pet.foto_url || solicitacao.pet.foto || '/img/THUNDERPETS (4) (1).png'" alt="Foto de {{ solicitacao.pet.nome }}" class="pet-foto">
+            <div>
+              <h4>{{ solicitacao.pet.nome }}</h4>
+              <p>{{ solicitacao.pet.raca }}</p>
+            </div>
+          </div>
+          <div class="solicitante-info">
+            <p><strong>Solicitante:</strong> {{ solicitacao.solicitante.nome }}</p>
+            <p><strong>Email:</strong> {{ solicitacao.solicitante.email }}</p>
+            <p><strong>Data:</strong> {{ solicitacao.data | date: 'dd/MM/yyyy' }}</p>
+          </div>
+          <div class="actions">
+            <button (click)="aprovarSolicitacao(solicitacao)" class="btn-approve">Aprovar</button>
+            <button (click)="rejeitarSolicitacao(solicitacao)" class="btn-reject">Rejeitar</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </main>
+
+<!-- ===== MODAL DE EDIÇÃO DE DEPOIMENTO ===== -->
+<div class="pet-modal-overlay" *ngIf="isEditingDepoimento" (click)="cancelarEdicaoDepoimento()">
+  <div class="pet-modal editing" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Editar Depoimento</h2>
+      <button class="modal-close" (click)="cancelarEdicaoDepoimento()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Depoimento</label>
+        <textarea [(ngModel)]="editingDepoimentoData.depoimento" rows="6"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelarEdicaoDepoimento()">Cancelar</button>
+      <button class="btn-save" (click)="salvarEdicaoDepoimento()">Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL DE EDIÇÃO DE PET (Mediador) ===== -->
+<div class="pet-modal-overlay" *ngIf="isEditing && editingPet" (click)="cancelEditPet()">
+  <div class="pet-modal editing" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Editar: {{ editingPet.nome }}</h2>
+      <button class="modal-close" (click)="cancelEditPet()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nome</label>
+          <input [(ngModel)]="editedData.nome" />
+        </div>
+        <div class="form-group">
+          <label>Raça</label>
+          <input [(ngModel)]="editedData.raca" />
+        </div>
+        <div class="form-group">
+          <label>Idade (meses)</label>
+          <input type="number" [(ngModel)]="editedData.idade" />
+        </div>
+        <div class="form-group">
+          <label>Porte</label>
+          <select [(ngModel)]="editedData.porte">
+            <option value="pequeno">Pequeno</option>
+            <option value="medio">Médio</option>
+            <option value="grande">Grande</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nível de Energia</label>
+          <select [(ngModel)]="editedData.energia">
+            <option value="calmo-caseiro">Calmo/Caseiro</option>
+            <option value="moderado">Moderado/Ativo</option>
+            <option value="alto">Hiperativo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Benefício Emocional</label>
+          <input [(ngModel)]="editedData.beneficioEmocional" />
+        </div>
+        <div class="form-group">
+          <label>Personalidade</label>
+          <textarea [(ngModel)]="editedData.personalidade"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelEditPet()">Cancelar</button>
+      <button class="btn-save" (click)="saveEditPet()">Salvar</button>
+    </div>
+  </div>
+</div>

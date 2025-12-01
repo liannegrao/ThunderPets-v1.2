@@ -2,7 +2,7 @@
   <div class="container">
     <nav class="navbar" role="navigation" aria-label="Main navigation">
       <a href="/" class="logo">
-        <img src="/img/THUNDERPETS (4) (1).png" class="logo-img" alt="logo">
+        <img ngSrc="/img/THUNDERPETS (4) (1).png" class="logo-img" alt="logo" width="200" height="50">
         ThunderPets
       </a>
       <!-- Mobile hamburger menu button -->
@@ -25,8 +25,9 @@
         </div>
       </ng-template>
         <div class="nav-buttons" *ngIf="(currentUser$ | async) as user; else buttonsNoAuth">
-        <span class="user-welcome">Olá, {{ user.nome }} ({{ getRoleLabel(user.role) }})</span>
-        <button class="button button-primary" [routerLink]="['painel-' + user.role]" (click)="closeMenu()">Painel</button>
+        <span class="user-welcome">Olá, {{ user.nome }} <span *ngIf="user.role === 'mediador'">({{ getRoleLabel(user.role) }})</span></span>
+        <button class="button button-primary" [routerLink]="['/meu-painel']" (click)="closeMenu()">Painel</button>
+        <button *ngIf="user.role === 'doador' || user.role === 'comum'" class="button button-primary" [routerLink]="['/cadastrar-pet']" (click)="closeMenu()">Cadastrar Pet</button>
         <button class="button button-secondary" (click)="logout(); closeMenu()">Sair</button>
       </div>
       <ng-template #buttonsNoAuth>

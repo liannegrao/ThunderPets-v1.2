@@ -29,15 +29,25 @@ class DatabaseManager {
     async initDatabase() {
         await this.init();
 
-        const schemaPath = path.join(__dirname, 'schema.sql');
-        const schema = fs.readFileSync(schemaPath, 'utf8');
-        const statements = schema.split(';').map(s => s.trim()).filter(s => s.length > 0);
+        // Verifica se a tabela 'pets' já existe
+        const tableCheck = await this.get("SELECT name FROM sqlite_master WHERE type='table' AND name='pets'");
 
-        for (const statement of statements) {
-            if (statement) await this.run(statement);
+        if (!tableCheck) {
+            // Se não existe, executa todo o schema.sql
+            console.log('🐾 Criando e populando o banco de dados do zero...');
+            const schemaPath = path.join(__dirname, 'schema.sql');
+            const schema = fs.readFileSync(schemaPath, 'utf8');
+            await new Promise((resolve, reject) => {
+                this.db.exec(schema, (err) => {
+                    if (err) return reject(err);
+                    console.log('✅ Schema inicializado com dados de exemplo');
+                    resolve();
+                });
+            });
+        } else {
+            // Se a tabela existe, apenas informa
+            console.log('✅ O banco de dados já está populado.');
         }
-
-        console.log('✅ Schema inicializado com dados de exemplo');
     }
 
     run(sql, params = []) {

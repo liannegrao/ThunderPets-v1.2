@@ -141,7 +141,7 @@
           <div class="pet-showcase-info">
             <span class="pet-info-item">📏 {{ pet.porte | titlecase }}</span>
             <span class="pet-info-item">⚡ {{ pet.energia || 'Moderado' }}</span>
-            <span class="pet-info-item">🎂 {{ getFormattedAge(pet.idade) }}</span>
+            <span class="pet-info-item">🎂 {{ calcularIdade(pet.idade) }}</span>
           </div>
 
           <p class="pet-showcase-description">{{ pet.personalidade | slice:0:100 }}...</p>
@@ -230,7 +230,7 @@
             </div>
             <div class="detail-item">
               <span class="detail-label">Idade:</span>
-              <span class="detail-value">{{ getFormattedAge(selectedPet.idade) }}</span>
+              <span class="detail-value">{{ calcularIdade(selectedPet.idade) }}</span>
             </div>
             <div class="detail-item">
               <span class="detail-label">Porte:</span>

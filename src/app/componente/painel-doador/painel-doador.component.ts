@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService, Usuario } from '../../services/auth.service';
+import { AdocaoService, SolicitacaoAdocao } from '../../services/adocao.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { SlicePipe } from '@angular/common';
@@ -36,17 +37,20 @@ interface UsuarioInteressado {
   templateUrl: './painel-doador.component.html',
   styleUrl: './painel-doador.component.css'
 })
+// Componente para gerenciar o painel do doador de pets
 export class PainelDoadorComponent implements OnInit, OnDestroy {
-  currentUser: Usuario | null = null;
-  meusPets: PetCadastrado[] = [];
-  selectedPet: PetCadastrado | null = null;
-  interessados: UsuarioInteressado[] = [];
-  showInteressados = false;
+  public currentUser: Usuario | null = null;
+  public meusPets: PetCadastrado[] = [];
+  public solicitacoes: SolicitacaoAdocao[] = [];
+  public selectedPet: PetCadastrado | null = null;
+  public interessados: UsuarioInteressado[] = [];
+  public showInteressados = false;
 
   private destroy$ = new Subject<void>();
 
   constructor(
     private authService: AuthService,
+    private adocaoService: AdocaoService,
     private router: Router
   ) {}
 
@@ -61,12 +65,32 @@ export class PainelDoadorComponent implements OnInit, OnDestroy {
           return;
         }
         this.carregarMeusPets();
+        this.carregarSolicitacoes();
       });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  carregarSolicitacoes(): void {
+    this.adocaoService.solicitacoes$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(solicitacoes => {
+        if (!this.currentUser || this.meusPets.length === 0) {
+          this.solicitacoes = [];
+          return;
+        }
+
+        const meusPetsIds = this.meusPets.map(pet => pet.id);
+
+        this.solicitacoes = solicitacoes
+          .filter(s => meusPetsIds.includes(s.pet.id))
+          .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()); // Ordena da mais recente para a mais antiga
+
+        console.log(`💌 ${this.solicitacoes.length} solicitações de adoção encontradas para os pets de ${this.currentUser.nome}`);
+      });
   }
 
   // Carregar pets cadastrados pelo usuário atual
@@ -162,15 +186,34 @@ export class PainelDoadorComponent implements OnInit, OnDestroy {
   // Status badge
   getStatusBadge(status: string): { text: string, class: string } {
     switch (status) {
+      // Status do Pet
       case 'disponivel':
         return { text: 'Disponível', class: 'status-disponivel' };
       case 'adotado':
         return { text: 'Adotado', class: 'status-adotado' };
       case 'em_analise':
         return { text: 'Em Análise', class: 'status-analise' };
+
+      // Status da Solicitação de Adoção
+      case 'pendente':
+        return { text: 'Pendente', class: 'status-analise' }; // Reutilizando a cor amarela
+      case 'aprovada':
+        return { text: 'Aprovada', class: 'status-disponivel' }; // Reutilizando a cor verde
+      case 'rejeitada':
+        return { text: 'Rejeitada', class: 'status-adotado' }; // Reutilizando a cor vermelha/rosa
+
       default:
         return { text: status, class: 'status-default' };
     }
+  }
+
+  // Estatísticas das solicitações
+  getSolicitacoesStats() {
+    return {
+      pendentes: this.solicitacoes.filter(s => s.status === 'pendente').length,
+      aprovadas: this.solicitacoes.filter(s => s.status === 'aprovada').length,
+      rejeitadas: this.solicitacoes.filter(s => s.status === 'rejeitada').length
+    };
   }
 
   // Estatísticas rápidas

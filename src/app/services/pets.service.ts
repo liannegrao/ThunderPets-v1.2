@@ -218,6 +218,11 @@ export class PetsService {
     }
   }
 
+  // Permite forçar um refresh para assinantes (ex.: recarregar dados locais)
+  emitChange(): void {
+    this.petsData.next([...this.petsData.value]);
+  }
+
   // 🔥 CARREGAMENTO ÚNICO E DEFINITIVO - NENHUMA DUPLICAÇÃO
   private loadAllPetsOnce(): void {
     console.log('🚀 Iniciando carregamento único de pets...');
@@ -564,5 +569,28 @@ export class PetsService {
 
   getImagensCloudinary(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/pets/images`);
+  }
+
+  updatePet(id: number, petData: Partial<Pet>): Observable<any> {
+    const url = `${this.apiUrl}/pets/${id}`;
+    // Simulação de autenticação: o ideal é que o AuthService forneça o token/role
+    const headers = { 'x-user-role': 'mediador' };
+
+    return this.http.put(url, petData, { headers }).pipe(
+      tap(() => {
+        // Atualizar o BehaviorSubject localmente após o sucesso
+        const currentPets = this.petsData.value;
+        const updatedPets = currentPets.map(p => p.id === id ? { ...p, ...petData } : p);
+        this.petsData.next(updatedPets);
+      }),
+      catchError(this.handleError<any>('updatePet'))
+    );
+  }
+
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+      console.error(`${operation} failed: ${error.message}`);
+      return of(result as T);
+    };
   }
 }

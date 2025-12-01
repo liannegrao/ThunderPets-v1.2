@@ -1,8 +1,9 @@
+
 require('dotenv').config();
 const { listarImagensThunderPets } = require('./cloudinary');
 const { DatabaseManager } = require('./db');
 
-// Script para sincronizar pets com imagens do Cloudinary (60 pets)
+// Script para sincronizar pets com imagens do Cloudinary (97 pets)
 async function syncPetsWithCloudinaryImages() {
   try {
     console.log('🚀 Iniciando sincronização de imagens dos pets...');
@@ -22,13 +23,13 @@ async function syncPetsWithCloudinaryImages() {
       return;
     }
 
-    // Buscar todos os pets (60 pets)
+    // Buscar todos os pets (97 pets)
     console.log('🐕 Buscando pets no banco...');
-    const pets = await global.dbManager.all('SELECT id, nome, foto_url FROM pets ORDER BY id');
+    const pets = await global.dbManager.all('SELECT id, nome, especie, foto_url FROM pets ORDER BY id');
     console.log(`✅ Encontrados ${pets.length} pets no banco`);
 
-    if (pets.length !== 60) {
-      console.log(`⚠️  Avisos: Esperados 60 pets, encontrados ${pets.length}`);
+    if (pets.length !== 97) {
+      console.log(`⚠️  Avisos: Esperados 97 pets, encontrados ${pets.length}`);
     }
 
     // 🔍 CLASSIFICAR IMAGENS POR TIPO (Cachorro vs Gato)
@@ -74,70 +75,73 @@ async function syncPetsWithCloudinaryImages() {
     console.log(`🐕 ${cachorros.length} pets cachorros para sincronizar`);
     console.log(`🐱 ${gatos.length} pets gatos para sincronizar`);
 
-    // Atribuir imagens para cachorros
-    let indexCachorro = 0;
+    // Usar cópias para não modificar os arrays originais
+    let poolCachorros = [...imagensCachorros];
+    let poolGatos = [...imagensGatos];
+    let poolNeutras = [...imagensNeutras];
+    let poolTodas = [...imagensCloudinary];
+
+    const atribuirImagem = (pet, poolEspecifica, poolFallback, poolGeral) => {
+      let imagem;
+      if (poolEspecifica.length > 0) {
+        const index = Math.floor(Math.random() * poolEspecifica.length);
+        imagem = poolEspecifica.splice(index, 1)[0];
+      } else if (poolFallback.length > 0) {
+        const index = Math.floor(Math.random() * poolFallback.length);
+        imagem = poolFallback.splice(index, 1)[0];
+      } else if (poolGeral.length > 0) {
+        const index = Math.floor(Math.random() * poolGeral.length);
+        imagem = poolGeral.splice(index, 1)[0];
+      }
+
+      if (imagem) {
+        // Remover a imagem da pool geral para não ser usada novamente
+        const geralIndex = poolTodas.findIndex(img => img.public_id === imagem.public_id);
+        if (geralIndex > -1) {
+          poolTodas.splice(geralIndex, 1);
+        }
+        return imagem;
+      }
+      return null;
+    };
+
     for (const pet of cachorros) {
-      let imagem;
-      if (imagensCachorros.length > 0) {
-        imagem = imagensCachorros[indexCachorro % imagensCachorros.length];
-        indexCachorro++;
-      } else if (imagensNeutras.length > 0) {
-        imagem = imagensNeutras[indexCachorro % imagensNeutras.length];
-        indexCachorro++;
+      const imagem = atribuirImagem(pet, poolCachorros, poolNeutras, poolTodas);
+      if (imagem) {
+        console.log(`🐕 ${pet.nome} (ID: ${pet.id}) → ${imagem.filename}`);
+        await global.dbManager.run(
+          'UPDATE pets SET foto_url = ? WHERE id = ?',
+          [imagem.url, pet.id]
+        );
       } else {
-        // Fallback para qualquer imagem
-        imagem = imagensCloudinary[indexCachorro % imagensCloudinary.length];
-        indexCachorro++;
+        console.log(`⚠️  Nenhuma imagem disponível para o cachorro ${pet.nome}`);
       }
-
-      console.log(`🐕 ${pet.nome} (ID: ${pet.id}) → ${imagem.filename}`);
-
-      await global.dbManager.run(
-        'UPDATE pets SET foto_url = ? WHERE id = ?',
-        [imagem.url, pet.id]
-      );
     }
 
-    // Atribuir imagens para gatos
-    let indexGato = 0;
     for (const pet of gatos) {
-      let imagem;
-      if (imagensGatos.length > 0) {
-        imagem = imagensGatos[indexGato % imagensGatos.length];
-        indexGato++;
-      } else if (imagensNeutras.length > 0) {
-        imagem = imagensNeutras[indexGato % imagensNeutras.length];
-        indexGato++;
+      const imagem = atribuirImagem(pet, poolGatos, poolNeutras, poolTodas);
+      if (imagem) {
+        console.log(`🐱 ${pet.nome} (ID: ${pet.id}) → ${imagem.filename}`);
+        await global.dbManager.run(
+          'UPDATE pets SET foto_url = ? WHERE id = ?',
+          [imagem.url, pet.id]
+        );
       } else {
-        // Fallback para qualquer imagem
-        imagem = imagensCloudinary[indexGato % imagensCloudinary.length];
-        indexGato++;
+        console.log(`⚠️  Nenhuma imagem disponível para o gato ${pet.nome}`);
       }
-
-      console.log(`🐱 ${pet.nome} (ID: ${pet.id}) → ${imagem.filename}`);
-
-      await global.dbManager.run(
-        'UPDATE pets SET foto_url = ? WHERE id = ?',
-        [imagem.url, pet.id]
-      );
     }
 
-    console.log('✅ Sincronização concluída!');
-    console.log(`📊 ${pets.length} pets sincronizados com ${imagensCloudinary.length} imagens Cloudinary`);
-
-    // Verificar algumas atualizações
-    const petsVerificacao = await global.dbManager.all('SELECT id, nome, foto_url FROM pets LIMIT 10');
-    console.log('\n🔍 Verificação das primeiras sincronizações:');
-    petsVerificacao.forEach(pet => {
-      const url = pet.foto_url;
-      const isCloudinary = url && url.includes('cloudinary.com');
-      console.log(`${isCloudinary ? '✅' : '❌'} ${pet.nome}: ${url ? url.substring(0, 60) + '...' : 'SEM URL'}`);
-    });
-
+    console.log(`
+📊 ${pets.length} pets sincronizados com ${imagensCloudinary.length} imagens Cloudinary`);
+    console.log('✅ Sincronização concluída com sucesso!');
   } catch (error) {
-    console.error('❌ Erro na sincronização:', error);
+    console.error('❌ Erro ao sincronizar pets com imagens do Cloudinary:', error);
   } finally {
-    process.exit(0);
+    // Fechar a conexão com o banco de dados
+    if (global.dbManager) {
+      await global.dbManager.close();
+      console.log('🚪 Conexão com o banco de dados fechada.');
+    }
   }
 }
 

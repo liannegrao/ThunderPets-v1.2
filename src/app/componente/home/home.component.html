@@ -124,8 +124,10 @@
             <div class="pet-match-image">
               <!-- Imagem real com fallback -->
               <img
-                [src]="pet.foto_url || '/img/THUNDERPETS (4) (1).png'"
+                [ngSrc]="pet.foto_url || '/img/THUNDERPETS (4) (1).png'"
                 [alt]="'Foto de ' + pet.nome"
+                width="200"
+                height="200"
                 class="pet-img"
               />
               <div class="pet-status-badge" [ngClass]="getTherapyBadge(pet)">
@@ -198,7 +200,7 @@
     </div>
     <div class="pet-grid">
       <div *ngFor="let pet of showcasedPets" class="pet-card">
-        <img [src]="getLocalImage(pet)" [alt]="'Foto de ' + pet.nome" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+        <img [ngSrc]="getLocalImage(pet)" [alt]="'Foto de ' + pet.nome" width="300" height="200" style="object-fit: cover; border-radius: 8px; margin-bottom: 1rem; height: auto;">
         <div class="pet-card-content">
           <h3>{{ pet.nome }}</h3>
           <p><span style="font-weight: 600;">Benefício Emocional:</span> {{ pet.beneficioEmocional || 'Companheiro Terapêutico' }}<br><span style="font-weight: 600;">Perfil:</span> {{ pet.porte }} • {{ pet.idade }} meses</p>
@@ -216,28 +218,24 @@
         <h2>Transformações que Mudam Vidas</h2>
         <p>Veja como nossos companheiros terapêuticos trouxeram luz aos dias mais difíceis.</p>
       </div>
-      <div class="testimonial-grid">
-        <div class="testimonial-card">
-          <p>"Estava em profunda depressão após perder meu marido. O Luna me deu uma razão para acordar todos os dias. Seu amor incondicional e ronronar suave me ajudaram a reconstruir minha capacidade de amar. Hoje, me sinto pronta para viver novamente!"</p>
+      <div class="testimonial-grid" *ngIf="depoimentos.length > 0; else noDepoimentos">
+        <div class="testimonial-card" *ngFor="let depoimento of depoimentos">
+          <p class="testimonial-text">"{{ depoimento.text }}"</p>
           <div class="testimonial-author">
-            <img src="https://placehold.co/100x100/CBD5E0/333333?text=Ana+Maria" alt="Ana Maria">
+            <img [src]="depoimento.img" alt="Foto de {{ depoimento.name }}" class="author-img">
             <div>
-              <p class="author-name">Ana Maria Santos</p>
-              <p class="author-info">Superou Depressão com Luna</p>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <p>"Ansiedade me consumia diariamente. O Thor, com sua alegria contagiante, me lembrou como sorrir novamente. Ele me acompanhou em consultas de terapia e até no trabalho. Hoje eu consigo controlar melhor minhas emoções!"</p>
-          <div class="testimonial-author">
-            <img src="https://placehold.co/100x100/EDF2F7/333333?text=Rafael" alt="Rafael">
-            <div>
-              <p class="author-name">Rafael Pedrosa</p>
-              <p class="author-info">Venceu Ansiedade com Thor</p>
+              <p class="author-name">{{ depoimento.name }}</p>
+              <p class="author-info">{{ depoimento.info }}</p>
             </div>
           </div>
         </div>
       </div>
+      <ng-template #noDepoimentos>
+        <div class="no-testimonials" style="text-align: center; padding: 2rem; background-color: #f7fafc; border-radius: 8px;">
+          <p style="margin-bottom: 1rem;">Ainda não temos depoimentos. Que tal compartilhar sua história e inspirar outras pessoas?</p>
+          <a routerLink="/comentar" class="button button-primary">Deixar meu Depoimento</a>
+        </div>
+      </ng-template>
     </div>
   </section>
 
@@ -245,7 +243,7 @@
   <section id="ajude" class="section container help-section">
     <h2>Como Você Pode Ajudar</h2>
     <p>Existem várias formas de contribuir com a saúde emocional de pessoas e animais. Escolha a modalidade que melhor se adequa às suas possibilidades.</p>
-    <div class="help-buttons">
+    <div class="help-options">
       <!-- Botão dinâmico baseado no tipo de usuário -->
       <a *ngIf="getUserRole() === 'doador'" href="/cadastrar-pet" class="button button-primary">
         🐾 Sou Doador: Cadastrar Pet
@@ -257,8 +255,8 @@
         🔐 Faça Login para Ajudar
       </router-link>
 
-      <router-link *ngIf="getUserRole() !== 'mediador'" [routerLink]="['/doar']" class="button button-primary">🤝 Cuide Temporariamente</router-link>
-      <router-link [routerLink]="['/voluntario']" class="button button-secondary">⭐ Seja Voluntário Terapêutico</router-link>
+      <a [routerLink]="isUserLoggedIn() ? '/comentar' : '/auth'" class="button button-secondary">Comentar</a>
+      <a [routerLink]="isUserLoggedIn() ? '/painel-adotante' : '/auth'" class="button button-secondary">Adotar um animal</a>
     </div>
   </section>
 </main>
@@ -274,7 +272,13 @@
     <div class="pet-modal-body">
       <div class="pet-modal-main">
         <div class="pet-modal-image">
-          <div style="width: 100%; height: 300px; background: #f3f4f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #6b7280; font-weight: 600; font-size: 1.2rem;">Foto de {{ selectedPet.nome }}</div>
+          <img
+            [ngSrc]="selectedPet.foto_url || '/img/THUNDERPETS (4) (1).png'"
+            [alt]="'Foto de ' + selectedPet.nome"
+            width="300"
+            height="300"
+            style="object-fit: cover; border-radius: 12px; width: 100%; height: 100%;"
+          >
         </div>
 
         <div class="pet-modal-info">
@@ -282,7 +286,7 @@
             <div class="info-card">
               <h3>🐕 Dados Básicos</h3>
               <p><strong>Raça:</strong> {{ selectedPet.raca }}</p>
-              <p><strong>Idade:</strong> {{ getFormattedAge(selectedPet.idade) }}</p>
+              <p><strong>Idade:</strong> {{ calcularIdade(selectedPet.idade) }}</p>
               <p><strong>Porte:</strong> {{ capitalize(selectedPet.porte) }}</p>
               <p><strong>Perfil:</strong> {{ capitalize(selectedPet.energia) }}</p>
             </div>
@@ -291,7 +295,7 @@
               <h3>💚 Benefícios Terapêuticos</h3>
               <p>{{ selectedPet.beneficioEmocional || 'Companheiro terapêutico de confiança e amor incondicional' }}</p>
               <div class="compat-score">
-                <h4>Compatibilidade Emocional</h4>
+                <h4>Encaixe de Perfil</h4>
                 <div *ngFor="let score of getTopScores(selectedPet)" class="score-item">
                   <span>{{ score.label }}:</span>
                   <div class="score-bar">

@@ -143,6 +143,10 @@
 }
 
 /* Depoimentos */
+.help-options .button {
+  margin-right: 1rem;
+}
+
 .testimonials {
   background: #f8fafc;
   border-radius: 16px;
@@ -167,6 +171,20 @@
 
 .testimonial-card:hover {
   transform: translateY(-3px);
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.author-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .testimonial-card p {
@@ -215,6 +233,10 @@
 .button-secondary:hover {
   background: #1d4ed8;
   transform: translateY(-2px);
+}
+
+.help-options .button:not(:last-child) {
+  margin-right: 1rem;
 }
 
 /* ===== Mobile First Design - Organizado ===== */

@@ -103,6 +103,17 @@
               <option value="Administrador">Administrador</option>
             </select>
 
+            <label class="checkbox-label" style="margin-top: 0.75rem;">
+              <input type="checkbox" formControlName="lgpd">
+              <span>Concordo com o tratamento de dados conforme a LGPD
+                (<a href="#" target="_blank" rel="noopener">Política de Privacidade</a>)
+              </span>
+            </label>
+
+            <div *ngIf="cadastroFormErrors.lgpd && (cadastroForm.get('lgpd')?.touched || isSubmitted)" class="auth-message error" style="margin-top: 0.5rem; text-align: left; font-size: 0.8rem;">
+              Você deve concordar com os termos.
+            </div>
+
             <button type="submit" class="auth-submit-btn" [disabled]="isLoading">
               {{ isLoading ? 'Cadastrando...' : 'Cadastrar' }}
             </button>
