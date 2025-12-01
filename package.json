@@ -1,9 +1,9 @@
 {
-  "name": "thunderpets-angular",
-  "version": "0.0.0",
+  "name": "thunderpets-root",
+  "private": true,
+  "workspaces": ["thunderpets-api"],
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
+    "start": "node thunderpets-api/server.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
