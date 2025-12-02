@@ -1,24 +1,9 @@
-/* Global app styles */
-
 .main-content {
-  /* Normal pages */
+  flex: 1;
 }
 
-.main-content.fullscreen {
-  /* Auth page - remove any padding/margin from body/main */
-  padding: 0 !important;
-  margin: 0 !important;
-  min-height: 100vh;
-}
-
-/* Ensure auth page takes full screen */
-:host {
-  display: block;
-  min-height: 100vh;
-}
-
-/* Override any global padding for auth */
-.main-content.fullscreen :global(main) {
-  padding: 0 !important;
-  margin: 0 !important;
+.fullscreen {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }

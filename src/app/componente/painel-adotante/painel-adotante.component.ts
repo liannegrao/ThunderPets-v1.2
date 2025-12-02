@@ -103,10 +103,15 @@ export class PainelAdotanteComponent implements OnInit {
   currentUser: any = null;
   selectedFile: File | null = null;
 
+  // Novas propriedades para solicitações de adoção
+  solicitacoes: SolicitacaoAdocao[] = [];
+  stats = { pendentes: 0, aprovadas: 0, rejeitadas: 0 };
+
   constructor(
     private fb: FormBuilder,
     private petsService: PetsService,
-    private router: Router
+    private router: Router,
+    private adocaoService: AdocaoService
   ) {}
 
   ngOnInit() {
@@ -115,9 +120,7 @@ export class PainelAdotanteComponent implements OnInit {
     this.loadCurrentUser();
     this.carregarPetsDisponiveis();
     this.aplicarFiltros(); // Inicializa filtros
-
-    // Inicializar estatísticas
-    this.atualizarEstatisticas();
+    this.carregarSolicitacoes(); // Carrega as solicitações de adoção
   }
 
   private initForm() {
@@ -274,47 +277,31 @@ export class PainelAdotanteComponent implements OnInit {
 
     console.log('👤 Usuário atual:', currentUser);
 
-   // Se não tem usuário no localStorage, mostrar mensagem de login
-if (!currentUser || !currentUser.nome) {
-  alert('Para solicitar adoção, você precisa estar logado. Redirecionando para login...');
-  this.router.navigate(['/auth']);
-  return;
-}
+    // Se não tem usuário no localStorage, mostrar mensagem de login
+    if (!currentUser || !currentUser.nome) {
+      alert('Para solicitar adoção, você precisa estar logado. Redirecionando para login...');
+      this.router.navigate(['/auth']);
+      return;
+    }
 
-console.log('✅ Usuário validado:', currentUser.nome, 'Role:', currentUser.role);
+    console.log('✅ Usuário validado:', currentUser.nome, 'Role:', currentUser.role);
 
-// Definir o painel certo conforme o tipo de usuário
-const painel = currentUser.role === 'mediador' ? 'painel-mediador' : 'painel-adotante';
-const tipoPainel = currentUser.role === 'mediador' ? 'Painel de Mediador' : 'Painel de Adotante';
+    // Definir o painel certo conforme o tipo de usuário
+    const painel = currentUser.role === 'mediador' ? 'painel-mediador' : 'painel-adotante';
 
-// Mensagem correta
-const confirmacao = confirm(
-        `Sua escolha do pet ${pet.nome} foi para seu painel. Depois o mediador vai ver, lá em Solicitações de Adoção Pendentes, o seu nome (${currentUser.nome}).`
-      );
+    // Mensagem correta
+    const confirmacao = confirm(
+      `Sua escolha do pet ${pet.nome} foi para seu painel. Depois o mediador vai ver, lá em Solicitações de Adoção Pendentes, o seu nome (${currentUser.nome}).`
+    );
 
-if (confirmacao) {
-      // Salvar a solicitação no localStorage
-      const adoptionRequest: SolicitacaoAdocao = {
-        id: Date.now(),
-        pet: {
-          ...pet,
-          foto: pet.foto || '/img/THUNDERPETS (4) (1).png',
-          foto_url: pet.foto_url || ''
-        },
-        solicitante: currentUser,
-        data: new Date(),
-        status: 'pendente',
-      };
-
-      // Obter solicitações existentes e adicionar a nova
-      const existingRequests = JSON.parse(localStorage.getItem('adocaoSolicitations') || '[]');
-      existingRequests.push(adoptionRequest);
-      localStorage.setItem('adocaoSolicitations', JSON.stringify(existingRequests));
+    if (confirmacao) {
+      // Usar o AdocaoService para criar a solicitação
+      this.adocaoService.novaSolicitacao(pet, currentUser);
 
       // Redirecionar para o painel
       this.router.navigate([`/${painel}`]);
     }
-}
+  }
 
   confirmAdoption() {
     if (!this.confirmationPet) return;
@@ -494,21 +481,28 @@ if (confirmacao) {
     return pet.id;
   }
 
-  // Estatísticas das solicitações do usuário
-  getSolicitacoesStats() {
-    // Simulação - em produção viria do backend
-    const solicitacoes = JSON.parse(localStorage.getItem('adocaoSolicitations') || '[]');
-    const currentUser = JSON.parse(localStorage.getItem('thunderpets_logged_user') || 'null');
+  // Carrega as solicitações de adoção do usuário logado
+  carregarSolicitacoes() {
+    if (!this.currentUser) return;
 
-    if (!currentUser) {
-      return { pendentes: 0, aprovadas: 0, rejeitadas: 0 };
+    this.adocaoService.getSolicitacoesPorUsuario(this.currentUser.email).subscribe((solicitacoes: SolicitacaoAdocao[]) => {
+      this.solicitacoes = solicitacoes;
+      this.atualizarEstatisticas();
+      console.log('Solicitações carregadas:', this.solicitacoes);
+    });
+  }
+
+  // Atualiza as estatísticas com base nas solicitações carregadas
+  atualizarEstatisticas() {
+    this.stats.pendentes = this.solicitacoes.filter(s => s.status === 'pendente').length;
+    this.stats.aprovadas = this.solicitacoes.filter(s => s.status === 'aprovada').length;
+    this.stats.rejeitadas = this.solicitacoes.filter(s => s.status === 'rejeitada').length;
+  }
+
+  limparHistorico() {
+    if (this.currentUser && confirm('Tem certeza que deseja limpar o histórico de solicitações aprovadas e rejeitadas?')) {
+      this.adocaoService.limparHistoricoSolicitacoes(this.currentUser.email);
     }
-
-    return {
-      pendentes: 3,  // Simulação
-      aprovadas: 5,  // Simulação
-      rejeitadas: 1  // Simulação
-    };
   }
 
   // Estatísticas gerais
@@ -595,17 +589,7 @@ if (confirmacao) {
     }
   }
 
-  // Atualizar estatísticas (para evitar ExpressionChangedAfterItHasBeenCheckedError)
-  private atualizarEstatisticas(): void {
-    try {
-      const petsAdotados = JSON.parse(localStorage.getItem('petsCadastrados') || '[]')
-        .filter((pet: any) => pet.status === 'adotado');
 
-      this.totalAdocoes = petsAdotados.length + 25; // Simulação com base fixa
-    } catch (error) {
-      this.totalAdocoes = 25; // Valor padrão
-    }
-  }
 
   getFormattedAge(idadeMeses: number): string {
     const anos = Math.floor(idadeMeses / 12);

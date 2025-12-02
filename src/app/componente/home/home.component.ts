@@ -254,8 +254,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.adocaoService.novaSolicitacao(pet, currentUser);
 
-    // Mensagem de sucesso para o usuário
-    alert(`✅ Solicitação de adoção para ${pet.nome} enviada com sucesso!\n\nNossa equipe de mediação irá avaliar seu pedido e entrará em contato em breve. Fique de olho no seu painel!`);
+    // Redireciona para o painel do usuário
+    this.router.navigate(['/painel-' + currentUser.role]);
 
     // Opcional: fechar o modal se estiver aberto
     if (this.showPetModal) {
@@ -460,25 +460,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   // Método para solicitar adoção (similar ao adoptPet)
   requestAdoption(pet: Pet) {
-    console.log('Processando solicitação de adoção:', pet);
-
-    // Verificar se usuário está logado
-    const currentUser = JSON.parse(localStorage.getItem('thunderpets_logged_user') || 'null');
-
-    console.log('👤 Usuário no home:', currentUser);
-
-    // Se não tem usuário no localStorage, mostrar mensagem de login
-    if (!currentUser || !currentUser.nome) {
-      alert('Para solicitar adoção, você precisa estar logado. Redirecionando para login...');
-      this.router.navigate(['/auth']);
-      return;
-    }
-
-    console.log('✅ Usuário validado no home:', currentUser.nome, 'Role:', currentUser.role);
-
-    this.adocaoService.novaSolicitacao(pet, currentUser);
-
-    // Mensagem de sucesso para o usuário
-    alert(`✅ Solicitação de adoção para ${pet.nome} enviada com sucesso!\n\nNossa equipe de mediação irá avaliar seu pedido e entrará em contato em breve. Fique de olho no seu painel!`);
+    // Reutiliza a lógica principal de adoptPet para consistência
+    this.adoptPet(pet);
   }
 }

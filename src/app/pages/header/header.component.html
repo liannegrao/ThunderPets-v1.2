@@ -14,7 +14,7 @@
         <div class="nav-links" *ngIf="(currentUser$ | async); else linksNoAuth">
         <a href="#missao" (click)="closeMenu()">Nossa Missão</a>
         <a href="#adote" (click)="closeMenu()">Adote</a>
-        <a [routerLink]="['painel-' + (currentUser$ | async)?.role]" (click)="closeMenu()">Meu Painel</a>
+        <a [routerLink]="['painel-' + (currentUser$ | async)?.role]" (click)="closeMenu()">Painel</a>
         <a href="#ajude" (click)="closeMenu()">Ajude</a>
       </div>
       <ng-template #linksNoAuth>

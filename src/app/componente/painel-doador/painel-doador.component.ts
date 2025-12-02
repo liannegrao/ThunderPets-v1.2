@@ -45,6 +45,12 @@ export class PainelDoadorComponent implements OnInit, OnDestroy {
   public selectedPet: PetCadastrado | null = null;
   public interessados: UsuarioInteressado[] = [];
   public showInteressados = false;
+  public stats = {
+    totalPets: 0,
+    petsDisponiveis: 0,
+    petsAdotados: 0,
+    totalSolicitacoes: 0
+  };
 
   private destroy$ = new Subject<void>();
 
@@ -66,6 +72,7 @@ export class PainelDoadorComponent implements OnInit, OnDestroy {
         }
         this.carregarMeusPets();
         this.carregarSolicitacoes();
+        this.atualizarEstatisticas();
       });
   }
 
@@ -80,6 +87,7 @@ export class PainelDoadorComponent implements OnInit, OnDestroy {
       .subscribe(solicitacoes => {
         if (!this.currentUser || this.meusPets.length === 0) {
           this.solicitacoes = [];
+          this.atualizarEstatisticas();
           return;
         }
 
@@ -89,6 +97,7 @@ export class PainelDoadorComponent implements OnInit, OnDestroy {
           .filter(s => meusPetsIds.includes(s.pet.id))
           .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()); // Ordena da mais recente para a mais antiga
 
+        this.atualizarEstatisticas();
         console.log(`💌 ${this.solicitacoes.length} solicitações de adoção encontradas para os pets de ${this.currentUser.nome}`);
       });
   }
@@ -115,8 +124,7 @@ export class PainelDoadorComponent implements OnInit, OnDestroy {
           status: pet.status || 'disponivel',
           dataCadastro: pet.dataCadastro,
           descricao: pet.descricao,
-          localizacao: pet.localizacao,
-          interessantes: pet.interessantes || 0
+          localizacao: pet.localizacao
         }));
 
       console.log(`🐕 ${this.meusPets.length} pets encontrados para ${this.currentUser.nome}`);
@@ -216,14 +224,11 @@ export class PainelDoadorComponent implements OnInit, OnDestroy {
     };
   }
 
-  // Estatísticas rápidas
-  getEstatisticas() {
-    return {
-      totalPets: this.meusPets.length,
-      petsDisponiveis: this.meusPets.filter(p => p.status === 'disponivel').length,
-      petsAdotados: this.meusPets.filter(p => p.status === 'adotado').length,
-      totalInteressados: this.meusPets.reduce((sum, pet) => sum + (pet.interessantes || 0), 0)
-    };
+  atualizarEstatisticas(): void {
+    this.stats.totalPets = this.meusPets.length;
+    this.stats.petsDisponiveis = this.meusPets.filter(p => p.status === 'disponivel').length;
+    this.stats.petsAdotados = this.meusPets.filter(p => p.status === 'adotado').length;
+    this.stats.totalSolicitacoes = this.solicitacoes.length;
   }
 
   // Formatar telefone para WhatsApp (remover caracteres não numéricos)

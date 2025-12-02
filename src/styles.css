@@ -129,6 +129,8 @@ button {
 /* ===== BODY PROFISSIONAL ===== */
 
 body {
+    display: flex;
+    flex-direction: column;
     font-family: 'Inter', sans-serif;
     font-size: var(--text-base);
     line-height: 1.6;

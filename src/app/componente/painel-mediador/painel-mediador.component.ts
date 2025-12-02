@@ -62,9 +62,9 @@ export class PainelMediadorComponent implements OnInit {
       cor: 'var(--color-success)'
     },
     {
-      titulo: 'Taxa de Sucesso',
-      valor: '0%',
-      icone: '📈',
+      titulo: 'Solicitações Pendentes',
+      valor: 0,
+      icone: '💌',
       cor: 'var(--color-warning)'
     }
   ];
@@ -82,6 +82,7 @@ export class PainelMediadorComponent implements OnInit {
     this.loadPets();
     this.loadUsuarios();
     this.loadDepoimentos();
+    this.loadSolicitacoesAdocao();
     this.atualizarEstatisticas();
   }
 
@@ -89,10 +90,13 @@ export class PainelMediadorComponent implements OnInit {
     this.depoimentoService.depoimentos$.subscribe(depoimentos => {
       this.depoimentos = depoimentos;
     });
+  }
 
-    // Carregar solicitações de adoção do localStorage
-    const solicitacoes = JSON.parse(localStorage.getItem('adocaoSolicitations') || '[]');
-    this.solicitacoesAdocao = solicitacoes.filter((s: SolicitacaoAdocao) => s.status === 'pendente');
+  private loadSolicitacoesAdocao() {
+    this.adocaoService.solicitacoes$.subscribe(solicitacoes => {
+      this.solicitacoesAdocao = solicitacoes.filter(s => s.status === 'pendente');
+      this.atualizarEstatisticas();
+    });
   }
 
   private loadCurrentUser() {
@@ -172,8 +176,7 @@ export class PainelMediadorComponent implements OnInit {
     this.estatisticas[0].valor = this.pets.length;
     this.estatisticas[1].valor = this.usuarios.length;
     this.estatisticas[2].valor = this.pets.filter(p => p.adotado).length;
-    const taxaSucesso = this.pets.length > 0 ? Math.round((this.pets.filter(p => p.adotado).length / this.pets.length) * 100) : 0;
-    this.estatisticas[3].valor = `${taxaSucesso}%`;
+    this.estatisticas[3].valor = this.solicitacoesAdocao.length;
   }
 
   getPetsPorStatus(status: string): PetComDoador[] {
@@ -398,23 +401,11 @@ export class PainelMediadorComponent implements OnInit {
 
   // ===== SOLICITAÇÕES DE ADOÇÃO =====
   aprovarSolicitacao(solicitacao: SolicitacaoAdocao) {
-    solicitacao.status = 'aprovada';
-    this.atualizarSolicitacoes(solicitacao);
+    this.adocaoService.aprovarSolicitacao(solicitacao.id);
   }
 
   rejeitarSolicitacao(solicitacao: SolicitacaoAdocao) {
-    solicitacao.status = 'rejeitada';
-    this.atualizarSolicitacoes(solicitacao);
-  }
-
-  private atualizarSolicitacoes(solicitacaoAtualizada: SolicitacaoAdocao) {
-    const solicitacoes = JSON.parse(localStorage.getItem('adocaoSolicitations') || '[]');
-    const index = solicitacoes.findIndex((s: SolicitacaoAdocao) => s.id === solicitacaoAtualizada.id);
-    if (index !== -1) {
-      solicitacoes[index] = solicitacaoAtualizada;
-      localStorage.setItem('adocaoSolicitations', JSON.stringify(solicitacoes));
-      this.solicitacoesAdocao = solicitacoes.filter((s: SolicitacaoAdocao) => s.status === 'pendente');
-    }
+    this.adocaoService.rejeitarSolicitacao(solicitacao.id);
   }
 
   // Métodos para obter totais para cada seção

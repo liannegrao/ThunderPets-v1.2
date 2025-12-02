@@ -8,20 +8,41 @@
   <!-- ===== SUAS SOLICITAÇÕES ===== -->
   <section class="solicitacoes-section">
     <div class="solicitacoes-card">
-      <h2>📋 Suas Solicitações</h2>
+      <div class="solicitacoes-header">
+        <h3><i class="fas fa-paw"></i> Suas Solicitações</h3>
+        <button (click)="limparHistorico()" class="btn-limpar-historico" *ngIf="solicitacoes.length > 0">
+          <i class="fas fa-trash-alt"></i> Limpar Histórico
+        </button>
+      </div>
       <div class="solicitacoes-stats">
         <div class="stat-item">
-          <span class="stat-number">{{ getSolicitacoesStats().pendentes }}</span>
+          <span class="stat-number">{{ stats.pendentes }}</span>
           <span class="stat-label">Aguardando Aprovação</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">{{ getSolicitacoesStats().aprovadas }}</span>
+          <span class="stat-number">{{ stats.aprovadas }}</span>
           <span class="stat-label">Aprovadas</span>
         </div>
         <div class="stat-item">
-          <span class="stat-number">{{ getSolicitacoesStats().rejeitadas }}</span>
+          <span class="stat-number">{{ stats.rejeitadas }}</span>
           <span class="stat-label">Não Aprovadas</span>
         </div>
+      </div>
+
+      <!-- Lista de Solicitações -->
+      <div class="solicitacoes-list" *ngIf="solicitacoes.length > 0">
+        <div class="solicitacao-item" *ngFor="let solicitacao of solicitacoes">
+          <img [src]="solicitacao.pet.foto_url || '/img/THUNDERPETS (4) (1).png'" alt="Foto do pet" class="pet-avatar">
+          <div class="solicitacao-info">
+            <h4>{{ solicitacao.pet.nome }}</h4>
+            <p>Status: <span class="status" [ngClass]="solicitacao.status">{{ solicitacao.status | titlecase }}</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensagem de Nenhuma Solicitação -->
+      <div class="empty-solicitacoes" *ngIf="solicitacoes.length === 0">
+        <p>📪 Nenhuma solicitação de adoção ainda. Quando um usuário solicitar a adoção de um de seus pets, o status aparecerá aqui.</p>
       </div>
     </div>
   </section>

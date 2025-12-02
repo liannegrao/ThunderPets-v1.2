@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Pet } from './pets.service';
 import { Usuario } from './auth.service';
 
@@ -62,5 +63,17 @@ export class AdocaoService {
       solicitacoes[index].status = 'rejeitada';
       this.saveSolicitacoes(solicitacoes);
     }
+  }
+
+  getSolicitacoesPorUsuario(email: string) {
+    return this.solicitacoes$.pipe(
+      map(solicitacoes => solicitacoes.filter(s => s.solicitante.email === email))
+    );
+  }
+
+  limparHistoricoSolicitacoes(email: string) {
+    const solicitacoes = this._solicitacoes.getValue();
+    const solicitacoesMantidas = solicitacoes.filter(s => s.solicitante.email !== email || s.status === 'pendente');
+    this.saveSolicitacoes(solicitacoesMantidas);
   }
 }
