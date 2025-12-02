@@ -1,5 +1,13 @@
 /* ===== Mobile Responsivo Perfeito ===== */
 
+main > section {
+  margin-bottom: 3rem;
+}
+
+main > section:last-of-type {
+  margin-bottom: 0;
+}
+
 /* Hero Section Mobile */
 .hero {
   position: relative;
@@ -99,7 +107,8 @@
 /* Cards dos Pets */
 .pet-grid {
   display: grid;
-  gap: 2rem;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
 .pet-card {
@@ -143,6 +152,14 @@
 }
 
 /* Depoimentos */
+.help-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
 .help-options .button {
   margin-right: 1rem;
 }
@@ -158,6 +175,7 @@
   display: grid;
   gap: 2rem;
   margin-top: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
 .testimonial-card {
@@ -317,7 +335,6 @@
 
   /* Pet grids mobile */
   .pet-grid {
-    grid-template-columns: 1fr;
     gap: 1.5rem;
   }
 
@@ -458,11 +475,6 @@
 
   .vision-values-grid {
     gap: 2rem;
-  }
-
-  .pet-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    max-width: none;
   }
 
   .testimonial-grid {
