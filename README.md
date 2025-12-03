@@ -1,162 +1,222 @@
 # ThunderPets 🐾
 
-**Plataforma de adoção terapêutica de pets** - Conectando pessoas com animais para terapia emocional.
+Uma plataforma de adoção terapêutica de pets que conecta pessoas com animais para terapia emocional e companhia.
+
+## 📋 Visão Geral
+
+ThunderPets é uma aplicação web inovadora projetada para facilitar a adoção terapêutica de pets. A plataforma utiliza algoritmos inteligentes de matching baseados nas necessidades emocionais dos usuários (scores de depressão, ansiedade, solidão) para pareá-los com pets adequados para adoção. O sistema suporta múltiplas funções de usuário incluindo adotantes, doadores e mediadores, fornecendo um ecossistema abrangente para adoção de pets com foco no bem-estar emocional.
+
+## ✨ Funcionalidades
+
+- **Matching Terapêutico**: Pareamento inteligente de pets baseado em scores de saúde emocional
+- **Sistema Multi-Função**: Painéis separados para adotantes, doadores e mediadores
+- **Integração Cloudinary**: Hospedagem e gerenciamento otimizado de imagens
+- **Design Responsivo**: Interface amigável para desktop e mobile
+- **Comentários em Tempo Real**: Sistema de discussão para perfis de pets
+- **Sistema de Autenticação**: Login seguro e acesso baseado em funções
+- **Gerenciamento de Banco**: SQLite com sincronização automática
+- **97 Pets Pré-carregados**: Banco abrangente de pets com imagens
+
+## 🛠️ Stack Tecnológico
+
+### Frontend
+- **Angular 19**: Framework web moderno para construção da interface do usuário
+- **TypeScript**: Linguagem de programação fortemente tipada
+- **CSS**: Estilização personalizada com design responsivo
+
+### Backend
+- **Node.js**: Ambiente de execução JavaScript para desenvolvimento server-side
+- **Express.js**: Framework de aplicação web
+- **SQLite**: Banco de dados relacional leve
+- **Cloudinary**: Gerenciamento e otimização de imagens baseado em nuvem
+
+### Bibliotecas Adicionais
+- **bcrypt**: Hashing de senhas
+- **CORS**: Compartilhamento de recursos entre origens
+- **Helmet**: Middleware de segurança
+- **Multer**: Gerenciamento de upload de arquivos
+- **UUID**: Geração de identificadores únicos
 
 ## 📋 Pré-requisitos
 
 - **Node.js** (versão 18 ou superior)
-- **npm** ou **yarn**
-- Conta no **Cloudinary** para hospedagem de imagens
+- **npm** ou **yarn** como gerenciador de pacotes
+- **Conta Cloudinary** para hospedagem de imagens
 
-## 🚀 Instalação e Configuração
+## 🚀 Instalação
 
-### Passo 1: Clonar o repositório
-```bash
-git clone https://github.com/liannegrao/ThunderPets-v1.2.git
-cd ThunderPets-v1.2
-```
-
-### Passo 2: Instalar dependências
-```bash
-npm install
-```
-
-### Passo 3: Configurar Cloudinary
-1. Acesse [cloudinary.com](https://cloudinary.com) e crie uma conta
-2. Vá para Dashboard > Account Details > API Keys
-3. Copie a **API Environment variable** (formato: `cloudinary://API_KEY:API_SECRET@CLOUD_NAME`)
-4. Abra o arquivo `thunderpets-api/.env`
-5. Substitua a linha `CLOUDINARY_URL=` pela sua URL completa:
-   ```env
-   CLOUDINARY_URL=cloudinary://YOUR_API_KEY:YOUR_API_SECRET@YOUR_CLOUD_NAME
+1. **Clone o repositório**
+   ```bash
+   git clone https://github.com/liannegrao/ThunderPets-v1.2.git
+   cd ThunderPets-v1.2
    ```
 
-### Passo 4: Verificar configuração
+2. **Instale as dependências**
+   ```bash
+   npm install
+   ```
+
+3. **Configure o Cloudinary**
+   - Crie uma conta em [cloudinary.com](https://cloudinary.com)
+   - Navegue para Dashboard > Account Details > API Keys
+   - Copie a **API Environment variable** (formato: `cloudinary://API_KEY:API_SECRET@CLOUD_NAME`)
+   - Abra `thunderpets-api/.env`
+   - Substitua a linha `CLOUDINARY_URL=` pela sua URL completa:
+     ```env
+     CLOUDINARY_URL=cloudinary://SUA_API_KEY:SUA_API_SECRET@SEU_CLOUD_NAME
+     ```
+
+4. **Verifique a configuração**
+   ```bash
+   cd thunderpets-api
+   node -e "require('dotenv').config(); console.log('✅ Cloudinary:', process.env.CLOUDINARY_URL ? 'Configurado' : 'NÃO configurado');"
+   ```
+
+## 🏃‍♂️ Executando a Aplicação
+
+### Modo Desenvolvimento
+
+1. **Inicie o servidor da API** (em um terminal):
+   ```bash
+   cd thunderpets-api
+   npm start
+   ```
+   A API funcionará em `http://localhost:3001`
+
+2. **Inicie a aplicação Angular** (em outro terminal):
+   ```bash
+   npm start
+   ```
+   O frontend funcionará em `http://localhost:4200`
+
+3. **Opcional: Sincronize imagens dos pets** (execute uma vez após a primeira configuração):
+   ```bash
+   cd thunderpets-api
+   node update-pets-images.js
+   ```
+
+### Configuração Automatizada de Desenvolvimento
+
+Para uma configuração completa com inicialização do banco e sincronização de imagens, use:
 ```bash
-cd thunderpets-api
-node -e "require('dotenv').config(); console.log('✅ Cloudinary:', process.env.CLOUDINARY_URL ? 'Configurado' : 'NÃO configurado');"
+npm run dev
 ```
 
-## 🏃‍♂️ Como Executar
+Este comando irá:
+- Limpar e recriar o banco de dados
+- Sincronizar imagens do Cloudinary
+- Iniciar tanto a API quanto os servidores Angular
 
-## 🔧 Aplicar Correções
+## 🌐 Acessando a Aplicação
 
-Agora, para aplicar as correções, siga estes passos:
-
-1. Pare a API : Se o servidor da API estiver em execução, pare-o no terminal.
-2. Delete o banco de dados antigo : Vá até a pasta thunderpets-api e apague o arquivo thunderpets.db .
-3. Inicie a API novamente : No terminal, dentro da pasta thunderpets-api , execute npm start . Isso criará um novo banco de dados com os 97 pets.
-4. Execute o script de sincronização : Em outro terminal, também na pasta thunderpets-api , execute o comando node update-pets-images.js .
-O script agora irá atribuir uma imagem única para cada pet, priorizando a correspondência por espécie (cão/gato) e evitando as duplicatas.
-
-Depois de executar o script, verifique sua aplicação e você verá que cada pet tem uma imagem diferente e correta.
-
-
-
-#### 5. Iniciar Angular (em outro terminal)
-```bash
-npm start
-```
-## 🌐 Acessar a Aplicação
-
-Após executar `npm run dev`, acesse:
-
-- **Aplicação principal**: http://localhost:4200
+- **Aplicação Principal**: http://localhost:4200
 - **Painel do Adotante**: http://localhost:4200/painel-adotante
-- **API**: http://localhost:3001/api/pets
+- **Painel do Doador**: http://localhost:4200/painel-doador
+- **Painel do Mediador**: http://localhost:4200/painel-mediador
+- **Documentação da API**: http://localhost:3001/api/pets
 
 ## 📁 Estrutura do Projeto
 
 ```
 ThunderPets-v1.2/
-├── src/                    # Aplicação Angular
+├── src/                          # Frontend Angular
 │   ├── app/
-│   │   ├── componente/     # Componentes da aplicação
-│   │   ├── services/       # Serviços (API, autenticação)
-│   │   └── guards/         # Guards de rota
-│   └── styles.css          # Estilos globais
-├── thunderpets-api/        # API Backend
-│   ├── routes/             # Rotas da API
-│   ├── db.js              # Gerenciamento do banco
-│   ├── server.js          # Servidor Express
-│   ├── cloudinary.js      # Integração Cloudinary
-│   └── .env               # Variáveis de ambiente
-└── package.json           # Scripts e dependências
+│   │   ├── componente/           # Componentes da Aplicação
+│   │   │   ├── home/            # Página inicial
+│   │   │   ├── login/           # Autenticação
+│   │   │   ├── painel-adotante/ # Painel do adotante
+│   │   │   ├── painel-doador/   # Painel do doador
+│   │   │   └── painel-mediador/ # Painel do mediador
+│   │   ├── pages/               # Componentes de Página
+│   │   │   ├── cadastrar-pet/   # Cadastro de pets
+│   │   │   ├── comentar/        # Sistema de comentários
+│   │   │   ├── header/          # Cabeçalho de navegação
+│   │   │   └── footer/          # Rodapé da página
+│   │   ├── services/            # Serviços Angular
+│   │   │   ├── auth.service.ts  # Autenticação
+│   │   │   ├── pets.service.ts  # Gerenciamento de pets
+│   │   │   └── adocao.service.ts # Processo de adoção
+│   │   └── guards/              # Guards de Rota
+│   │       └── auth.guard.ts    # Guard de autenticação
+│   ├── styles.css               # Estilos globais
+│   └── index.html               # Template HTML principal
+├── thunderpets-api/             # API Backend
+│   ├── routes/                  # Rotas da API
+│   │   ├── pets.js             # Endpoints de pets
+│   │   ├── adoptions.js        # Endpoints de adoções
+│   │   ├── donations.js        # Endpoints de doações
+│   │   └── mediators.js        # Endpoints de mediadores
+│   ├── db.js                   # Gerenciamento do banco
+│   ├── server.js               # Servidor Express
+│   ├── cloudinary.js           # Integração Cloudinary
+│   ├── update-pets-images.js   # Sincronização de imagens
+│   ├── schema.sql             # Schema do banco
+│   ├── .env                   # Variáveis de ambiente
+│   └── package.json           # Dependências da API
+├── public/                     # Assets estáticos
+│   └── img/                   # Imagens estáticas
+├── package.json               # Dependências e scripts raiz
+└── angular.json              # Configuração Angular
 ```
 
-## 🛠️ Scripts Disponíveis
+## 🔧 Scripts Disponíveis
 
+### Scripts do Nível Raiz
 ```bash
-# Desenvolvimento completo (recomendado)
-npm run dev
-
-# Apenas API
-npm run api
-
-# Sincronizar imagens Cloudinary
-npm run sync
-
-# Limpar duplicatas do banco
-npm run clean
-
-# Angular normal
-npm start
-
-# Build de produção
-npm run build
-
-# Testes
-npm test
+npm start          # Inicia servidor de desenvolvimento Angular
+npm run build      # Build para produção
+npm run test       # Executa testes Angular
+npm run dev        # Configuração completa de desenvolvimento (API + Frontend + DB)
+npm run api        # Inicia apenas o servidor da API
+npm run sync       # Sincroniza imagens Cloudinary
+npm run clean      # Limpa duplicatas do banco
 ```
 
-## 🐕 Sobre o ThunderPets
+### Scripts da API
+```bash
+cd thunderpets-api
+npm start          # Inicia servidor da API
+npm run dev        # Inicia com nodemon (reinício automático)
+npm run init-db    # Inicializa banco de dados
+```
 
-ThunderPets é uma plataforma inovadora que conecta pessoas com necessidades terapêuticas a pets adequados para adoção. O sistema utiliza:
-
-- **Matching terapêutico inteligente** baseado em scores de depressão, ansiedade e solidão
-- **Integração com Cloudinary** para hospedagem e otimização de imagens
-- **Interface responsiva** para desktop e mobile
-- **Sistema de adoção** com acompanhamento
-
-### Funcionalidades
-
-- ✅ **97 pets cadastrados** com perfis terapêuticos
-- ✅ **Imagens otimizadas** via Cloudinary
-- ✅ **Sistema de matching** por necessidades emocionais
-- ✅ **Painéis especializados** (Adotante, Doador, Mediador)
-- ✅ **Autenticação** e perfis de usuário
-
-## 🔧 Configuração Avançada
+## 🔧 Configuração
 
 ### Banco de Dados
-O sistema usa SQLite e recria o banco automaticamente. Para manter dados persistentes, modifique `thunderpets-api/server.js` linha 67-72.
+- **Tipo**: SQLite
+- **Localização**: `thunderpets-api/thunderpets.db`
+- **Auto-inicialização**: Banco criado automaticamente na primeira execução
+- **Persistência de dados**: Modifique `thunderpets-api/server.js` linhas 67-72 para alterar comportamento de persistência
 
-### Imagens Cloudinary
-- Pasta padrão: `ThunderPets/`
-- Formatos aceitos: JPG, PNG, JPEG
-- Otimização automática ativada
+### Gerenciamento de Imagens
+- **Provedor**: Cloudinary
+- **Pasta padrão**: `ThunderPets/`
+- **Formatos suportados**: JPG, PNG, JPEG
+- **Otimização automática**: Habilitada por padrão
+- **Sincronização**: Execute `node update-pets-images.js` para sincronizar imagens com pets
 
 ### Portas
-- API: 3001
-- Angular: 4200 (ou próxima disponível)
+- **Frontend**: 4200 (ou próxima disponível)
+- **API**: 3001
+- **Banco**: Baseado em arquivo (SQLite)
 
 ## 🤝 Contribuição
 
 1. Fork o projeto
-2. Crie uma branch (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
+2. Crie sua branch de feature (`git checkout -b feature/FuncionalidadeIncrivel`)
+3. Commit suas mudanças (`git commit -m 'Adiciona funcionalidade incrível'`)
+4. Push para a branch (`git push origin feature/FuncionalidadeIncrivel`)
 5. Abra um Pull Request
 
 ## 📝 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para detalhes.
+Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 ## 📞 Suporte
 
-Para dúvidas ou sugestões:
+Para dúvidas, problemas ou sugestões:
 - Abra uma issue no GitHub
-- Email: suporte@thunderpets.com
+- Contato: suporte@thunderpets.com
 
 ---
 

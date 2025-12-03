@@ -106,7 +106,7 @@
             <label class="checkbox-label" style="margin-top: 0.75rem;">
               <input type="checkbox" formControlName="lgpd">
               <span>Concordo com o tratamento de dados conforme a LGPD
-                (<a href="#" target="_blank" rel="noopener">Política de Privacidade</a>)
+                (<a href="#" (click)="openPoliticaPrivacidade(); $event.preventDefault()">Política de Privacidade</a>)
               </span>
             </label>
 
@@ -124,8 +124,14 @@
             </p>
           </form>
 
-        </div>
-      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Política de Privacidade -->
+  <app-politica-privacidade
+    *ngIf="showPoliticaPrivacidade"
+    (closed)="onPoliticaPrivacidadeClosed()">
+  </app-politica-privacidade>
 
     </div>
   </div>

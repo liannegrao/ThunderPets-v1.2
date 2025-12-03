@@ -1,0 +1,137 @@
+<!-- Modal de Política de Privacidade LGPD -->
+<div class="modal-overlay" *ngIf="isVisible" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Política de Privacidade - LGPD</h2>
+      <button class="close-button" (click)="closeModal()" aria-label="Fechar">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="privacy-content">
+
+        <section>
+          <h3>1. Introdução</h3>
+          <p>A ThunderPets ("nós", "nosso" ou "empresa") está comprometida em proteger a privacidade e os dados pessoais dos usuários da nossa plataforma de adoção terapêutica de pets. Esta Política de Privacidade descreve como coletamos, usamos, armazenamos e protegemos suas informações pessoais, em conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018).</p>
+        </section>
+
+        <section>
+          <h3>2. Dados Pessoais Coletados</h3>
+          <p>Coletamos os seguintes tipos de dados pessoais:</p>
+          <ul>
+            <li><strong>Dados de identificação:</strong> Nome completo, CPF, data de nascimento</li>
+            <li><strong>Dados de contato:</strong> Endereço de e-mail, número de telefone</li>
+            <li><strong>Dados de localização:</strong> Cidade e estado de residência</li>
+            <li><strong>Dados comportamentais:</strong> Preferências de adoção, histórico de navegação na plataforma</li>
+            <li><strong>Dados sensíveis:</strong> Informações sobre saúde emocional (níveis de depressão, ansiedade, solidão) para matching terapêutico</li>
+            <li><strong>Dados de pets:</strong> Informações sobre animais cadastrados (espécie, raça, idade, condições especiais)</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>3. Finalidade do Tratamento dos Dados</h3>
+          <p>Utilizamos seus dados pessoais para:</p>
+          <ul>
+            <li>Fornecer serviços de matching terapêutico entre adotantes e pets adequados</li>
+            <li>Gerenciar processos de adoção e acompanhamento pós-adoção</li>
+            <li>Manter comunicação sobre adoções em andamento</li>
+            <li>Melhorar nossos serviços através de análise de dados</li>
+            <li>Cumprir obrigações legais e regulatórias</li>
+            <li>Prevenir fraudes e garantir segurança da plataforma</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>4. Compartilhamento de Dados</h3>
+          <p>Seus dados pessoais podem ser compartilhados com:</p>
+          <ul>
+            <li><strong>Doadores e adotantes:</strong> Informações necessárias para o processo de adoção</li>
+            <li><strong>Mediadores:</strong> Profissionais que auxiliam no processo terapêutico</li>
+            <li><strong>Provedores de serviços:</strong> Cloudinary (para armazenamento de imagens), apenas dados técnicos necessários</li>
+            <li><strong>Autoridades legais:</strong> Quando exigido por lei ou ordem judicial</li>
+          </ul>
+          <p>Não vendemos ou alugamos dados pessoais para terceiros.</p>
+        </section>
+
+        <section>
+          <h3>5. Seus Direitos sob a LGPD</h3>
+          <p>De acordo com a LGPD, você tem os seguintes direitos:</p>
+          <ul>
+            <li><strong>Confirmação:</strong> Saber se tratamos seus dados pessoais</li>
+            <li><strong>Acesso:</strong> Obter cópia dos dados pessoais que mantemos</li>
+            <li><strong>Correção:</strong> Solicitar correção de dados incompletos ou inexatos</li>
+            <li><strong>Anonimização:</strong> Solicitar anonimização de dados desnecessários</li>
+            <li><strong>Portabilidade:</strong> Solicitar transferência de dados para outro fornecedor</li>
+            <li><strong>Eliminação:</strong> Solicitar exclusão de dados quando não houver base legal para tratamento</li>
+            <li><strong>Informação:</strong> Saber com quem compartilhamos seus dados</li>
+            <li><strong>Revogação:</strong> Revogar consentimento para tratamento de dados sensíveis</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>6. Segurança dos Dados</h3>
+          <p>Implementamos medidas técnicas e organizacionais para proteger seus dados pessoais:</p>
+          <ul>
+            <li>Criptografia de dados em trânsito e armazenamento</li>
+            <li>Controle de acesso restrito aos dados</li>
+            <li>Auditorias regulares de segurança</li>
+            <li>Backup seguro e recuperação de desastres</li>
+            <li>Treinamento da equipe sobre proteção de dados</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>7. Retenção de Dados</h3>
+          <p>Retemos seus dados pessoais apenas pelo tempo necessário para cumprir as finalidades descritas, ou conforme exigido por lei:</p>
+          <ul>
+            <li>Dados de usuários ativos: Enquanto mantiver conta ativa</li>
+            <li>Dados de adoções: 5 anos após conclusão, para garantia legal</li>
+            <li>Dados de comunicação: 2 anos para resolução de disputas</li>
+            <li>Dados anonimizados: Indefinidamente para análise estatística</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>8. Cookies e Tecnologias Similares</h3>
+          <p>Utilizamos cookies para melhorar sua experiência na plataforma:</p>
+          <ul>
+            <li><strong>Cookies essenciais:</strong> Para funcionamento básico da plataforma</li>
+            <li><strong>Cookies de preferência:</strong> Para lembrar suas configurações</li>
+            <li><strong>Cookies analíticos:</strong> Para entender como a plataforma é usada</li>
+          </ul>
+          <p>Você pode gerenciar cookies através das configurações do seu navegador.</p>
+        </section>
+
+        <section>
+          <h3>9. Menores de Idade</h3>
+          <p>A plataforma é destinada a maiores de 18 anos. Não coletamos intencionalmente dados de menores de idade. Se descobrirmos que coletamos dados de menor, eles serão imediatamente excluídos.</p>
+        </section>
+
+        <section>
+          <h3>10. Alterações nesta Política</h3>
+          <p>Podemos atualizar esta política periodicamente. Alterações significativas serão comunicadas através de e-mail ou aviso na plataforma. O uso continuado após alterações constitui aceitação da nova política.</p>
+        </section>
+
+        <section>
+          <h3>11. Contato</h3>
+          <p>Para exercer seus direitos ou esclarecer dúvidas sobre esta política:</p>
+          <ul>
+            <li><strong>Email:</strong> privacidade&#64;thunderpets.com</li>
+            <li><strong>Telefone:</strong> (11) 99999-9999</li>
+            <li><strong>Endereço:</strong> São Paulo, SP - Brasil</li>
+          </ul>
+          <p>Encarregado de Dados (DPO): dpo&#64;thunderpets.com</p>
+        </section>
+
+        <section>
+          <h3>12. Legislação Aplicável</h3>
+          <p>Esta política é regida pela Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018) e demais legislações brasileiras aplicáveis à proteção de dados pessoais.</p>
+        </section>
+
+        <div class="consent-section">
+          <p><em>Última atualização: Dezembro de 2025</em></p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

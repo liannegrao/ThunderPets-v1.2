@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { PoliticaPrivacidadeComponent } from '../../politica-privacidade/politica-privacidade.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, PoliticaPrivacidadeComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -22,6 +23,9 @@ export class LoginComponent implements OnInit {
 
   loginForm: FormGroup;
   cadastroForm: FormGroup;
+
+  // Modal de política de privacidade
+  showPoliticaPrivacidade = false;
 
   constructor(
     private fb: FormBuilder,
@@ -205,6 +209,15 @@ export class LoginComponent implements OnInit {
       password: this.cadastroForm.get('password')?.errors,
       lgpd: this.cadastroForm.get('lgpd')?.errors
     };
+  }
+
+  // Modal de política de privacidade
+  openPoliticaPrivacidade() {
+    this.showPoliticaPrivacidade = true;
+  }
+
+  onPoliticaPrivacidadeClosed() {
+    this.showPoliticaPrivacidade = false;
   }
 
   closeModal(): void {
