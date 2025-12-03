@@ -32,7 +32,7 @@
       <!-- Lista de Solicitações -->
       <div class="solicitacoes-list" *ngIf="solicitacoes.length > 0">
         <div class="solicitacao-item" *ngFor="let solicitacao of solicitacoes">
-          <img [src]="solicitacao.pet.foto_url || '/img/THUNDERPETS (4) (1).png'" alt="Foto do pet" class="pet-avatar">
+          <img [src]="solicitacao.pet.foto_url || solicitacao.pet.foto || 'img/THUNDERPETS (4) (1).png'" alt="Foto do pet" class="pet-avatar">
           <div class="solicitacao-info">
             <h4>{{ solicitacao.pet.nome }}</h4>
             <p>Status: <span class="status" [ngClass]="solicitacao.status">{{ solicitacao.status | titlecase }}</span></p>

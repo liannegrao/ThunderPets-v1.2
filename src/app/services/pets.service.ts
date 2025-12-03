@@ -467,6 +467,10 @@ export class PetsService {
     );
   }
 
+  getPetFromLocalById(id: number): Pet | undefined {
+    return this.petsData.getValue().find(p => p.id === id);
+  }
+
   getAllPets(): Observable<Pet[]> {
     return this.http.get<Pet[]>(`${this.apiUrl}/pets`).pipe(
       tap(pets => {

@@ -97,6 +97,7 @@
   font-weight: 800;
   color: #92400e;
   margin-bottom: 0.5rem;
+  margin-right: 5px
 }
 
 .stat-label {
@@ -1142,7 +1143,7 @@
     gap: 2.5rem;
   }
 
-  .solicitacoes-stats {
+  .display {
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
 

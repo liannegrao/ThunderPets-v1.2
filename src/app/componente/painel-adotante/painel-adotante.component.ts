@@ -485,7 +485,13 @@ export class PainelAdotanteComponent implements OnInit {
     if (!this.currentUser) return;
 
     this.adocaoService.getSolicitacoesPorUsuario(this.currentUser.email).subscribe((solicitacoes: SolicitacaoAdocao[]) => {
-      this.solicitacoes = solicitacoes;
+      this.solicitacoes = solicitacoes.map(solicitacao => {
+        const petCompleto = this.petsService.getPetFromLocalById(solicitacao.pet.id);
+        if (petCompleto) {
+          solicitacao.pet = petCompleto;
+        }
+        return solicitacao;
+      });
       this.atualizarEstatisticas();
       console.log('Solicitações carregadas:', this.solicitacoes);
     });
