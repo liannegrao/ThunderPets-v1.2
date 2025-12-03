@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -13,7 +13,8 @@ import { PoliticaPrivacidadeComponent } from '../../politica-privacidade/politic
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
-  @Output() closed = new EventEmitter<void>();
+    @Output() closed = new EventEmitter<void>();
+    @ViewChild(PoliticaPrivacidadeComponent) politicaPrivacidadeComponent!: PoliticaPrivacidadeComponent;
 
   isCadastroMode = false; // false = login, true = cadastro
   isLoading = false;
