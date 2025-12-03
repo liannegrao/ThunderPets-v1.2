@@ -255,7 +255,7 @@
         🔐 Faça Login para Ajudar
       </router-link>
 
-      <a [routerLink]="isUserLoggedIn() ? '/comentar' : '/auth'" class="button button-secondary">Comentar</a>
+      <a *ngIf="getUserRole() !== 'mediador'" [routerLink]="isUserLoggedIn() ? '/comentar' : '/auth'" class="button button-secondary">Comentar</a>
       <a [routerLink]="isUserLoggedIn() ? '/painel-adotante' : '/auth'" class="button button-secondary">Adotar um animal</a>
     </div>
   </section>
