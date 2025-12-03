@@ -128,7 +128,10 @@
   </div>
 
   <!-- Modal de Política de Privacidade -->
-  <app-politica-privacidade></app-politica-privacidade>
+  <app-politica-privacidade
+    *ngIf="showPoliticaPrivacidade"
+    (closed)="onPoliticaPrivacidadeClosed()">
+  </app-politica-privacidade>
 
     </div>
   </div>
