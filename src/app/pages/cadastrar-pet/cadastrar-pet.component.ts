@@ -197,11 +197,28 @@ export class CadastrarPetComponent implements OnInit {
     return current.includes(temperamento);
   }
 
+  // Converter idade automaticamente se > 12 meses
+  private converterIdadeAutomaticamente(petData: PetData): PetData {
+    if (petData.unidade_idade === 'meses' && petData.idade > 12) {
+      const anosConvertidos = Math.floor(petData.idade / 12);
+      console.log(`🔄 Convertendo ${petData.idade} meses para ${anosConvertidos} anos`);
+      return {
+        ...petData,
+        idade: anosConvertidos,
+        unidade_idade: 'anos'
+      };
+    }
+    return petData;
+  }
+
   // Salvar cadastro ou atualização
   async onSubmit(): Promise<void> {
     if (this.petForm.valid && this.usuarioAtual) {
       try {
-        const petData: PetData = this.petForm.value;
+        let petData: PetData = this.petForm.value;
+
+        // Aplicar conversão automática de idade se necessário
+        petData = this.converterIdadeAutomaticamente(petData);
         const petsExistentes = JSON.parse(localStorage.getItem('petsCadastrados') || '[]');
 
         if (this.isEditMode && this.editingPetId) {
