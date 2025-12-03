@@ -106,6 +106,7 @@ export class PainelAdotanteComponent implements OnInit {
   // Novas propriedades para solicitações de adoção
   solicitacoes: SolicitacaoAdocao[] = [];
   stats = { pendentes: 0, aprovadas: 0, rejeitadas: 0 };
+  adoptionSuccessMessage: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -289,18 +290,16 @@ export class PainelAdotanteComponent implements OnInit {
     // Definir o painel certo conforme o tipo de usuário
     const painel = currentUser.role === 'mediador' ? 'painel-mediador' : 'painel-adotante';
 
-    // Mensagem correta
-    const confirmacao = confirm(
-      `Sua escolha do pet ${pet.nome} foi para seu painel. Depois o mediador vai ver, lá em Solicitações de Adoção Pendentes, o seu nome (${currentUser.nome}).`
-    );
+    // Não exibir mais o confirm, processar diretamente
+    this.adocaoService.novaSolicitacao(pet, currentUser);
 
-    if (confirmacao) {
-      // Usar o AdocaoService para criar a solicitação
-      this.adocaoService.novaSolicitacao(pet, currentUser);
+    // Exibir mensagem de sucesso
+    this.adoptionSuccessMessage = `Parabéns! Sua solicitação para adotar o ${pet.nome} foi enviada com sucesso.`;
 
-      // Redirecionar para o painel
-      this.router.navigate([`/${painel}`]);
-    }
+    // Opcional: limpar a mensagem após alguns segundos
+    setTimeout(() => {
+      this.adoptionSuccessMessage = null;
+    }, 5000); // A mensagem desaparecerá após 5 segundos
   }
 
   confirmAdoption() {

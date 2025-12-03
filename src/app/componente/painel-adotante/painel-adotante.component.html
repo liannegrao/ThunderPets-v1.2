@@ -107,6 +107,11 @@
       <p>Conheça nossos companheiros que aguardam um novo lar</p>
     </div>
 
+    <!-- Mensagem de Sucesso -->
+    <div *ngIf="adoptionSuccessMessage" class="success-message">
+      {{ adoptionSuccessMessage }}
+    </div>
+
     <!-- Filtros -->
     <div class="filters-section">
       <div class="filters-grid">
