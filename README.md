@@ -56,15 +56,17 @@ ThunderPets é uma aplicação web inovadora projetada para facilitar a adoção
    npm install
    ```
 
-3. **Configure o Cloudinary**
-   - Crie uma conta em [cloudinary.com](https://cloudinary.com)
-   - Navegue para Dashboard > Account Details > API Keys
-   - Copie a **API Environment variable** (formato: `cloudinary://API_KEY:API_SECRET@CLOUD_NAME`)
-   - Abra `thunderpets-api/.env`
-   - Substitua a linha `CLOUDINARY_URL=` pela sua URL completa:
-     ```env
-     CLOUDINARY_URL=cloudinary://SUA_API_KEY:SUA_API_SECRET@SEU_CLOUD_NAME
-     ```
+3. ### 3. Configure o Cloudinary
+
+O projeto utiliza o Cloudinary para armazenar e otimizar as imagens dos pets.  
+Siga os passos abaixo para configurar corretamente:
+
+1. Abra a pasta `thunderpets-api/`
+2. Crie um arquivo chamado `.env`
+3. Cole a seguinte variável exatamente **em uma única linha**:
+
+```env
+CLOUDINARY_URL=cloudinary://451688694316172:26uQM5CwTzT_UJb3RyWPKkMacHY@dblescwur
 
 4. **Verifique a configuração**
    ```bash
