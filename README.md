@@ -91,7 +91,7 @@ CLOUDINARY_URL=cloudinary://451688694316172:26uQM5CwTzT_UJb3RyWPKkMacHY@dblescwu
    ```
    O frontend funcionará em `http://localhost:4200`
 
-3. **Opcional: Sincronize imagens dos pets** (execute uma vez após a primeira configuração):
+3. ** Sincronize imagens dos pets** (execute uma vez após a primeira configuração):
    ```bash
    cd thunderpets-api
    node update-pets-images.js
