@@ -92,7 +92,7 @@ const PETS_DATABASE: Pet[] = [
     id: 3,
     nome: "Buddy",
     especie: "cachorro" as const,
-    raca: "Poodle",
+    raca: "Vira-Lata",
     idade: 60,
     porte: "pequeno" as const,
     energia: "moderado" as const,
@@ -102,7 +102,7 @@ const PETS_DATABASE: Pet[] = [
     cuidados: "Cuidados veterinários regulares, exercícios leves diarios.",
     historia: "Companion dog bem cuidado, procura novo lar amoroso.",
     casaIdeal: "Apartamentos ou casas pequenas com rotina estruturada.",
-    foto: "/img/cachorro-_1750287085273-750x375.webp",
+    foto: "/img/raca-de-cachorro_2.jpg",
     adotado: false,
     compatibilidade: {
       emocao: ["ansiedade", "terapia"],
@@ -118,8 +118,8 @@ const PETS_DATABASE: Pet[] = [
   {
     id: 4,
     nome: "Lua",
-    especie: "cachorro" as const,
-    raca: "Beagle",
+    especie: "gato" as const,
+    raca: "malhado",
     idade: 48,
     porte: "pequeno" as const,
     energia: "calmo-caseiro" as const,
