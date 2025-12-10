@@ -425,7 +425,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       'Sonecas': '/img/patas.png'
     };
 
-    return imageMap[pet.nome] || pet.foto_url || '/img/THUNDERPETS (4) (1).png';
+    return imageMap[pet.nome] || pet.foto_url || '/img/pexels-photo-2247894.jpeg';
   }
 
   // Método para obter badge de terapia baseado na compatibilidade
