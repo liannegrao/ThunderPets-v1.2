@@ -41,6 +41,7 @@ export class PainelMediadorComponent implements OnInit {
   depoimentos: Depoimento[] = [];
   solicitacoesAdocao: SolicitacaoAdocao[] = [];
   activeTab: 'dashboard' | 'pets' | 'usuarios' | 'depoimentos' | 'relatorios' | 'solicitacoes-adocao' = 'dashboard';
+  taxaDeAdocao: string = '0%';
 
   estatisticas: Estatistica[] = [
     {
@@ -177,6 +178,11 @@ export class PainelMediadorComponent implements OnInit {
     this.estatisticas[1].valor = this.usuarios.length;
     this.estatisticas[2].valor = this.pets.filter(p => p.adotado).length;
     this.estatisticas[3].valor = this.solicitacoesAdocao.length;
+
+    const totalPets = this.pets.length;
+    const petsAdotados = this.pets.filter(p => p.adotado).length;
+    const taxa = totalPets > 0 ? (petsAdotados / totalPets) * 100 : 0;
+    this.taxaDeAdocao = `${taxa.toFixed(1)}%`;
   }
 
   getPetsPorStatus(status: string): PetComDoador[] {

@@ -26,7 +26,7 @@
       </ng-template>
         <div class="nav-buttons" *ngIf="(currentUser$ | async) as user; else buttonsNoAuth">
         <span class="user-welcome">Olá, {{ user.nome }} <span *ngIf="user.role === 'mediador'">({{ getRoleLabel(user.role) }})</span></span>
-        <button class="button button-primary" [routerLink]="['/meu-painel']" (click)="closeMenu()">Painel</button>
+        <button class="button button-primary" [routerLink]="[(currentUser$ | async)?.role === 'mediador' ? '/painel-mediador' : '/meu-painel']" (click)="closeMenu()">Painel</button>
         <button *ngIf="user.role === 'doador' || user.role === 'comum'" class="button button-primary" [routerLink]="['/cadastrar-pet']" (click)="closeMenu()">Cadastrar Pet</button>
         <button class="button button-secondary" (click)="logout(); closeMenu()">Sair</button>
       </div>
