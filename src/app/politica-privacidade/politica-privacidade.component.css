@@ -33,8 +33,12 @@
   align-items: center;
   padding: 20px 24px;
   border-bottom: 1px solid #e0e0e0;
-  background: linear-gradient(135deg, #000000 0%, #f6f6f6 100%);
-  color: white;
+  background: black;
+}
+
+#LGPD{
+  color: #ffffff;
+  font-size: 18px;
 }
 
 .modal-header h2 {
