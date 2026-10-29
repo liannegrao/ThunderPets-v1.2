@@ -1,7 +1,7 @@
 <!-- ===== PAINEL DOADOR CABEÇALHO ===== -->
 <div class="painel-doadores container">
   <header class="painel-header">
-    <h1>🐾 Meu Painel Doador</h1>
+    <h1>Painel do doador</h1>
     <p>Gerencie seus pets cadastrados e acompanhe adoções</p>
   </header>
 
@@ -9,7 +9,7 @@
   <section class="stats-section" *ngIf="meusPets.length > 0">
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon">📊</div>
+        <div class="stat-icon"></div>
         <div class="stat-content">
           <div class="stat-number">{{ stats.totalPets }}</div>
           <div class="stat-label">Pets Cadastrados</div>
@@ -17,7 +17,7 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">💚</div>
+        <div class="stat-icon available"></div>
         <div class="stat-content">
           <div class="stat-number">{{ stats.petsDisponiveis }}</div>
           <div class="stat-label">Disponíveis</div>
@@ -25,7 +25,7 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">❤️</div>
+        <div class="stat-icon adopted"></div>
         <div class="stat-content">
           <div class="stat-number">{{ stats.petsAdotados }}</div>
           <div class="stat-label">Adotados</div>
@@ -33,7 +33,7 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon">💌</div>
+        <div class="stat-icon requests"></div>
         <div class="stat-content">
           <div class="stat-number">{{ stats.totalSolicitacoes }}</div>
           <div class="stat-label">Solicitações</div>
@@ -48,14 +48,14 @@
     <!-- AÇÕES RÁPIDAS -->
     <section class="actions-section">
       <button class="btn-primary" (click)="adicionarNovoPet()">
-        🐶 Adicionar Novo Pet
+        Adicionar novo pet
       </button>
     </section>
 
     <!-- ===== SUAS SOLICITAÇÕES ===== -->
     <section class="solicitacoes-section">
       <div class="solicitacoes-card">
-        <h2>📋 Suas Solicitações</h2>
+        <h2>Suas solicitações</h2>
         <div class="solicitacoes-stats">
           <div class="stat-item">
             <span class="stat-number">{{ getSolicitacoesStats().pendentes }}</span>
@@ -81,11 +81,10 @@
 
       <!-- Estado vazio -->
       <div class="empty-state" *ngIf="meusPets.length === 0">
-        <div class="empty-icon">🐕‍🦺</div>
         <h3>Ainda não há pets cadastrados</h3>
-        <p>Cadastre seu primeiro companheiro terapêutico!</p>
-        <button class="btn-primary" (click)="adicionarNovoPet()">
-          📝 Cadastrar Primeiro Pet
+        <p>Cadastre o primeiro pet para encontrar um lar.</p>
+        <button class="btn-primary" type="button" (click)="adicionarNovoPet()">
+          Cadastrar primeiro pet
         </button>
       </div>
 
@@ -110,11 +109,8 @@
           </div>
 
           <div class="pet-actions" *ngIf="pet.status === 'disponivel'">
-            <button class="btn-secondary" (click)="verInteressados(pet)" *ngIf="pet.interessantes && pet.interessantes > 0">
-              👥 Ver Interessados
-            </button>
-            <button class="btn-outline" (click)="editarPet(pet)">
-              ✏️ Editar
+            <button class="btn-outline" type="button" (click)="editarPet(pet)">
+              Editar
             </button>
             <!-- Botão removido: só mediadores podem marcar como adotado -->
           </div>
@@ -130,7 +126,6 @@
 
       <!-- Estado vazio -->
       <div class="empty-state" *ngIf="solicitacoes.length === 0">
-        <div class="empty-icon">📪</div>
         <h3>Nenhuma solicitação de adoção ainda</h3>
         <p>Quando um usuário solicitar a adoção de um de seus pets, o status aparecerá aqui.</p>
       </div>
@@ -163,7 +158,7 @@
 <div class="modal-overlay" *ngIf="showInteressados && selectedPet" (click)="fecharModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>👥 Interessados em {{ selectedPet.nome }}</h2>
+      <h2>Interessados em {{ selectedPet.nome }}</h2>
       <button class="modal-close" (click)="fecharModal()">&times;</button>
     </div>
 
@@ -189,7 +184,6 @@
       </div>
 
       <div class="empty-interessados" *ngIf="interessados.length === 0">
-        <div class="empty-icon">😴</div>
         <h3>Nenhum interessado ainda</h3>
         <p>Quando pessoas demonstrarem interesse, aparecerão aqui.</p>
       </div>

@@ -46,6 +46,12 @@ export class AuthService {
     return this.currentUser !== null;
   }
 
+  getPanelRoute(role?: Usuario['role'] | null): string {
+    if (role === 'mediador') return '/painel-mediador';
+    if (role === 'doador') return '/meu-painel';
+    return '/painel-adotante';
+  }
+
   // Login method
   async login(credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> {
     const { email, password, rememberMe } = credentials;

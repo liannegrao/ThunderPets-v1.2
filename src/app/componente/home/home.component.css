@@ -37,9 +37,9 @@ main > section:last-of-type {
 }
 
 .hero a.button {
-  font-size: 1.1rem;
-  padding: 1rem 2rem;
-  border-radius: 30px;
+  font-size: 1rem;
+  padding: 0.9rem 1.6rem;
+  border-radius: var(--radius-lg);
 }
 
 /* Missão Section */
@@ -239,8 +239,7 @@ main > section:last-of-type {
 }
 
 .button-primary:hover {
-  background: #e85d27;
-  transform: translateY(-2px);
+  background: var(--color-cta-hover);
 }
 
 .button-secondary {
@@ -249,8 +248,7 @@ main > section:last-of-type {
 }
 
 .button-secondary:hover {
-  background: #1d4ed8;
-  transform: translateY(-2px);
+  background: var(--color-primary-hover);
 }
 
 .help-options .button:not(:last-child) {
@@ -550,7 +548,7 @@ main > section:last-of-type {
   align-items: center;
   padding: 1.5rem 2rem;
   border-bottom: 1px solid #e5e7eb;
-  background: linear-gradient(135deg, #14b8a6, #0891b2);
+  background: var(--color-primary);
   color: white;
   border-radius: 16px 16px 0 0;
 }
@@ -559,6 +557,8 @@ main > section:last-of-type {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
+  color: #fff;
+  text-align: left;
 }
 
 .modal-close-btn {
@@ -683,7 +683,7 @@ main > section:last-of-type {
 
 .score-fill {
   height: 100%;
-  background: linear-gradient(90deg, #14b8a6, #0891b2);
+  background: var(--color-accent);
   border-radius: 4px;
   transition: width 0.5s ease;
 }
@@ -720,13 +720,12 @@ main > section:last-of-type {
 }
 
 .pet-modal-actions .button-primary {
-  background: linear-gradient(135deg, #14b8a6, #0891b2);
+  background: var(--color-secondary);
   color: white;
 }
 
 .pet-modal-actions .button-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(20, 184, 166, 0.3);
+  background: var(--color-cta-hover);
 }
 
 .pet-modal-actions .button-secondary {
@@ -786,22 +785,22 @@ main > section:last-of-type {
 }
 
 .badge-excelente {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: var(--color-accent);
   color: white;
 }
 
 .badge-bom {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: var(--color-primary);
   color: white;
 }
 
 .badge-medio {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: var(--color-secondary);
   color: white;
 }
 
 .badge-baixo {
-  background: linear-gradient(135deg, #6b7280, #4b5563);
+  background: var(--color-gray-500);
   color: white;
 }
 
@@ -827,10 +826,10 @@ main > section:last-of-type {
 
 .benefit-chip {
   display: inline-block;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background: var(--color-primary);
   color: white;
-  padding: 0.4rem 0.8rem;
-  border-radius: 12px;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -862,7 +861,7 @@ main > section:last-of-type {
 
 .score-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  background: var(--color-accent);
   border-radius: 3px;
   transition: width 0.3s ease;
 }
@@ -908,13 +907,37 @@ main > section:last-of-type {
 }
 
 .pet-actions .btn-primary {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background: var(--color-secondary);
   color: white;
 }
 
 .pet-actions .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  background: var(--color-cta-hover);
+}
+
+.matching-results {
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.matching-results h3 {
+  margin-bottom: 1rem;
+  color: var(--color-primary);
+}
+
+.empty-match,
+.no-testimonials {
+  text-align: center;
+  padding: 2rem 1.25rem;
+  background: var(--color-gray-50);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.empty-match p,
+.no-testimonials p {
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
 }
 
 /* ===== Responsive Modal ===== */

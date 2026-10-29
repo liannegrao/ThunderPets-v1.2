@@ -10,9 +10,9 @@
       ></div>
     </div>
     <div class="container">
-      <h1>Transforme Vidas,<br>Encontre Alegria Duradoura.</h1>
-      <p>Na ThunderPets, acreditamos que a adoção permanente de um animal é conectar pessoas a parceiros que são uma ajuda natural e poderosa no combate à depressão, solidão e restaurar a alegria de viver.</p>
-      <a href="#adote" class="button button-primary">Quero Adotar e Transformar Minha Vida!</a>
+      <h1>Transforme vidas.<br>Encontre companhia de verdade.</h1>
+      <p>A ThunderPets conecta pessoas a cães e gatos para adoção responsável, com foco em bem-estar emocional e vínculos duradouros.</p>
+      <a href="#adote" class="button button-primary">Quero adotar</a>
     </div>
   </section>
 
@@ -29,7 +29,7 @@
           <p>Ser a principal plataforma de conexão entre pessoas que desejam doar ou adotar cães e gatos, promovendo vínculos afetivos que fortaleçam a saúde emocional dos adotantes e ofereçam aos animais uma vida segura, acolhedora e cheia de afeto. Almejamos tornar-nos referência em adoção responsável, cuidado emocional e bem-estar humano-animal.</p>
         </div>
         <div class="vision-values-item">
-          <h3 style="text-align: center; margin-bottom: 1.5rem;">Valores</h3>
+          <h3>Valores</h3>
           <div class="values-list">
             <div class="value-item">
               <strong>1. Empatia</strong><br>
@@ -68,8 +68,8 @@
   <!-- Pet Matching Section -->
   <section class="match-section container">
     <div class="match-box">
-      <h2>💙 Encontre seu Animal Terapeuta Emocional</h2>
-      <p>Descreva suas necessidades emocionais e encontraremos o companheiro terapêutico ideal para sua jornada de cura!</p>
+      <h2>Encontre seu companheiro</h2>
+      <p>Descreva sua rotina e o tipo de energia que você busca. Vamos indicar pets compatíveis.</p>
 
       <form class="match-form" [formGroup]="matchingForm" (ngSubmit)="onMatchSubmit()">
         <label for="situacao">Qual sua situação emocional atual?</label>
@@ -98,7 +98,6 @@
               [formControlName]="option.value"
               [value]="option.value"
             >
-            <span class="checkmark">{{ option.emoji }}</span>
             {{ option.label }}
           </label>
         </div>
@@ -109,14 +108,14 @@
           [disabled]="matchingForm.invalid || isMatching"
           id="matchBtn"
         >
-          <span *ngIf="!isMatching">💚 Encontrar meu Terapeuta Emocional!</span>
-          <span *ngIf="isMatching">🔍 Buscando terapeuta...</span>
+          <span *ngIf="!isMatching">Encontrar pets compatíveis</span>
+          <span *ngIf="isMatching">Buscando...</span>
         </button>
       </form>
 
       <!-- Results Section -->
-      <div *ngIf="showResults" id="matching-results" style="margin-top: 2rem;">
-        <h3 style="margin-bottom: 1rem; color: #14b8a6;">💝 Terapeutas Emocionais Compatíveis!</h3>
+      <div *ngIf="showResults" id="matching-results" class="matching-results">
+        <h3>Pets compatíveis</h3>
 
         <!-- Lista de Pets Matched -->
         <div class="pets-matched-grid">
@@ -155,27 +154,23 @@
                 </div>
               </div>
 
-              <p class="pet-description" [innerHTML]="pet.personalidade | slice:0:120"></p>
+              <p class="pet-description">{{ pet.personalidade | slice:0:120 }}</p>
 
               <div class="pet-actions">
-                <button class="btn-secondary" (click)="openPetDetails(pet)">
-                  📋 Ver Detalhes
+                <button class="btn-outline" type="button" (click)="openPetDetails(pet)">
+                  Ver detalhes
                 </button>
-                <button class="btn-primary" (click)="requestAdoption(pet)">
-                  ❤️ Solicitar Adoção
+                <button class="btn-primary" type="button" (click)="requestAdoption(pet)">
+                  Solicitar adoção
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        <div *ngIf="matchedPets.length === 0" style="text-align: center; padding: 3rem; background: #fef3c7; border-radius: 12px; border: 2px solid #f59e0b; margin-top: 2rem;">
-          <p style="color: #92400e; font-weight: bold; font-size: 1.1rem; margin-bottom: 0.5rem;">
-            😔 Nenhum pet compatível encontrado
-          </p>
-          <p style="color: #78350f; margin: 0;">
-            Tente ajustar suas preferências ou entre em contato conosco para ajuda personalizada.
-          </p>
+        <div *ngIf="matchedPets.length === 0" class="empty-match">
+          <p>Nenhum pet compatível encontrado com esses filtros.</p>
+          <p>Ajuste as preferências e tente de novo.</p>
         </div>
 
         <div *ngIf="hasMoreResults" style="text-align: center; margin-top: 1.5rem;">
@@ -183,9 +178,8 @@
             id="showMoreResults"
             class="button button-primary"
             (click)="onShowMoreResults()"
-            style="background: #f97316; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;"
           >
-            Ver Mais Opções Terapêuticas
+            Ver mais opções
           </button>
         </div>
       </div>
@@ -200,12 +194,12 @@
     </div>
     <div class="pet-grid">
       <div *ngFor="let pet of showcasedPets" class="pet-card">
-        <img [ngSrc]="getLocalImage(pet)" [alt]="'Foto de ' + pet.nome" width="300" height="200" style="object-fit: cover; border-radius: 8px; margin-bottom: 1rem; height: auto;">
+        <img [ngSrc]="getLocalImage(pet)" [alt]="'Foto de ' + pet.nome" width="300" height="200">
         <div class="pet-card-content">
           <h3>{{ pet.nome }}</h3>
-          <p><span style="font-weight: 600;">Benefício Emocional:</span> {{ pet.beneficioEmocional || 'Companheiro Terapêutico' }}<br><span style="font-weight: 600;">Perfil:</span> {{ pet.porte }} • {{ pet.idade }} meses</p>
+          <p><strong>Benefício:</strong> {{ pet.beneficioEmocional || 'Companheiro terapêutico' }}<br><strong>Perfil:</strong> {{ pet.porte }} • {{ pet.idade }} meses</p>
           <p>{{ pet.personalidade }}</p>
-          <button class="button button-secondary" (click)="adoptPet(pet)">❤️ Quero Adotar {{ pet.nome }}</button>
+          <button class="button button-primary" type="button" (click)="adoptPet(pet)">Adotar {{ pet.nome }}</button>
         </div>
       </div>
     </div>
@@ -231,9 +225,9 @@
         </div>
       </div>
       <ng-template #noDepoimentos>
-        <div class="no-testimonials" style="text-align: center; padding: 2rem; background-color: #f7fafc; border-radius: 8px;">
-          <p style="margin-bottom: 1rem;">Ainda não temos depoimentos. Que tal compartilhar sua história e inspirar outras pessoas?</p>
-          <a routerLink="/comentar" class="button button-primary">Deixar meu Depoimento</a>
+        <div class="no-testimonials">
+          <p>Ainda não há depoimentos publicados. Se você já adotou, compartilhe sua história.</p>
+          <a routerLink="/comentar" class="button button-primary">Deixar depoimento</a>
         </div>
       </ng-template>
     </div>
@@ -245,18 +239,17 @@
     <p>Existem várias formas de contribuir com a saúde emocional de pessoas e animais. Escolha a modalidade que melhor se adequa às suas possibilidades.</p>
     <div class="help-options">
       <!-- Botão dinâmico baseado no tipo de usuário -->
-      <a *ngIf="getUserRole() === 'doador'" href="/cadastrar-pet" class="button button-primary">
-        🐾 Sou Doador: Cadastrar Pet
+      <a *ngIf="getUserRole() === 'doador'" routerLink="/cadastrar-pet" class="button button-primary">
+        Cadastrar pet
       </a>
-      <a *ngIf="getUserRole() === 'mediador'" href="/painel-mediador" class="button button-primary">
-        🎛️ Painel Administrativo
+      <a *ngIf="getUserRole() === 'mediador'" routerLink="/painel-mediador" class="button button-primary">
+        Painel administrativo
       </a>
-      <router-link *ngIf="!isUserLoggedIn()" [routerLink]="['/auth']" class="button button-primary">
-        🔐 Faça Login para Ajudar
-      </router-link>
-
-      <a *ngIf="getUserRole() !== 'mediador'" [routerLink]="isUserLoggedIn() ? '/comentar' : '/auth'" class="button button-secondary">Comentar</a>
-      <a [routerLink]="isUserLoggedIn() ? '/painel-adotante' : '/auth'" class="button button-secondary">Adotar um animal</a>
+      <a *ngIf="!isUserLoggedIn()" routerLink="/auth" class="button button-primary">
+        Entrar para ajudar
+      </a>
+      <a *ngIf="getUserRole() !== 'mediador'" [routerLink]="isUserLoggedIn() ? '/comentar' : '/auth'" class="button button-secondary">Deixar depoimento</a>
+      <a [routerLink]="isUserLoggedIn() ? '/painel-adotante' : '/auth'" class="btn-outline">Ver pets para adotar</a>
     </div>
   </section>
 </main>
@@ -265,7 +258,7 @@
 <div *ngIf="showPetModal && selectedPet" class="pet-modal-overlay" (click)="onBackdropClick($event)">
   <div class="pet-modal-content">
     <div class="pet-modal-header">
-      <h2>🐾 {{ selectedPet.nome }}</h2>
+      <h2>{{ selectedPet.nome }}</h2>
       <button class="modal-close-btn" (click)="closePetModal()" aria-label="Fechar">✕</button>
     </div>
 
@@ -277,14 +270,14 @@
             [alt]="'Foto de ' + selectedPet.nome"
             width="300"
             height="300"
-            style="object-fit: cover; border-radius: 12px; width: 100%; height: 100%;"
+            class="pet-large-image"
           >
         </div>
 
         <div class="pet-modal-info">
           <div class="pet-info-grid">
             <div class="info-card">
-              <h3>🐕 Dados Básicos</h3>
+              <h3>Dados básicos</h3>
               <p><strong>Raça:</strong> {{ selectedPet.raca }}</p>
               <p><strong>Idade:</strong> {{ calcularIdade(selectedPet.idade) }}</p>
               <p><strong>Porte:</strong> {{ capitalize(selectedPet.porte) }}</p>
@@ -292,7 +285,7 @@
             </div>
 
             <div class="info-card">
-              <h3>💚 Benefícios Terapêuticos</h3>
+              <h3>Benefícios terapêuticos</h3>
               <p>{{ selectedPet.beneficioEmocional || 'Companheiro terapêutico de confiança e amor incondicional' }}</p>
               <div class="compat-score">
                 <h4>Encaixe de Perfil</h4>
@@ -307,24 +300,24 @@
             </div>
 
             <div class="info-card">
-              <h3>❤️ Personalidade</h3>
+              <h3>Personalidade</h3>
               <p>{{ selectedPet.personalidade }}</p>
             </div>
 
             <div class="info-card">
-              <h3>🏥 Saúde</h3>
+              <h3>Saúde</h3>
               <p>{{ selectedPet.saude }}</p>
               <h4>Cuidados Específicos</h4>
               <p>{{ selectedPet.cuidados }}</p>
             </div>
 
             <div class="info-card full-width">
-              <h3>🏠 Lar Ideal</h3>
+              <h3>Lar ideal</h3>
               <p>{{ selectedPet.casaIdeal }}</p>
             </div>
 
             <div class="info-card full-width">
-              <h3>📖 História</h3>
+              <h3>História</h3>
               <p>{{ selectedPet.historia }}</p>
             </div>
           </div>
@@ -332,11 +325,11 @@
       </div>
 
       <div class="pet-modal-actions">
-        <button class="button-primary" (click)="adoptPet(selectedPet)">
-          ❤️ Quero Adotar {{ selectedPet.nome }}
+        <button class="button-primary" type="button" (click)="adoptPet(selectedPet)">
+          Quero adotar {{ selectedPet.nome }}
         </button>
-        <button class="button-secondary" (click)="closePetModal()">
-          ❌ Fechar
+        <button class="btn-outline" type="button" (click)="closePetModal()">
+          Fechar
         </button>
       </div>
     </div>

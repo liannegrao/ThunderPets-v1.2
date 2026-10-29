@@ -14,7 +14,7 @@
 
 .form-header h1 {
   font-size: 2.5rem;
-  color: #14b8a6;
+  color: var(--color-primary);
   margin-bottom: 0.5rem;
 }
 
@@ -57,7 +57,7 @@
 .submit-button {
   width: 100%;
   padding: 1rem;
-  background-color: #14b8a6;
+  background-color: var(--color-secondary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -73,5 +73,5 @@
 }
 
 .submit-button:not(:disabled):hover {
-  background-color: #0f766e;
+  background-color: var(--color-cta-hover);
 }

@@ -280,26 +280,12 @@ export class PainelAdotanteComponent implements OnInit {
 
     // Se não tem usuário no localStorage, mostrar mensagem de login
     if (!currentUser || !currentUser.nome) {
-      alert('Para solicitar adoção, você precisa estar logado. Redirecionando para login...');
       this.router.navigate(['/auth']);
       return;
     }
 
-    console.log('✅ Usuário validado:', currentUser.nome, 'Role:', currentUser.role);
-
-    // Definir o painel certo conforme o tipo de usuário
-    const painel = currentUser.role === 'mediador' ? 'painel-mediador' : 'painel-adotante';
-
-    // Não exibir mais o confirm, processar diretamente
-    this.adocaoService.novaSolicitacao(pet, currentUser);
-
-    // Exibir mensagem de sucesso
-    this.adoptionSuccessMessage = `Parabéns! Sua solicitação para adotar o ${pet.nome} foi enviada com sucesso.`;
-
-    // Opcional: limpar a mensagem após alguns segundos
-    setTimeout(() => {
-      this.adoptionSuccessMessage = null;
-    }, 5000); // A mensagem desaparecerá após 5 segundos
+    this.confirmationPet = pet;
+    this.showConfirmationModal = true;
   }
 
   confirmAdoption() {
@@ -323,33 +309,14 @@ export class PainelAdotanteComponent implements OnInit {
       scores_compatibilidade: pet.compatibilidadeScore
     };
 
-    console.log('📡 Enviando solicitação para mediadores:', adoptionRequest);
-
-    // Aqui você pode adicionar a chamada para a API dos mediadores
-    // Por exemplo: this.mediatorService.submitAdoptionRequest(adoptionRequest);
-
-    // Fechar modais
+    this.adocaoService.novaSolicitacao(pet, currentUser);
     this.showConfirmationModal = false;
     this.showPetModal = false;
     this.confirmationPet = null;
-
-    // Redirect baseado no tipo de usuário
-    if (currentUser.role === 'mediador') {
-      // Mediadores vão para seu painel para ver solicitações
-      alert(`✅ Solicitação enviada!\n\nComo mediador, você pode revisar esta e outras solicitações no seu painel administrativo.`);
-      this.router.navigate(['/painel-mediador']);
-    } else {
-      // Usuários comuns têm confirmação
-      alert(`✅ Solicitação Enviada com Sucesso!\n\nPet: ${pet.nome}\n\nEm breve um mediador entrará em contato para avaliar sua solicitação e confirmar a adoção terapêutica.\n\nObrigado por buscar ajuda através da adoção terapêutica! 💙`);
-
-      // Voltar para a seção de adoção
-      setTimeout(() => {
-        const adoptionSection = document.getElementById('adote');
-        if (adoptionSection) {
-          adoptionSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 500);
-    }
+    this.adoptionSuccessMessage = `Solicitação para adotar ${pet.nome} enviada. Um mediador vai avaliar o pedido.`;
+    setTimeout(() => {
+      this.adoptionSuccessMessage = null;
+    }, 5000);
   }
 
   cancelAdoption() {

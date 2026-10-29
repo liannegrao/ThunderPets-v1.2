@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -13,6 +13,7 @@ import { PoliticaPrivacidadeComponent } from '../../politica-privacidade/politic
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
+  @Input() startInCadastro = false;
   @Output() closed = new EventEmitter<void>();
 
   isCadastroMode = false; // false = login, true = cadastro
@@ -37,10 +38,9 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Check URL parameters to determine which form to show
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get('tab');
-    this.isCadastroMode = tab === 'cadastro';
+    this.isCadastroMode = this.startInCadastro || tab === 'cadastro';
   }
 
   private createLoginForm(): FormGroup {
@@ -55,7 +55,7 @@ export class LoginComponent implements OnInit {
       nome: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      tipo: ['Usuário Comum', Validators.required],
+      tipo: ['adotante', Validators.required],
       lgpd: [false, Validators.requiredTrue]
     });
   }
@@ -98,16 +98,12 @@ export class LoginComponent implements OnInit {
       const result = await this.authService.login({ email, password });
 
       if (result.success) {
-        this.showMessage('🔒 Login realizado com sucesso!', 'success');
+        this.showMessage('Login realizado com sucesso.', 'success');
         setTimeout(() => {
           this.closeModal();
           const user = this.authService.currentUser;
-          if (user?.role === 'mediador') {
-            this.router.navigate(['/painel-mediador']);
-          } else {
-            this.router.navigate(['/meu-painel']);
-          }
-        }, 1500);
+          this.router.navigate([this.authService.getPanelRoute(user?.role)]);
+        }, 800);
       } else {
         this.showMessage(result.error || 'Erro no login', 'error');
       }
@@ -140,7 +136,7 @@ export class LoginComponent implements OnInit {
         return;
       }
 
-      const role = tipo === 'Administrador' ? 'mediador' : 'doador';
+      const role = tipo === 'doador' ? 'doador' : 'adotante';
 
       const result = await this.authService.register({
         nome,
@@ -150,7 +146,7 @@ export class LoginComponent implements OnInit {
       });
 
       if (result.success) {
-        this.showMessage('✅ Conta criada com sucesso!', 'success');
+        this.showMessage('Conta criada com sucesso.', 'success');
 
         // 🔄 Fazer login automático após cadastro
         setTimeout(async () => {
@@ -167,11 +163,7 @@ export class LoginComponent implements OnInit {
 
               // Redirecionar baseado no role do usuário
               const userRole = role; // O role que acabamos de determinar
-              if (userRole === 'mediador') {
-                this.router.navigate(['/painel-mediador']);
-              } else {
-                this.router.navigate(['/meu-painel']); // Redireciona para o painel unificado
-              }
+              this.router.navigate([this.authService.getPanelRoute(userRole as 'doador' | 'adotante')]);
             } else {
               console.error('❌ Falhou login automático');
               this.closeModal();
