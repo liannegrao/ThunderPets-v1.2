@@ -11,7 +11,7 @@ import { AuthGuard } from './guards/auth.guard';
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'auth', component: LoginComponent },
-  { path: 'cadastrar-pet', component: CadastrarPetComponent, canActivate: [AuthGuard], data: { roles: ['doador', 'comum'] } },
+  { path: 'cadastrar-pet', component: CadastrarPetComponent, canActivate: [AuthGuard], data: { roles: ['doador', 'comum', 'mediador'] } },
   {
     path: 'painel-mediador',
     component: PainelMediadorComponent,

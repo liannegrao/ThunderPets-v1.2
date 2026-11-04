@@ -102,6 +102,9 @@
 
     <!-- Pets Management Tab -->
     <div *ngIf="activeTab === 'pets'" class="tab-content">
+      <div class="pets-toolbar">
+        <button class="btn-primary" type="button" (click)="cadastrarPet()">Cadastrar pet</button>
+      </div>
       <!-- Pets Summary -->
       <div class="pets-summary">
         <div class="summary-item">
@@ -140,9 +143,9 @@
               <p>{{ pet.personalidade }}</p>
             </div>
             <div class="pet-actions">
-              <button class="btn-approve" (click)="aprovarPet(pet)">Aprovar</button>
-              <button class="btn-reject" (click)="rejeitarPet(pet)">Rejeitar</button>
-              <button *ngIf="currentUser?.role === 'mediador'" class="btn-edit" (click)="openEditPet(pet)" title="Editar (Mediador)">Editar</button>
+              <button class="btn-approve" type="button" (click)="aprovarPet(pet)">Aprovar</button>
+              <button class="btn-edit" type="button" (click)="openEditPet(pet)">Editar</button>
+              <button class="btn-reject" type="button" (click)="excluirPet(pet)">Excluir</button>
             </div>
           </div>
         </div>
@@ -168,8 +171,9 @@
                 <p>{{ pet.personalidade }}</p>
               </div>
               <div class="pet-actions">
-                <button class="btn-adopt" (click)="marcarComoAdotado(pet)">Marcar como adotado</button>
-                <button *ngIf="currentUser?.role === 'mediador'" class="btn-edit" (click)="openEditPet(pet)" title="Editar (Mediador)">Editar</button>
+                <button class="btn-adopt" type="button" (click)="marcarComoAdotado(pet)">Marcar como adotado</button>
+                <button class="btn-edit" type="button" (click)="openEditPet(pet)">Editar</button>
+                <button class="btn-reject" type="button" (click)="excluirPet(pet)">Excluir</button>
               </div>
             </div>
           </div>
@@ -201,6 +205,9 @@
               </div>
               <div class="pet-description">
                 <p>{{ pet.personalidade }}</p>
+              </div>
+              <div class="pet-actions">
+                <button class="btn-reject" type="button" (click)="excluirPet(pet)">Excluir</button>
               </div>
             </div>
           </div>

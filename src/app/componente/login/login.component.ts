@@ -100,9 +100,7 @@ export class LoginComponent implements OnInit {
       if (result.success) {
         this.showMessage('Login realizado com sucesso.', 'success');
         setTimeout(() => {
-          this.closeModal();
-          const user = this.authService.currentUser;
-          this.router.navigate([this.authService.getPanelRoute(user?.role)]);
+          this.goToPanel(this.authService.currentUser?.role);
         }, 800);
       } else {
         this.showMessage(result.error || 'Erro no login', 'error');
@@ -136,7 +134,7 @@ export class LoginComponent implements OnInit {
         return;
       }
 
-      const role = tipo === 'doador' ? 'doador' : 'adotante';
+      const role = this.resolveRole(tipo);
 
       const result = await this.authService.register({
         nome,
@@ -158,12 +156,7 @@ export class LoginComponent implements OnInit {
             });
 
             if (loginResult.success) {
-              console.log('✅ Login automático realizado após cadastro');
-              this.closeModal();
-
-              // Redirecionar baseado no role do usuário
-              const userRole = role; // O role que acabamos de determinar
-              this.router.navigate([this.authService.getPanelRoute(userRole as 'doador' | 'adotante')]);
+              this.goToPanel(role);
             } else {
               console.error('❌ Falhou login automático');
               this.closeModal();
@@ -214,15 +207,15 @@ export class LoginComponent implements OnInit {
 
   closeModal(): void {
     this.closed.emit();
-    console.log('🗂️ Modal de autenticação fechado: navegando para home e seção "Disponíveis para Adoção"');
-    // Primeiro navegar para home, depois fazer scroll
-    this.router.navigate(['/']).then(() => {
-      setTimeout(() => {
-        const adoptionSection = document.getElementById('adote');
-        if (adoptionSection) {
-          adoptionSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 300);
-    });
+  }
+
+  private resolveRole(tipo: string): 'adotante' | 'doador' | 'mediador' {
+    if (tipo === 'doador' || tipo === 'mediador') return tipo;
+    return 'adotante';
+  }
+
+  private goToPanel(role?: string | null): void {
+    this.closed.emit();
+    this.router.navigate([this.authService.getPanelRoute(role as 'adotante' | 'doador' | 'mediador')]);
   }
 }

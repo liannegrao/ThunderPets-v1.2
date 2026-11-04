@@ -240,6 +240,12 @@
   transition: all 0.3s ease;
 }
 
+.pets-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.25rem;
+}
+
 .btn-edit {
   background-color: #3b82f6;
   color: white;

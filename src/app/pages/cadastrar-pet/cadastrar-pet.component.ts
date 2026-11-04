@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PetsService } from '../../services/pets.service';
+import { AuthService } from '../../services/auth.service';
 
 export interface PetData {
   nome: string;
@@ -66,7 +67,13 @@ export class CadastrarPetComponent implements OnInit {
     { value: 'outros', label: 'Outros', icon: '🐾' }
   ];
 
-  constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute, private petService: PetsService) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute,
+    private petService: PetsService,
+    private authService: AuthService
+  ) {
     this.petForm = this.createPetForm();
   }
 
@@ -251,8 +258,7 @@ export class CadastrarPetComponent implements OnInit {
         const message = this.isEditMode ? '✅ Pet atualizado com sucesso!' : '✅ Pet cadastrado com sucesso!';
         alert(message);
 
-        // Sempre redirecionar para o painel do doador
-        this.router.navigate(['/painel-doador']);
+        this.voltarAoPainel();
       } catch (error) {
         alert('❌ Erro ao salvar pet. Tente novamente.');
       }
@@ -266,11 +272,15 @@ export class CadastrarPetComponent implements OnInit {
     return (this.currentStep / this.totalSteps) * 100;
   }
 
+  private voltarAoPainel(): void {
+    this.router.navigate([this.authService.getPanelRoute(this.usuarioAtual?.role)]);
+  }
+
   // Cancelar cadastro
   cancelCadastro(): void {
     const message = this.isEditMode ? 'cancelar a edição' : 'cancelar o cadastro';
     if (confirm(`Tem certeza que deseja ${message}? Os dados não salvos serão perdidos.`)) {
-      this.router.navigate(['/painel-doador']);
+      this.voltarAoPainel();
     }
   }
 
@@ -395,12 +405,12 @@ export class CadastrarPetComponent implements OnInit {
         }
       } else {
         alert('Pet não encontrado ou você não tem permissão para editá-lo.');
-        this.router.navigate(['/painel-doador']);
+        this.voltarAoPainel();
       }
     } catch (error) {
       console.error('Erro ao carregar pet para edição:', error);
       alert('Erro ao carregar dados do pet.');
-      this.router.navigate(['/painel-doador']);
+      this.voltarAoPainel();
     }
   }
 }

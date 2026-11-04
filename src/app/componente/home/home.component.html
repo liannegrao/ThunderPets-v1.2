@@ -243,7 +243,10 @@
         Cadastrar pet
       </a>
       <a *ngIf="getUserRole() === 'mediador'" routerLink="/painel-mediador" class="button button-primary">
-        Painel administrativo
+        Painel do mediador
+      </a>
+      <a *ngIf="getUserRole() === 'mediador'" routerLink="/cadastrar-pet" class="button button-secondary">
+        Cadastrar pet
       </a>
       <a *ngIf="!isUserLoggedIn()" routerLink="/auth" class="button button-primary">
         Entrar para ajudar
