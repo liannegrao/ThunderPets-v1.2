@@ -1,137 +1,153 @@
-<!-- Modal Overlay -->
-  <div class="modal-overlay" (click)="closeModal()">
-    <!-- Modal Content -->
-    <div class="modal-content" (click)="$event.stopPropagation()">
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="authTitle">
 
-      <!-- Modal Close Button -->
-      <button class="modal-close-btn" (click)="closeModal()">&times;</button>
+    <button class="modal-close-btn" type="button" (click)="closeModal()" aria-label="Fechar">×</button>
 
-      <!-- Modal Body - Two Column Layout -->
-      <div class="modal-body">
+    <div class="modal-body">
+      <div class="modal-left">
+        <img src="/img/homem-abracando-seu-pitbull-amigavel.jpg" alt="" class="modal-image">
+      </div>
 
-        <!-- Left Column - Image -->
-        <div class="modal-left">
-          <img src="/img/homem-abracando-seu-pitbull-amigavel.jpg" alt="Pet therapy image" class="modal-image">
+      <div class="modal-right">
+        <div class="auth-tabs" role="tablist">
+          <button
+            type="button"
+            class="auth-tab"
+            role="tab"
+            [class.active]="!isCadastroMode"
+            [attr.aria-selected]="!isCadastroMode"
+            (click)="toggleMode('login')"
+          >
+            Entrar
+          </button>
+          <button
+            type="button"
+            class="auth-tab"
+            role="tab"
+            [class.active]="isCadastroMode"
+            [attr.aria-selected]="isCadastroMode"
+            (click)="toggleMode('cadastro')"
+          >
+            Cadastrar
+          </button>
         </div>
 
-        <!-- Right Column - Forms -->
-        <div class="modal-right">
+        <div *ngIf="errorMessage" class="auth-message error" role="alert">
+          {{ errorMessage }}
+        </div>
+        <div *ngIf="successMessage" class="auth-message success" role="status">
+          {{ successMessage }}
+        </div>
 
-          <!-- Tab Navigation -->
-          <div class="auth-tabs">
-            <button
-              class="auth-tab"
-              [class.active]="!isCadastroMode"
-              (click)="toggleMode('login')"
-            >
-              Entrar
-            </button>
-            <button
-              class="auth-tab"
-              [class.active]="isCadastroMode"
-              (click)="toggleMode('cadastro')"
-            >
-              Cadastrar
-            </button>
-          </div>
+        <form *ngIf="!isCadastroMode" [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-form">
+          <h2 id="authTitle">Entrar</h2>
+          <p class="auth-subtitle">Acesse sua conta ThunderPets.</p>
 
-          <!-- Error/Success Messages -->
-          <div *ngIf="errorMessage" class="auth-message error">
-            {{ errorMessage }}
-          </div>
-          <div *ngIf="successMessage" class="auth-message success">
-            {{ successMessage }}
-          </div>
-
-          <!-- Login Form -->
-          <form *ngIf="!isCadastroMode" [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-form">
-            <h2>Entrar</h2>
-            <p class="auth-subtitle">Bem-vindo de volta!</p>
-
+          <div class="field">
+            <label for="login-email">E-mail</label>
             <input
+              id="login-email"
               type="email"
               formControlName="email"
-              placeholder="E-mail"
+              autocomplete="email"
               [class.error]="loginFormErrors.email && (loginForm.get('email')?.touched || isSubmitted)"
             >
+          </div>
 
+          <div class="field">
+            <label for="login-password">Senha</label>
             <input
+              id="login-password"
               type="password"
               formControlName="password"
-              placeholder="Senha"
+              autocomplete="current-password"
               [class.error]="loginFormErrors.password && (loginForm.get('password')?.touched || isSubmitted)"
             >
+          </div>
 
-            <button type="submit" class="auth-submit-btn" [disabled]="isLoading">
-              {{ isLoading ? 'Entrando...' : 'Entrar' }}
-            </button>
+          <button type="submit" class="auth-submit-btn" [disabled]="isLoading">
+            {{ isLoading ? 'Entrando...' : 'Entrar' }}
+          </button>
 
-            <p class="auth-toggle-text">
-              Não tem conta?
-              <span (click)="toggleMode('cadastro')">Cadastrar-se</span>
-            </p>
-          </form>
+          <p class="auth-toggle-text">
+            Não tem conta?
+            <button type="button" class="text-link" (click)="toggleMode('cadastro')">Cadastrar-se</button>
+          </p>
+        </form>
 
-          <!-- Cadastro Form -->
-          <form *ngIf="isCadastroMode" [formGroup]="cadastroForm" (ngSubmit)="onCadastro()" class="auth-form">
-            <h2>Criar Conta</h2>
-            <p class="auth-subtitle">Junte-se ao ThunderPets!</p>
+        <form *ngIf="isCadastroMode" [formGroup]="cadastroForm" (ngSubmit)="onCadastro()" class="auth-form">
+          <h2 id="authTitle">Criar conta</h2>
+          <p class="auth-subtitle">Junte-se ao ThunderPets.</p>
 
+          <div class="field">
+            <label for="cadastro-nome">Nome completo</label>
             <input
+              id="cadastro-nome"
               type="text"
               formControlName="nome"
-              placeholder="Nome completo"
+              autocomplete="name"
               [class.error]="cadastroFormErrors.nome && (cadastroForm.get('nome')?.touched || isSubmitted)"
             >
+          </div>
 
+          <div class="field">
+            <label for="cadastro-email">E-mail</label>
             <input
+              id="cadastro-email"
               type="email"
               formControlName="email"
-              placeholder="E-mail"
+              autocomplete="email"
               [class.error]="cadastroFormErrors.email && (cadastroForm.get('email')?.touched || isSubmitted)"
             >
+          </div>
 
+          <div class="field">
+            <label for="cadastro-password">Senha</label>
             <input
+              id="cadastro-password"
               type="password"
               formControlName="password"
-              placeholder="Senha (mín. 6 caracteres)"
+              autocomplete="new-password"
+              placeholder="Mínimo de 6 caracteres"
               [class.error]="cadastroFormErrors.password && (cadastroForm.get('password')?.touched || isSubmitted)"
             >
+          </div>
 
-            <select formControlName="tipo">
-              <option value="Usuário Comum">Usuário</option>
-              <option value="Administrador">Mediador</option>
+          <div class="field">
+            <label for="cadastro-tipo">Como você quer participar?</label>
+            <select id="cadastro-tipo" formControlName="tipo">
+              <option value="adotante">Quero adotar</option>
+              <option value="doador">Quero doar um pet</option>
+              <option value="mediador">Sou mediador</option>
             </select>
+          </div>
 
-            <label class="checkbox-label" style="margin-top: 0.75rem;">
-              <input type="checkbox" formControlName="lgpd">
-              <span>Concordo com o tratamento de dados conforme a LGPD
-                (<a href="#" (click)="openPoliticaPrivacidade(); $event.preventDefault()">Política de Privacidade e os Termos de Serviço</a>)
-              </span>
-            </label>
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="lgpd">
+            <span>Concordo com o tratamento de dados conforme a LGPD
+              (<a href="#" (click)="openPoliticaPrivacidade(); $event.preventDefault()">Política de Privacidade e Termos</a>)
+            </span>
+          </label>
 
-            <div *ngIf="cadastroFormErrors.lgpd && (cadastroForm.get('lgpd')?.touched || isSubmitted)" class="auth-message error" style="margin-top: 0.5rem; text-align: left; font-size: 0.8rem;">
-              Você deve concordar com os termos.
-            </div>
+          <div *ngIf="cadastroFormErrors.lgpd && (cadastroForm.get('lgpd')?.touched || isSubmitted)" class="auth-message error">
+            Você deve concordar com os termos.
+          </div>
 
-            <button type="submit" class="auth-submit-btn" [disabled]="isLoading">
-              {{ isLoading ? 'Cadastrando...' : 'Cadastrar' }}
-            </button>
+          <button type="submit" class="auth-submit-btn" [disabled]="isLoading">
+            {{ isLoading ? 'Cadastrando...' : 'Cadastrar' }}
+          </button>
 
-            <p class="auth-toggle-text">
-              Já tem conta?
-              <span (click)="toggleMode('login')">Entrar</span>
-            </p>
-          </form>
-
+          <p class="auth-toggle-text">
+            Já tem conta?
+            <button type="button" class="text-link" (click)="toggleMode('login')">Entrar</button>
+          </p>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <!-- Modal de Política de Privacidade -->
-  <app-politica-privacidade
-    *ngIf="showPoliticaPrivacidade"
-    (closed)="onPoliticaPrivacidadeClosed()">
-  </app-politica-privacidade>
-
-    </div>
+    <app-politica-privacidade
+      *ngIf="showPoliticaPrivacidade"
+      (closed)="onPoliticaPrivacidadeClosed()">
+    </app-politica-privacidade>
   </div>
+</div>

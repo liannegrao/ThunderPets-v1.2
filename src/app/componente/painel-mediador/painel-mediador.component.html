@@ -3,8 +3,8 @@
   <div class="container">
     <div class="header-content">
       <div class="header-text">
-        <h1>🎛️ Painel do Mediador</h1>
-        <p class="header-subtitle">Gerencie adoções, usuários e acompanhe as conexões terapêuticas</p>
+        <h1>Painel do mediador</h1>
+        <p class="header-subtitle">Gerencie adoções, usuários e conexões terapêuticas</p>
       </div>
       <div class="header-actions">
         <button class="btn-secondary" (click)="logout()">Sair</button>
@@ -23,42 +23,42 @@
         [class.active]="activeTab === 'dashboard'"
         (click)="setActiveTab('dashboard')"
       >
-        📊 Dashboard
+        Dashboard
       </button>
       <button
         class="nav-tab"
         [class.active]="activeTab === 'pets'"
         (click)="setActiveTab('pets')"
       >
-        🐾 Gerenciar Pets
+        Pets
       </button>
       <button
         class="nav-tab"
         [class.active]="activeTab === 'usuarios'"
         (click)="setActiveTab('usuarios')"
       >
-        👥 Usuários
+        Usuários
       </button>
       <button
         class="nav-tab"
         [class.active]="activeTab === 'depoimentos'"
         (click)="setActiveTab('depoimentos')"
       >
-        💬 Depoimentos
+        Depoimentos
       </button>
       <button
         class="nav-tab"
         [class.active]="activeTab === 'solicitacoes-adocao'"
         (click)="setActiveTab('solicitacoes-adocao')"
       >
-        📝 Solicitações
+        Solicitações
       </button>
       <button
         class="nav-tab"
         [class.active]="activeTab === 'relatorios'"
         (click)="setActiveTab('relatorios')"
       >
-        📈 Relatórios
+        Relatórios
       </button>
     </div>
 
@@ -78,12 +78,12 @@
       <!-- Quick Overview Cards -->
       <div class="overview-grid">
         <div class="overview-card warning">
-          <h3>📋 Pets Pendentes</h3>
+          <h3>Pets pendentes</h3>
           <p class="overview-number">{{ getPendingPetsCount() }}</p>
           <p class="overview-desc">Aguardando aprovação</p>
         </div>
         <div class="overview-card success">
-          <h3>🐾 Pets Disponíveis</h3>
+          <h3>Pets disponíveis</h3>
           <p class="overview-number">{{ getAvailablePetsCount() }}</p>
           <p class="overview-desc">Prontos para adoção</p>
         </div>
@@ -94,37 +94,17 @@
         </div>
       </div>
 
-      <!-- Recent Activity -->
       <div class="activity-card">
-        <h3>📱 Atividade Recente</h3>
-        <div class="activity-list">
-          <div class="activity-item">
-            <span class="activity-icon">✅</span>
-            <div class="activity-content">
-              <p class="activity-title">Nova adoção terapêutica</p>
-              <p class="activity-desc">João adotou Luna há 2 horas</p>
-            </div>
-          </div>
-          <div class="activity-item">
-            <span class="activity-icon">❤️</span>
-            <div class="activity-content">
-              <p class="activity-title">Avaliação positiva</p>
-              <p class="activity-desc">Maria deu 5 estrelas para Thor</p>
-            </div>
-          </div>
-          <div class="activity-item">
-            <span class="activity-icon">🔄</span>
-            <div class="activity-content">
-              <p class="activity-title">Pet aprovado</p>
-              <p class="activity-desc">Cachorro Buddy agora está disponível</p>
-            </div>
-          </div>
-        </div>
+        <h3>Resumo</h3>
+        <p class="overview-desc">Aprove pets, revise depoimentos e acompanhe solicitações nas abas acima. Os números deste dashboard refletem o estado atual da plataforma.</p>
       </div>
     </div>
 
     <!-- Pets Management Tab -->
     <div *ngIf="activeTab === 'pets'" class="tab-content">
+      <div class="pets-toolbar">
+        <button class="btn-primary" type="button" (click)="cadastrarPet()">Cadastrar pet</button>
+      </div>
       <!-- Pets Summary -->
       <div class="pets-summary">
         <div class="summary-item">
@@ -163,9 +143,9 @@
               <p>{{ pet.personalidade }}</p>
             </div>
             <div class="pet-actions">
-              <button class="btn-approve" (click)="aprovarPet(pet)">✅ Aprovar</button>
-              <button class="btn-reject" (click)="rejeitarPet(pet)">❌ Rejeitar</button>
-              <button *ngIf="currentUser?.role === 'mediador'" class="btn-edit" (click)="openEditPet(pet)" title="Editar (Mediador)">✏️ Editar</button>
+              <button class="btn-approve" type="button" (click)="aprovarPet(pet)">Aprovar</button>
+              <button class="btn-edit" type="button" (click)="openEditPet(pet)">Editar</button>
+              <button class="btn-reject" type="button" (click)="excluirPet(pet)">Excluir</button>
             </div>
           </div>
         </div>
@@ -173,7 +153,7 @@
 
         <!-- Available Pets -->
         <div class="pets-list">
-          <h3>🐾 Pets Disponíveis</h3>
+          <h3>Pets disponíveis</h3>
           <div class="pets-grid">
             <div *ngFor="let pet of getPetsPorStatus('aprovado')" class="pet-card-mediador">
               <div class="pet-header">
@@ -191,8 +171,9 @@
                 <p>{{ pet.personalidade }}</p>
               </div>
               <div class="pet-actions">
-                <button class="btn-adopt" (click)="marcarComoAdotado(pet)">❤️ Marcar como Adotado</button>
-                <button *ngIf="currentUser?.role === 'mediador'" class="btn-edit" (click)="openEditPet(pet)" title="Editar (Mediador)">✏️ Editar</button>
+                <button class="btn-adopt" type="button" (click)="marcarComoAdotado(pet)">Marcar como adotado</button>
+                <button class="btn-edit" type="button" (click)="openEditPet(pet)">Editar</button>
+                <button class="btn-reject" type="button" (click)="excluirPet(pet)">Excluir</button>
               </div>
             </div>
           </div>
@@ -206,7 +187,7 @@
                     class="btn-cleanup"
                     (click)="limparPetsAdotados()"
                     title="Limpar/finalizar pets adotados">
-              🧹 Limpar Pets Adotados
+              Limpar pets adotados
             </button>
           </div>
           <div class="pets-grid">
@@ -224,6 +205,9 @@
               </div>
               <div class="pet-description">
                 <p>{{ pet.personalidade }}</p>
+              </div>
+              <div class="pet-actions">
+                <button class="btn-reject" type="button" (click)="excluirPet(pet)">Excluir</button>
               </div>
             </div>
           </div>
@@ -298,9 +282,9 @@
               <p class="depoimento-texto">"{{ depoimento.depoimento }}"</p>
               <p class="depoimento-autor">- {{ depoimento.nome }}</p>
               <div class="depoimento-actions">
-                <button class="btn-approve" (click)="aprovarDepoimento(depoimento)">✅ Aprovar</button>
-                <button class="btn-reject" (click)="rejeitarDepoimento(depoimento)">❌ Rejeitar</button>
-                <button class="btn-edit" (click)="abrirModalEdicao(depoimento)">✏️ Editar</button>
+                <button class="btn-approve" (click)="aprovarDepoimento(depoimento)">Aprovar</button>
+                <button class="btn-reject" (click)="rejeitarDepoimento(depoimento)">Rejeitar</button>
+                <button class="btn-edit" (click)="abrirModalEdicao(depoimento)">Editar</button>
               </div>
               <div *ngIf="depoimento.fotoUrl" class="depoimento-imagem">
                 <img [src]="depoimento.fotoUrl" alt="Foto do depoimento">
@@ -322,7 +306,7 @@
               <p class="depoimento-texto">"{{ depoimento.depoimento }}"</p>
               <p class="depoimento-autor">- {{ depoimento.nome }}</p>
               <div class="depoimento-actions">
-                <button class="btn-edit" (click)="abrirModalEdicao(depoimento)">✏️ Editar</button>
+                <button class="btn-edit" (click)="abrirModalEdicao(depoimento)">Editar</button>
                 <button class="btn-reject" (click)="rejeitarDepoimento(depoimento)">❌ Reverter</button>
               </div>
               <div *ngIf="depoimento.fotoUrl" class="depoimento-imagem">

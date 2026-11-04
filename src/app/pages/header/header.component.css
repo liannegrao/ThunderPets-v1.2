@@ -3,7 +3,7 @@
   position: sticky;
   top: 0;
   background: var(--color-white);
-  z-index: 100;
+  z-index: 300;
   box-shadow: var(--shadow-sm);
   --header-height: 56px; /* Altura para mobile */
 }
@@ -124,7 +124,8 @@
   color: var(--color-primary);
 }
 
-.button {
+.button,
+.btn-outline {
   width: 100%;
   max-width: 280px;
   text-align: center;
@@ -170,7 +171,8 @@
     font-size: var(--text-base);
   }
 
-  .button {
+  .button,
+  .btn-outline {
     width: auto;
   }
 

@@ -245,7 +245,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     // Se não tem usuário no localStorage, mostrar mensagem de login
     if (!currentUser || !currentUser.nome) {
-      alert('Para adotar, você precisa estar logado. Redirecionando para login...');
       this.router.navigate(['/auth']);
       return;
     }
@@ -253,9 +252,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     console.log('✅ Usuário validado no home:', currentUser.nome, 'Role:', currentUser.role);
 
     this.adocaoService.novaSolicitacao(pet, currentUser);
-
-    // Redireciona para o painel do usuário
-    this.router.navigate(['/painel-' + currentUser.role]);
+    this.router.navigate([currentUser.role === 'mediador' ? '/painel-mediador' : '/painel-adotante']);
 
     // Opcional: fechar o modal se estiver aberto
     if (this.showPetModal) {

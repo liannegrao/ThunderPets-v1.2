@@ -1,6 +1,6 @@
 /* ===== CABEÇALHO DA PAGINA ===== */
 .cadastrar-pet-header {
-  background: linear-gradient(135deg, var(--color-secondary) 0%, orangered 100%);
+  background: var(--color-secondary);
   padding: 2rem 0;
   color: white;
   margin-bottom: 2rem;
@@ -17,7 +17,7 @@
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  color: #fff;
 }
 
 .header-text p {
@@ -63,7 +63,7 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-secondary), orangered);
+  background: var(--color-primary);
   border-radius: 4px;
   transition: width 0.3s ease;
 }

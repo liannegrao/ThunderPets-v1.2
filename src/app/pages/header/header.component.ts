@@ -20,6 +20,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('headerRef') headerRef!: ElementRef<HTMLElement>;
   currentUser$: Observable<Usuario | null> = this.authService.currentUser$;
   showAuthModal = false;
+  authStartsAsCadastro = false;
   isMenuOpen = false; // Control for mobile menu collapse
 
   ngOnInit(): void {
@@ -46,8 +47,13 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
     window.removeEventListener('orientationchange', this.updateHeaderHeightBound);
   }
 
-  openAuthModal(): void {
+  openAuthModal(cadastro = false): void {
+    this.authStartsAsCadastro = cadastro;
     this.showAuthModal = true;
+  }
+
+  getPanelRoute(role?: Usuario['role'] | null): string {
+    return this.authService.getPanelRoute(role);
   }
 
   closeAuthModal(): void {

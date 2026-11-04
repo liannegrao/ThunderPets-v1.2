@@ -137,7 +137,32 @@
   gap: var(--space-4);
 }
 
-.auth-form input,
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-gray-700);
+  text-align: left;
+}
+
+.text-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-secondary);
+  cursor: pointer;
+  font-weight: var(--font-semibold);
+  text-decoration: underline;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.auth-form input:not([type="checkbox"]),
 .auth-form select {
   width: 100%;
   padding: var(--space-3) var(--space-4);
@@ -148,7 +173,7 @@
   background: var(--color-gray-50);
 }
 
-.auth-form input:focus,
+.auth-form input:not([type="checkbox"]):focus,
 .auth-form select:focus {
   outline: none;
   border-color: var(--color-secondary);
@@ -193,11 +218,24 @@
   margin-top: var(--space-4);
 }
 
-.auth-toggle-text span {
-  color: var(--color-secondary);
-  cursor: pointer;
-  font-weight: var(--font-semibold);
-  text-decoration: underline;
+.auth-form .checkbox-label {
+  margin-top: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: var(--text-sm);
+  text-align: left;
+}
+
+.auth-form .checkbox-label input[type="checkbox"] {
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 3px;
+  flex-shrink: 0;
+  accent-color: var(--color-secondary);
 }
 
 .checkbox-label {
@@ -230,7 +268,7 @@
     flex: 1;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, orangered 0%, #f97316 100%);
+    background: var(--color-secondary);
     position: relative;
   }
 

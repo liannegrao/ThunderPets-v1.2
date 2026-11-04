@@ -2,7 +2,7 @@
   <div class="container">
     <nav class="navbar" role="navigation" aria-label="Main navigation">
       <a href="/" class="logo">
-        <img ngSrc="/img/THUNDERPETS (4) (1).png" class="logo-img" alt="logo" width="200" height="50">
+        <img ngSrc="/img/THUNDERPETS (4) (1).png" class="logo-img" alt="ThunderPets" width="200" height="50">
         ThunderPets
       </a>
       <!-- Mobile hamburger menu button -->
@@ -11,31 +11,23 @@
       </button>
 
       <div id="navCollapse" class="nav-collapse" [class.open]="isMenuOpen">
-        <div class="nav-links" *ngIf="(currentUser$ | async); else linksNoAuth">
-        <a href="#missao" (click)="closeMenu()">Nossa Missão</a>
-        <a href="#adote" (click)="closeMenu()">Adote</a>
-        <a [routerLink]="['painel-' + (currentUser$ | async)?.role]" (click)="closeMenu()">Painel</a>
-        <a href="#ajude" (click)="closeMenu()">Ajude</a>
-      </div>
-      <ng-template #linksNoAuth>
         <div class="nav-links">
-          <a href="#missao" (click)="closeMenu()">Nossa Missão</a>
+          <a href="#missao" (click)="closeMenu()">Missão</a>
           <a href="#adote" (click)="closeMenu()">Adote</a>
           <a href="#ajude" (click)="closeMenu()">Ajude</a>
         </div>
-      </ng-template>
         <div class="nav-buttons" *ngIf="(currentUser$ | async) as user; else buttonsNoAuth">
-        <span class="user-welcome">Olá, {{ user.nome }} <span *ngIf="user.role === 'mediador'">({{ getRoleLabel(user.role) }})</span></span>
-        <button class="button button-primary" [routerLink]="[(currentUser$ | async)?.role === 'mediador' ? '/painel-mediador' : '/meu-painel']" (click)="closeMenu()">Painel</button>
-        <button *ngIf="user.role === 'doador' || user.role === 'comum'" class="button button-primary" [routerLink]="['/cadastrar-pet']" (click)="closeMenu()">Cadastrar Pet</button>
-        <button class="button button-secondary" (click)="logout(); closeMenu()">Sair</button>
-      </div>
-      <ng-template #buttonsNoAuth>
-        <div class="nav-buttons">
-          <button class="button button-secondary" (click)="openAuthModal(); closeMenu()">Entrar</button>
-          <button class="button button-primary" (click)="openAuthModal(); closeMenu()">Cadastrar</button>
+          <span class="user-welcome">Olá, {{ user.nome }}</span>
+          <a class="button button-secondary" [routerLink]="getPanelRoute(user.role)" (click)="closeMenu()">Painel</a>
+          <a *ngIf="user.role === 'doador' || user.role === 'mediador'" class="button button-primary" routerLink="/cadastrar-pet" (click)="closeMenu()">Cadastrar pet</a>
+          <button class="btn-outline" (click)="logout(); closeMenu()">Sair</button>
         </div>
-      </ng-template>
+        <ng-template #buttonsNoAuth>
+          <div class="nav-buttons">
+            <button class="btn-outline" (click)="openAuthModal(false); closeMenu()">Entrar</button>
+            <button class="button button-primary" (click)="openAuthModal(true); closeMenu()">Cadastrar</button>
+          </div>
+        </ng-template>
       </div>
     </nav>
   </div>
@@ -43,6 +35,7 @@
   <!-- Auth Modal -->
   <app-login
     *ngIf="showAuthModal"
+    [startInCadastro]="authStartsAsCadastro"
     (closed)="closeAuthModal()">
   </app-login>
 </header>

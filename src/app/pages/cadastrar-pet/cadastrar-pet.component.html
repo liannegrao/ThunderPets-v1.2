@@ -3,7 +3,7 @@
   <div class="container">
     <div class="header-content">
       <div class="header-text">
-        <h1>🐕 {{ isEditMode ? 'Editar Pet' : 'Cadastrar Pet para Adoção' }}</h1>
+        <h1>{{ isEditMode ? 'Editar pet' : 'Cadastrar pet para adoção' }}</h1>
         <p>{{ isEditMode ? 'Atualize as informações do seu pet' : 'Preencha as informações e encontre um lar amoroso para seu pet' }}</p>
       </div>
       <div class="header-actions">
@@ -49,7 +49,7 @@
       <!-- ===== ETAPA 1: DADOS BÁSICOS ===== -->
       <div class="form-step" *ngIf="currentStep === 1">
         <div class="step-header">
-          <h2>🐾 Informações Básicas do Pet</h2>
+          <h2>Informações básicas do pet</h2>
           <p>Conte-nos sobre seu amigo de quatro patas</p>
         </div>
 
@@ -171,7 +171,7 @@
       <!-- ===== ETAPA 2: SAÚDE & TEMPERAMENTO ===== -->
       <div class="form-step" *ngIf="currentStep === 2">
         <div class="step-header">
-          <h2>❤️ Saúde e Temperamento</h2>
+          <h2>Saúde e temperamento</h2>
           <p>Ajude potenciais adotantes a conhecerem melhor seu pet</p>
         </div>
 
@@ -264,7 +264,7 @@
       <!-- ===== ETAPA 3: FOTOS & CONTATO ===== -->
       <div class="form-step" *ngIf="currentStep === 3">
         <div class="step-header">
-          <h2>📸 Fotos e Informações de Contato</h2>
+          <h2>Fotos e informações de contato</h2>
           <p>Complete o cadastro para conectar com futuros tutores</p>
         </div>
 
@@ -394,7 +394,7 @@
             *ngIf="currentStep === totalSteps"
             [disabled]="!petForm.valid"
           >
-            🎉 {{ isEditMode ? 'Salvar Alterações' : 'Finalizar Cadastro' }}
+            {{ isEditMode ? 'Salvar alterações' : 'Finalizar cadastro' }}
           </button>
         </div>
       </div>

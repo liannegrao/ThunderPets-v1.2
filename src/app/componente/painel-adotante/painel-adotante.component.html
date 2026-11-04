@@ -1,17 +1,17 @@
 <!-- ===== PAINEL DO ADOTANTE ===== -->
 <div class="painel-adotante container">
   <header class="painel-header">
-    <h1>🏠 Painel do Adotante</h1>
-    <p>Encontre o pet perfeito para sua família</p>
+    <h1>Painel do adotante</h1>
+    <p>Acompanhe suas solicitações e encontre um pet compatível</p>
   </header>
 
   <!-- ===== SUAS SOLICITAÇÕES ===== -->
   <section class="solicitacoes-section">
     <div class="solicitacoes-card">
       <div class="solicitacoes-header">
-        <h3><i class="fas fa-paw"></i> Suas Solicitações</h3>
-        <button (click)="limparHistorico()" class="btn-limpar-historico" *ngIf="solicitacoes.length > 0">
-          <i class="fas fa-trash-alt"></i> Limpar Histórico
+        <h3>Suas solicitações</h3>
+        <button (click)="limparHistorico()" class="btn-outline" type="button" *ngIf="solicitacoes.length > 0">
+          Limpar histórico
         </button>
       </div>
       <div class="solicitacoes-stats">
@@ -42,7 +42,7 @@
 
       <!-- Mensagem de Nenhuma Solicitação -->
       <div class="empty-solicitacoes" *ngIf="solicitacoes.length === 0">
-        <p>📪 Nenhuma solicitação de adoção ainda. Quando um usuário solicitar a adoção de um de seus pets, o status aparecerá aqui.</p>
+        <p>Você ainda não enviou nenhuma solicitação de adoção. Quando solicitar, o status aparece aqui.</p>
       </div>
     </div>
   </section>
@@ -50,7 +50,7 @@
   <!-- ===== MEU PERFIL ===== -->
   <section class="perfil-section" *ngIf="isUserLoggedIn()">
     <div class="perfil-card">
-      <h2>👤 Meu Perfil</h2>
+      <h2>Meu perfil</h2>
 
       <!-- Visualização do Perfil -->
       <div *ngIf="!showEditProfile" class="perfil-display">
@@ -89,13 +89,13 @@
           </div>
         </div>
         <div class="form-actions">
-          <button type="submit" class="btn-primary">💾 Salvar Alterações</button>
-          <button type="button" class="btn-secondary" (click)="toggleEditProfile()">❌ Cancelar</button>
+          <button type="submit" class="btn-primary">Salvar alterações</button>
+          <button type="button" class="btn-outline" (click)="toggleEditProfile()">Cancelar</button>
         </div>
       </form>
 
       <button class="btn-edit-profile" (click)="toggleEditProfile()">
-        ✏️ {{ showEditProfile ? 'Cancelar Edição' : 'Editar Perfil' }}
+        {{ showEditProfile ? 'Cancelar edição' : 'Editar perfil' }}
       </button>
     </div>
   </section>
@@ -103,7 +103,7 @@
   <!-- ===== PETS DISPONÍVEIS ===== -->
   <section class="pets-disponiveis-section">
     <div class="section-header">
-      <h2>❤️ Pets Disponíveis para Adoção</h2>
+      <h2>Pets disponíveis para adoção</h2>
       <p>Conheça nossos companheiros que aguardam um novo lar</p>
     </div>
 
@@ -117,9 +117,9 @@
       <div class="filters-grid">
         <select class="filter-select" [(ngModel)]="filtroEspecie" (change)="aplicarFiltros()">
           <option value="">Todas as Espécies</option>
-          <option value="cachorro">🐕 Cachorros</option>
-          <option value="gato">🐱 Gatos</option>
-          <option value="outros">🐾 Outros</option>
+          <option value="cachorro">Cachorros</option>
+          <option value="gato">Gatos</option>
+          <option value="outros">Outros</option>
         </select>
 
         <select class="filter-select" [(ngModel)]="filtroPorte" (change)="aplicarFiltros()">
@@ -146,11 +146,11 @@
                [alt]="'Foto de ' + pet.nome"
                class="pet-image">
           <div class="pet-showcase-overlay">
-            <button class="btn-view-details" (click)="openPetDetails(pet)">
-              📋 Ver Detalhes
+            <button class="btn-view-details" type="button" (click)="openPetDetails(pet)">
+              Ver detalhes
             </button>
-            <button class="btn-adopt-now" (click)="requestAdoption(pet)">
-              ❤️ Quero Adotar!
+            <button class="btn-adopt-now" type="button" (click)="requestAdoption(pet)">
+              Quero adotar
             </button>
           </div>
         </div>
@@ -159,15 +159,15 @@
           <div class="pet-showcase-header">
             <h3>{{ pet.nome }}</h3>
             <span class="pet-showcase-species">{{ pet.especie | titlecase }} • {{ pet.raca }}</span>
-            <button *ngIf="isUserMediator()" class="btn-delete-pet" (click)="excluirPet($event, pet)" title="Excluir pet (Apenas Mediadores)">
-              🗑️
+            <button *ngIf="isUserMediator()" class="btn-delete-pet" type="button" (click)="excluirPet($event, pet)" title="Excluir pet">
+              Excluir
             </button>
           </div>
 
           <div class="pet-showcase-info">
-            <span class="pet-info-item">📏 {{ pet.porte | titlecase }}</span>
-            <span class="pet-info-item">⚡ {{ pet.energia || 'Moderado' }}</span>
-            <span class="pet-info-item">🎂 {{ calcularIdade(pet.idade) }}</span>
+            <span class="pet-info-item">{{ pet.porte | titlecase }}</span>
+            <span class="pet-info-item">{{ pet.energia || 'Moderado' }}</span>
+            <span class="pet-info-item">{{ calcularIdade(pet.idade) }}</span>
           </div>
 
           <p class="pet-showcase-description">{{ pet.personalidade | slice:0:100 }}...</p>
@@ -180,19 +180,17 @@
     </div>
 
     <div class="loading-section" *ngIf="isLoadingPets">
-      <div class="loading-spinner">🔄</div>
+      <div class="loading-spinner" aria-hidden="true"></div>
       <p>Carregando pets disponíveis...</p>
     </div>
 
     <div class="empty-section" *ngIf="!isLoadingPets && petsFiltrados.length === 0 && petsDisponiveis.length > 0">
-      <div class="empty-icon">😔</div>
       <h3>Nenhum pet encontrado</h3>
       <p>Tente ajustar os filtros ou remover algumas restrições.</p>
-      <button class="btn-secondary" (click)="limparFiltros()">🔄 Limpar Filtros</button>
+      <button class="btn-outline" type="button" (click)="limparFiltros()">Limpar filtros</button>
     </div>
 
     <div class="empty-section" *ngIf="!isLoadingPets && petsDisponiveis.length === 0">
-      <div class="empty-icon">🐾</div>
       <h3>Em breve teremos pets disponíveis</h3>
       <p>Estamos aguardando novos cadastros de doadores. Volte em breve!</p>
     </div>
@@ -204,10 +202,10 @@
 
 <!-- ===== MODAL CONFIRMAÇÃO DE ADOÇÃO ===== -->
 <div class="confirmation-modal-overlay" *ngIf="showConfirmationModal && confirmationPet" (click)="cancelAdoption()">
-  <div class="confirmation-modal" (click)="$event.stopPropagation()">
+  <div class="confirmation-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
     <div class="modal-header-pet">
-      <h2>🤔 Confirmar Solicitação de Adoção</h2>
-      <button class="modal-close" (click)="cancelAdoption()">&times;</button>
+      <h2>Confirmar solicitação de adoção</h2>
+      <button class="modal-close" type="button" (click)="cancelAdoption()" aria-label="Fechar">&times;</button>
     </div>
 
     <div class="modal-body-pet">
@@ -216,7 +214,19 @@
              [alt]="'Foto de ' + confirmationPet.nome"
              class="pet-image-large">
       </div>
-      <!-- Resto do modal continua igual -->
+      <div class="confirmation-content">
+        <div class="confirmation-pet-info">
+          <h3>{{ confirmationPet.nome }}</h3>
+          <p class="confirmation-pet-description">
+            {{ confirmationPet.especie | titlecase }} • {{ confirmationPet.raca }} • {{ confirmationPet.porte | titlecase }}
+          </p>
+          <p>{{ confirmationPet.beneficioEmocional || 'Companheiro terapêutico' }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="confirmation-modal-actions">
+      <button class="btn-outline" type="button" (click)="cancelAdoption()">Cancelar</button>
+      <button class="btn-primary" type="button" (click)="confirmAdoption()">Enviar solicitação</button>
     </div>
   </div>
 </div>
@@ -240,7 +250,7 @@
       <div class="pet-details-content">
         <!-- Dados Básicos -->
         <div class="detail-section">
-          <h3>🐾 Dados Básicos</h3>
+          <h3>Dados básicos</h3>
           <div class="detail-grid">
             <div class="detail-item">
               <span class="detail-label">Nome:</span>
@@ -271,7 +281,7 @@
 
         <!-- Personalidade e Benefício Emocional -->
         <div class="detail-section">
-          <h3>💝 Personalidade e Benefício Emocional</h3>
+          <h3>Personalidade e benefício emocional</h3>
           <div class="detail-item">
             <span class="detail-label">Personalidade:</span>
             <span class="detail-value">{{ selectedPet.personalidade }}</span>
@@ -284,7 +294,7 @@
 
         <!-- Saúde e Cuidados -->
         <div class="detail-section">
-          <h3>🏥 Saúde e Cuidados</h3>
+          <h3>Saúde e cuidados</h3>
           <div class="detail-item">
             <span class="detail-label">Saúde:</span>
             <span class="detail-value">{{ selectedPet.saude }}</span>
@@ -297,7 +307,7 @@
 
         <!-- História e Casa Ideal -->
         <div class="detail-section">
-          <h3>📖 História e Ambiente Ideal</h3>
+          <h3>História e ambiente ideal</h3>
           <div class="detail-item">
             <span class="detail-label">História:</span>
             <span class="detail-value">{{ selectedPet.historia }}</span>
@@ -310,7 +320,7 @@
 
         <!-- Compatibilidade Terapêutica -->
         <div class="detail-section">
-          <h3>🎯 Compatibilidade Terapêutica</h3>
+          <h3>Compatibilidade terapêutica</h3>
           <div class="compatibility-scores">
             <div class="score-item">
               <span class="score-label">Depressão:</span>

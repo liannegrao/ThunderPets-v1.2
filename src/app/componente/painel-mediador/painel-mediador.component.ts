@@ -236,9 +236,29 @@ export class PainelMediadorComponent implements OnInit {
   }
 
   rejeitarPet(pet: PetComDoador) {
-    // Simular remoção do sistema
+    this.excluirPet(pet);
+  }
+
+  cadastrarPet(): void {
+    this.router.navigate(['/cadastrar-pet']);
+  }
+
+  excluirPet(pet: PetComDoador): void {
+    if (!confirm(`Excluir ${pet.nome}? Essa ação remove o pet da lista do mediador.`)) {
+      return;
+    }
+
     this.pets = this.pets.filter(p => p.id !== pet.id);
-    console.log('Pet rejeitado:', pet);
+
+    try {
+      const petsCadastrados = JSON.parse(localStorage.getItem('petsCadastrados') || '[]');
+      const atualizados = petsCadastrados.filter((p: { id: number }) => p.id !== pet.id);
+      localStorage.setItem('petsCadastrados', JSON.stringify(atualizados));
+    } catch (error) {
+      console.error('Erro ao excluir pet cadastrado:', error);
+    }
+
+    this.atualizarEstatisticas();
   }
 
   marcarComoAdotado(pet: PetComDoador) {
