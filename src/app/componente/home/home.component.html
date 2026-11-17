@@ -14,6 +14,20 @@
       <p>A ThunderPets conecta pessoas a cães e gatos para adoção responsável, com foco em bem-estar emocional e vínculos duradouros.</p>
       <a href="#adote" class="button button-primary">Quero adotar</a>
     </div>
+    <button
+      type="button"
+      class="carousel-toggle"
+      (click)="toggleCarousel()"
+      [attr.aria-pressed]="carouselPaused ? 'true' : 'false'"
+      [attr.aria-label]="carouselPaused ? 'Reproduzir carrossel' : 'Pausar carrossel'"
+    >
+      <svg *ngIf="carouselPaused" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 5.5v13l11-6.5-11-6.5z" fill="currentColor"/>
+      </svg>
+      <svg *ngIf="!carouselPaused" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 5h3.5v14H7V5zm6.5 0H17v14h-3.5V5z" fill="currentColor"/>
+      </svg>
+    </button>
   </section>
 
   <!-- Mission Section -->

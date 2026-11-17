@@ -125,15 +125,17 @@
             <div class="form-group">
               <label>Porte *</label>
               <div class="option-grid">
-                <div
+                <button
+                  type="button"
                   *ngFor="let porte of portesDisponiveis"
                   class="option-card"
                   [class.selected]="petForm.get('porte')?.value === porte.value"
+                  [attr.aria-pressed]="petForm.get('porte')?.value === porte.value ? 'true' : 'false'"
                   (click)="petForm.get('porte')?.setValue(porte.value)"
                 >
-                  <div class="option-icon">{{ porte.icon }}</div>
-                  <div class="option-text">{{ porte.label }}</div>
-                </div>
+                  <span class="option-icon" aria-hidden="true">{{ porte.icon }}</span>
+                  <span class="option-text">{{ porte.label }}</span>
+                </button>
               </div>
               <div class="field-error" *ngIf="petForm.get('porte')?.invalid && petForm.get('porte')?.touched">
                 Porte é obrigatório
@@ -143,22 +145,26 @@
             <div class="form-group">
               <label>Gênero *</label>
               <div class="option-grid">
-                <div
+                <button
+                  type="button"
                   class="option-card"
                   [class.selected]="petForm.get('genero')?.value === 'macho'"
+                  [attr.aria-pressed]="petForm.get('genero')?.value === 'macho' ? 'true' : 'false'"
                   (click)="petForm.get('genero')?.setValue('macho')"
                 >
-                  <div class="option-icon">♂️</div>
-                  <div class="option-text">Macho</div>
-                </div>
-                <div
+                  <span class="option-icon" aria-hidden="true">♂️</span>
+                  <span class="option-text">Macho</span>
+                </button>
+                <button
+                  type="button"
                   class="option-card"
                   [class.selected]="petForm.get('genero')?.value === 'femea'"
+                  [attr.aria-pressed]="petForm.get('genero')?.value === 'femea' ? 'true' : 'false'"
                   (click)="petForm.get('genero')?.setValue('femea')"
                 >
-                  <div class="option-icon">♀️</div>
-                  <div class="option-text">Fêmea</div>
-                </div>
+                  <span class="option-icon" aria-hidden="true">♀️</span>
+                  <span class="option-text">Fêmea</span>
+                </button>
               </div>
               <div class="field-error" *ngIf="petForm.get('genero')?.invalid && petForm.get('genero')?.touched">
                 Gênero é obrigatório
@@ -213,30 +219,36 @@
             <div class="form-group">
               <label>Nível de Energia *</label>
               <div class="option-grid">
-                <div
+                <button
+                  type="button"
                   class="option-card"
                   [class.selected]="petForm.get('energia')?.value === 'baixo'"
+                  [attr.aria-pressed]="petForm.get('energia')?.value === 'baixo' ? 'true' : 'false'"
                   (click)="petForm.get('energia')?.setValue('baixo')"
                 >
-                  <div class="option-icon">😴</div>
-                  <div class="option-text">Baixa</div>
-                </div>
-                <div
+                  <span class="option-icon" aria-hidden="true">😴</span>
+                  <span class="option-text">Baixa</span>
+                </button>
+                <button
+                  type="button"
                   class="option-card"
                   [class.selected]="petForm.get('energia')?.value === 'medio'"
+                  [attr.aria-pressed]="petForm.get('energia')?.value === 'medio' ? 'true' : 'false'"
                   (click)="petForm.get('energia')?.setValue('medio')"
                 >
-                  <div class="option-icon">😐</div>
-                  <div class="option-text">Média</div>
-                </div>
-                <div
+                  <span class="option-icon" aria-hidden="true">😐</span>
+                  <span class="option-text">Média</span>
+                </button>
+                <button
+                  type="button"
                   class="option-card"
                   [class.selected]="petForm.get('energia')?.value === 'alto'"
+                  [attr.aria-pressed]="petForm.get('energia')?.value === 'alto' ? 'true' : 'false'"
                   (click)="petForm.get('energia')?.setValue('alto')"
                 >
-                  <div class="option-icon">⚡</div>
-                  <div class="option-text">Alta</div>
-                </div>
+                  <span class="option-icon" aria-hidden="true">⚡</span>
+                  <span class="option-text">Alta</span>
+                </button>
               </div>
               <div class="field-error" *ngIf="petForm.get('energia')?.invalid && petForm.get('energia')?.touched">
                 Nível de energia é obrigatório
@@ -336,18 +348,18 @@
               <h3>📷 Foto do Pet</h3>
               <p>(obrigatório - será enviada para o Cloudinary)</p>
             </div>
-            <div class="photo-upload-placeholder" (click)="triggerFileInput()">
-              <div class="upload-icon">📸</div>
-              <p>Clique para selecionar uma foto do pet</p>
+            <label class="photo-upload-placeholder" for="pet-foto">
+              <input
+                id="pet-foto"
+                type="file"
+                class="visually-hidden-file"
+                accept="image/jpeg,image/png"
+                (change)="onFileSelected($event)"
+              />
+              <span class="upload-icon" aria-hidden="true">📸</span>
+              <span class="upload-label">Selecionar uma foto do pet</span>
               <small>JPG ou PNG, boa iluminação</small>
-            </div>
-            <input
-              type="file"
-              #fileInput
-              accept="image/jpeg,image/png"
-              (change)="onFileSelected($event)"
-              style="display: none;"
-            />
+            </label>
 
             <div class="selected-images" *ngIf="selectedImages">
               <h4>📸 Foto Selecionada:</h4>

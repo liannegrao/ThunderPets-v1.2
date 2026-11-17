@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -38,8 +38,6 @@ export interface PetData {
   styleUrl: './cadastrar-pet.component.css'
 })
 export class CadastrarPetComponent implements OnInit {
-
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   currentStep: number = 1;
   totalSteps: number = 3;
@@ -315,10 +313,6 @@ export class CadastrarPetComponent implements OnInit {
   getEspecieIcon(): string {
     const especie = this.petForm.get('especie')?.value;
     return this.especiesDisponiveis.find(e => e.value === especie)?.icon || '🐾';
-  }
-
-  triggerFileInput(): void {
-    this.fileInput.nativeElement.click();
   }
 
   async onFileSelected(event: any): Promise<void> {

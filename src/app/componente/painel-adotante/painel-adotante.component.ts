@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -266,6 +266,17 @@ export class PainelAdotanteComponent implements OnInit {
     document.body.style.overflow = 'auto';
   }
 
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.showConfirmationModal) {
+      this.cancelAdoption();
+      return;
+    }
+    if (this.showPetModal) {
+      this.closePetModal();
+    }
+  }
+
   // Modal de confirmação de adoção
   showConfirmationModal = false;
   confirmationPet: Pet | null = null;
@@ -280,7 +291,7 @@ export class PainelAdotanteComponent implements OnInit {
 
     // Se não tem usuário no localStorage, mostrar mensagem de login
     if (!currentUser || !currentUser.nome) {
-      this.router.navigate(['/auth']);
+      this.router.navigate(['/auth'], { queryParams: { returnUrl: this.router.url || '/painel-adotante' } });
       return;
     }
 

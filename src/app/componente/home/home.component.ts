@@ -1,8 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { PetsService, Pet } from '../../services/pets.service';
 import { DepoimentoService } from '../../services/depoimento.service';
 import { AdocaoService } from '../../services/adocao.service';
@@ -34,7 +33,7 @@ interface UnifiedDepoimento {
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isAdmin = false; // Depends on user auth
 
@@ -45,7 +44,27 @@ export class HomeComponent implements OnInit, OnDestroy {
     '/img/cachorro-_1750287085273-750x375.webp'
   ];
   currentSlideIndex = 0;
-  private carouselInterval: any;
+  carouselPaused = false;
+  private carouselInterval: ReturnType<typeof setInterval> | null = null;
+  private homeScrollActive = false;
+  private readonly onHomeScroll = () => {
+    const hero = document.querySelector('.hero') as HTMLElement | null;
+    const span = Math.max(hero?.offsetHeight ?? 480, 320);
+    const progress = Math.min(1, Math.max(0, (window.scrollY - span * 0.2) / (span * 0.6)));
+    document.documentElement.style.setProperty('--scroll-dark', progress.toFixed(3));
+    const active = progress > 0.01;
+    if (active !== this.homeScrollActive) {
+      this.homeScrollActive = active;
+      document.body.classList.toggle('home-scroll', active);
+    }
+  };
+  private motionMedia?: MediaQueryList;
+  private readonly onMotionPreferenceChange = (event: MediaQueryListEvent) => {
+    if (event.matches) {
+      this.carouselPaused = true;
+      this.stopCarousel();
+    }
+  };
 
   matchingForm!: FormGroup;
 
@@ -59,8 +78,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   isMatching = false;
   showResults = false;
   matchedPets: Pet[] = [];
+  private allMatches: Pet[] = [];
   hasMoreResults = false;
-  currentOffset = 0; // Controle de paginação para "Ver Mais"
 
   // Modal for pet details
   showPetModal = false;
@@ -96,7 +115,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private petsService: PetsService,
     private router: Router,
-    private http: HttpClient,
     private depoimentoService: DepoimentoService,
     private adocaoService: AdocaoService
   ) {}
@@ -124,7 +142,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Start carousel
+    this.motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (this.motionMedia.matches) {
+      this.carouselPaused = true;
+    }
+    this.motionMedia.addEventListener('change', this.onMotionPreferenceChange);
     this.startCarousel();
 
     this.depoimentoService.depoimentos$.subscribe(depoimentos => {
@@ -143,16 +165,43 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngAfterViewInit() {
+    this.onHomeScroll();
+    window.addEventListener('scroll', this.onHomeScroll, { passive: true });
+  }
+
   ngOnDestroy() {
-    if (this.carouselInterval) {
-      clearInterval(this.carouselInterval);
-    }
+    this.stopCarousel();
+    this.motionMedia?.removeEventListener('change', this.onMotionPreferenceChange);
+    window.removeEventListener('scroll', this.onHomeScroll);
+    document.body.classList.remove('home-scroll');
+    document.documentElement.style.removeProperty('--scroll-dark');
   }
 
   startCarousel() {
+    this.stopCarousel();
+    if (this.carouselPaused) {
+      return;
+    }
     this.carouselInterval = setInterval(() => {
       this.nextSlide();
-    }, 5000); // Change slide every 5 seconds
+    }, 5000);
+  }
+
+  stopCarousel() {
+    if (this.carouselInterval) {
+      clearInterval(this.carouselInterval);
+      this.carouselInterval = null;
+    }
+  }
+
+  toggleCarousel() {
+    this.carouselPaused = !this.carouselPaused;
+    if (this.carouselPaused) {
+      this.stopCarousel();
+      return;
+    }
+    this.startCarousel();
   }
 
   nextSlide() {
@@ -177,7 +226,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.isMatching = true;
     this.showResults = false;
-    this.currentOffset = 0; // Reset offset para nova busca
+    this.allMatches = [];
 
     const formValue = this.matchingForm.value;
     const disponibilidadeSelecionada = this.disponibilidadeOptions
@@ -196,7 +245,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       next: (matches: Pet[]) => {
         this.isMatching = false;
         this.showResults = true;
-        this.matchedPets = matches.slice(0, 3); // Mostrar 3 primeiros
+        this.allMatches = matches;
+        this.matchedPets = matches.slice(0, 3);
         this.hasMoreResults = matches.length > 3;
 
         console.log(`💚 API: ${matches.length} pets compatíveis encontrados`);
@@ -205,8 +255,10 @@ export class HomeComponent implements OnInit, OnDestroy {
         console.error('❌ Erro no matching via API:', error);
         this.isMatching = false;
         this.petsService.pets$.subscribe(allPets => {
-          this.matchedPets = allPets.filter((pet: Pet) => !pet.adotado).slice(0, 3);
-          this.hasMoreResults = allPets.length > 3;
+          const disponiveis = allPets.filter((pet: Pet) => !pet.adotado);
+          this.allMatches = disponiveis;
+          this.matchedPets = disponiveis.slice(0, 3);
+          this.hasMoreResults = disponiveis.length > 3;
           this.showResults = true;
           console.log('⚠️ Fallback: usando dados locais');
         }).unsubscribe();
@@ -245,7 +297,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     // Se não tem usuário no localStorage, mostrar mensagem de login
     if (!currentUser || !currentUser.nome) {
-      this.router.navigate(['/auth']);
+      this.router.navigate(['/auth'], { queryParams: { returnUrl: this.router.url || '/' } });
       return;
     }
 
@@ -261,44 +313,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   onShowMoreResults() {
-    const limit = 5; // Carregar 5 pets por vez
+    const proximos = this.allMatches
+      .filter(pet => !this.matchedPets.some(shown => shown.id === pet.id))
+      .slice(0, 5);
+    this.matchedPets = [...this.matchedPets, ...proximos];
+    this.hasMoreResults = this.matchedPets.length < this.allMatches.length;
+  }
 
-    // Fazer chamada HTTP direta ao endpoint /api/pets com paginação
-    this.http.get<{ pets: Pet[], pagination: any }>(`http://localhost:3001/api/pets?offset=${this.currentOffset}&limit=${limit}`)
-      .subscribe({
-        next: (response) => {
-          // Filtrar pets que ainda não foram mostrados (evitar duplicatas)
-          const newPets = response.pets.filter((pet: Pet) =>
-            !this.matchedPets.some(shown => shown.id === pet.id)
-          );
-
-          // Adicionar os novos pets à lista
-          this.matchedPets = [...this.matchedPets, ...newPets];
-
-          // Atualizar offset para próxima chamada
-          this.currentOffset += limit;
-
-          // Atualizar se ainda há mais pets para mostrar
-          this.hasMoreResults = response.pagination.hasMore;
-
-          console.log(`📈 Carregados ${newPets.length} novos pets via API. Total: ${this.matchedPets.length}`);
-          console.log(`📄 Offset atual: ${this.currentOffset}, Has more: ${this.hasMoreResults}`);
-        },
-        error: (error: any) => {
-          console.error('❌ Erro ao carregar mais pets:', error);
-          // Fallback: tentar usar dados locais do serviço
-          this.petsService.pets$.subscribe(allPets => {
-            const newPets = allPets.filter((pet: Pet) =>
-              !this.matchedPets.some(shown => shown.id === pet.id)
-            ).slice(0, 3);
-
-            if (newPets.length > 0) {
-              this.matchedPets = [...this.matchedPets, ...newPets];
-              console.log(`⚠️ Fallback: adicionados ${newPets.length} pets locais`);
-            }
-          }).unsubscribe();
-        }
-      });
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.showPetModal) {
+      this.closePetModal();
+    }
   }
 
   getTopScores(pet: Pet): { label: string, value: number }[] {

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DoarComponent } from './doar.component';
+import { ComentarComponent } from './comentar.component';
 
-describe('DoarComponent', () => {
-  let component: DoarComponent;
-  let fixture: ComponentFixture<DoarComponent>;
+describe('ComentarComponent', () => {
+  let component: ComentarComponent;
+  let fixture: ComponentFixture<ComentarComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DoarComponent]
+      imports: [ComentarComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(DoarComponent);
+    fixture = TestBed.createComponent(ComentarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

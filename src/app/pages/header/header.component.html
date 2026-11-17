@@ -6,15 +6,15 @@
         ThunderPets
       </a>
       <!-- Mobile hamburger menu button -->
-      <button class="nav-toggle" aria-controls="navCollapse" (click)="toggleMenu()" [attr.aria-expanded]="isMenuOpen" [class.open]="isMenuOpen">
+      <button type="button" class="nav-toggle" aria-controls="navCollapse" (click)="toggleMenu()" [attr.aria-expanded]="isMenuOpen ? 'true' : 'false'" [attr.aria-label]="isMenuOpen ? 'Fechar menu' : 'Abrir menu'" [class.open]="isMenuOpen">
         <span class="hamburger" aria-hidden="true"></span>
       </button>
 
       <div id="navCollapse" class="nav-collapse" [class.open]="isMenuOpen">
         <div class="nav-links">
-          <a href="#missao" (click)="closeMenu()">Missão</a>
-          <a href="#adote" (click)="closeMenu()">Adote</a>
-          <a href="#ajude" (click)="closeMenu()">Ajude</a>
+          <a routerLink="/" fragment="missao" (click)="closeMenu()">Missão</a>
+          <a routerLink="/" fragment="adote" (click)="closeMenu()">Adote</a>
+          <a routerLink="/" fragment="ajude" (click)="closeMenu()">Ajude</a>
         </div>
         <div class="nav-buttons" *ngIf="(currentUser$ | async) as user; else buttonsNoAuth">
           <span class="user-welcome">Olá, {{ user.nome }}</span>

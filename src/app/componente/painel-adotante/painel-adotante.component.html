@@ -145,14 +145,6 @@
           <img [src]="pet.foto_url || pet.foto || '/img/THUNDERPETS (4) (1).png'"
                [alt]="'Foto de ' + pet.nome"
                class="pet-image">
-          <div class="pet-showcase-overlay">
-            <button class="btn-view-details" type="button" (click)="openPetDetails(pet)">
-              Ver detalhes
-            </button>
-            <button class="btn-adopt-now" type="button" (click)="requestAdoption(pet)">
-              Quero adotar
-            </button>
-          </div>
         </div>
 
         <div class="pet-showcase-content">
@@ -174,6 +166,15 @@
 
           <div class="pet-showcase-benefits">
             <span class="benefit-tag">{{ pet.beneficioEmocional || 'Companheiro Fiel' }}</span>
+          </div>
+
+          <div class="pet-showcase-actions">
+            <button class="btn-view-details" type="button" (click)="openPetDetails(pet)">
+              Ver detalhes
+            </button>
+            <button class="btn-adopt-now" type="button" (click)="requestAdoption(pet)">
+              Quero adotar
+            </button>
           </div>
         </div>
       </div>

@@ -25,7 +25,7 @@ export class AuthGuard implements CanActivate {
         const allowedRoles = route.data['roles'] as Array<string>;
         if (allowedRoles && !allowedRoles.includes(user.role)) {
           // Se o usuário não tem a função necessária, redireciona para o painel principal
-          this.router.navigate(['/meu-painel']);
+          this.router.navigate([this.authService.getPanelRoute(user.role)]);
           return false;
         }
 

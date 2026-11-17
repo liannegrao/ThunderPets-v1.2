@@ -255,6 +255,9 @@
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
+  width: 100%;
+  font-family: inherit;
+  color: inherit;
 }
 
 .option-card:hover {
@@ -310,6 +313,7 @@
 }
 
 .checkbox-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -320,7 +324,20 @@
 }
 
 .checkbox-item input[type="checkbox"] {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.checkbox-item input:focus-visible + .checkmark {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .checkmark {
@@ -403,6 +420,8 @@
 }
 
 .photo-upload-placeholder {
+  position: relative;
+  display: block;
   border: 2px dashed #d1d5db;
   border-radius: 12px;
   padding: 3rem 2rem;
@@ -412,18 +431,37 @@
   cursor: pointer;
 }
 
+.visually-hidden-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.photo-upload-placeholder:has(.visually-hidden-file:focus-visible) {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .photo-upload-placeholder:hover {
   border-color: var(--color-primary);
   background: #f0f4f8;
 }
 
 .upload-icon {
+  display: block;
   font-size: 3rem;
   color: #9ca3af;
   margin-bottom: 1rem;
 }
 
-.photo-upload-placeholder p {
+.upload-label {
+  display: block;
   font-size: 1.1rem;
   color: #374151;
   margin-bottom: 0.5rem;
@@ -597,7 +635,7 @@
     padding: 2rem 1rem;
   }
 
-  .photo-upload-placeholder p {
+  .upload-label {
     font-size: 1rem;
   }
 }
@@ -647,7 +685,7 @@
 .btn-secondary:focus,
 .btn-primary:focus,
 .temperamento-btn:focus,
-.option-card:focus {
+.option-card:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
