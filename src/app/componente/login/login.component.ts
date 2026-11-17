@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -205,8 +205,20 @@ export class LoginComponent implements OnInit {
     this.showPoliticaPrivacidade = false;
   }
 
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.showPoliticaPrivacidade) {
+      this.showPoliticaPrivacidade = false;
+      return;
+    }
+    this.closeModal();
+  }
+
   closeModal(): void {
     this.closed.emit();
+    if (this.router.url.startsWith('/auth')) {
+      this.router.navigate(['/']);
+    }
   }
 
   private resolveRole(tipo: string): 'adotante' | 'doador' | 'mediador' {
@@ -216,6 +228,19 @@ export class LoginComponent implements OnInit {
 
   private goToPanel(role?: string | null): void {
     this.closed.emit();
+    const returnUrl = this.safeReturnUrl();
+    if (returnUrl) {
+      this.router.navigateByUrl(returnUrl);
+      return;
+    }
     this.router.navigate([this.authService.getPanelRoute(role as 'adotante' | 'doador' | 'mediador')]);
+  }
+
+  private safeReturnUrl(): string | null {
+    const raw = new URLSearchParams(window.location.search).get('returnUrl');
+    if (!raw || !raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\') || raw.startsWith('/auth')) {
+      return null;
+    }
+    return raw;
   }
 }

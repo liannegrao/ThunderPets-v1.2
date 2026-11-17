@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService, Usuario } from '../../services/auth.service';
@@ -392,6 +392,17 @@ export class PainelMediadorComponent implements OnInit {
     this.isEditingDepoimento = false;
     this.editingDepoimento = null;
     this.editingDepoimentoData = {};
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.isEditingDepoimento) {
+      this.cancelarEdicaoDepoimento();
+      return;
+    }
+    if (this.isEditing) {
+      this.cancelEditPet();
+    }
   }
 
   salvarEdicaoDepoimento() {

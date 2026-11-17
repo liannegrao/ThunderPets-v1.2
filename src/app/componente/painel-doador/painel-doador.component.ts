@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService, Usuario } from '../../services/auth.service';
@@ -183,6 +183,13 @@ export class PainelDoadorComponent implements OnInit, OnDestroy {
   fecharModal(): void {
     this.showInteressados = false;
     this.selectedPet = null;
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.showInteressados) {
+      this.fecharModal();
+    }
   }
 
   // Formatação de data

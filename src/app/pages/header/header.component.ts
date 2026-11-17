@@ -1,8 +1,8 @@
 import { Component, inject, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, HostListener, NgZone } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { AuthService, Usuario } from '../../services/auth.service';
 import { LoginComponent } from '../../componente/login/login.component';
 
@@ -24,7 +24,22 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
   isMenuOpen = false; // Control for mobile menu collapse
 
   ngOnInit(): void {
-    // Observable subscription handled in template
+    this.openLoginIfRequired();
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      takeUntil(this.destroy$)
+    ).subscribe(() => this.openLoginIfRequired());
+  }
+
+  private openLoginIfRequired(): void {
+    const tree = this.router.parseUrl(this.router.url);
+    if (tree.queryParams['login'] !== 'required') return;
+    this.openAuthModal(false);
+    this.router.navigate([], {
+      queryParams: { login: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
   }
 
   // Keep a reference to the bound function so we can add/remove listeners reliably

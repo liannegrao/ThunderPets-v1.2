@@ -138,7 +138,7 @@
 }
 
 /* Estilos para telas maiores (desktop) */
-@media (min-width: 768px) {
+@media (min-width: 1200px) {
   .header {
     --header-height: 72px; /* Altura maior para desktop */
   }

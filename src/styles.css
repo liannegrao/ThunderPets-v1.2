@@ -725,3 +725,69 @@ header {
         height: 120px;
     }
 }
+
+/* A home escurece conforme o scroll desce do hero */
+body.home-scroll {
+    background-color: color-mix(in srgb, #0b0b0b calc(var(--scroll-dark) * 100%), var(--color-gray-50));
+    color: color-mix(in srgb, #f3f4f6 calc(var(--scroll-dark) * 100%), var(--color-text-primary));
+}
+
+body.home-scroll app-header header.header,
+body.home-scroll app-header .nav-collapse {
+    background: color-mix(in srgb, #0b0b0b calc(var(--scroll-dark) * 100%), #ffffff);
+}
+
+body.home-scroll app-header .logo {
+    color: color-mix(in srgb, #93c5fd calc(var(--scroll-dark) * 100%), #2563eb);
+}
+
+body.home-scroll app-header .nav-collapse .nav-links a,
+body.home-scroll app-header .nav-collapse .user-welcome {
+    color: color-mix(in srgb, #e5e7eb calc(var(--scroll-dark) * 100%), #4b5563);
+}
+
+body.home-scroll app-header .nav-toggle .hamburger,
+body.home-scroll app-header .nav-toggle .hamburger::before,
+body.home-scroll app-header .nav-toggle .hamburger::after {
+    background: color-mix(in srgb, #ffffff calc(var(--scroll-dark) * 100%), #1f2937);
+}
+
+body.home-scroll .mission,
+body.home-scroll .match-box,
+body.home-scroll .pet-card,
+body.home-scroll .pet-match-card,
+body.home-scroll .testimonials,
+body.home-scroll .testimonial-card {
+    background: color-mix(in srgb, #111111 calc(var(--scroll-dark) * 100%), #ffffff);
+    color: color-mix(in srgb, #f3f4f6 calc(var(--scroll-dark) * 100%), #111827);
+}
+
+body.home-scroll .value-item,
+body.home-scroll .match-form select,
+body.home-scroll .match-form input,
+body.home-scroll .companheiros-options .checkbox-label {
+    background: color-mix(in srgb, #1a1a1a calc(var(--scroll-dark) * 100%), #f9fafb);
+    color: color-mix(in srgb, #e5e7eb calc(var(--scroll-dark) * 100%), #374151);
+    border-color: color-mix(in srgb, #3f3f46 calc(var(--scroll-dark) * 100%), #e5e7eb);
+}
+
+body.home-scroll .section p,
+body.home-scroll .section-header p,
+body.home-scroll .vision-values-item p,
+body.home-scroll .value-item small,
+body.home-scroll .pet-card p,
+body.home-scroll .match-box p,
+body.home-scroll .match-form label,
+body.home-scroll .testimonial-card p,
+body.home-scroll .author-info {
+    color: color-mix(in srgb, #ffffff calc(var(--scroll-dark) * 100%), #4b5563);
+}
+
+body.home-scroll .section-header h2,
+body.home-scroll .vision-values-item h3,
+body.home-scroll .value-item strong,
+body.home-scroll .pet-card h3,
+body.home-scroll .match-box h2,
+body.home-scroll .author-name {
+    color: color-mix(in srgb, #ffffff calc(var(--scroll-dark) * 100%), #2563eb);
+}
